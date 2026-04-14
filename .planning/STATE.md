@@ -5,7 +5,7 @@ milestone_name: milestone
 status: executing
 stopped_at: Phase 1 UI-SPEC approved
 last_updated: "2026-04-14T13:26:18.478Z"
-last_activity: 2026-04-14 -- Phase 01 planning complete
+last_activity: 2026-04-14 - Completed quick task 260414-nxs: добавить дефолтные категории упражнений, пресеты и т.д.
 progress:
   total_phases: 5
   completed_phases: 0
@@ -28,7 +28,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-14)
 Phase: 1 of 5 (Quick Logging Core & Local Persistence)
 Plan: 0 of 0 in current phase
 Status: Ready to execute
-Last activity: 2026-04-14 -- Phase 01 planning complete
+Last activity: 2026-04-14 - Completed quick task 260414-nxs: добавить дефолтные категории упражнений, пресеты и т.д.
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -77,6 +77,12 @@ None yet.
 ### Blockers/Concerns
 
 None yet.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260414-nxs | добавить дефолтные категории упражнений, пресеты и т.д. | 2026-04-14 | 4c4bf3a | [260414-nxs-default-exercise-categories-presets](./quick/260414-nxs-default-exercise-categories-presets/) |
 
 ## Session Continuity
 
