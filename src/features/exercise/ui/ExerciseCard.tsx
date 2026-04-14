@@ -178,10 +178,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
           <ChartColumnBig className="text-primary" />
         </div>
         <div className={style.card}>
-          <div
-            onClick={handleCardHeadClick}
-            className={cn(style.cardHead, "overflow-hidden ")}
-          >
+          <div onClick={handleCardHeadClick} className={style.cardHead}>
             <div className={style.info}>
               <div className={style.icon}>
                 <img
@@ -192,14 +189,6 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
                 />
               </div>
               <div className={style.exerciseName}>
-                {exercise.presetName && (
-                  <div
-                    style={{ borderColor: exerciseColor }}
-                    className={style.presetName}
-                  >
-                    Пресет: {exercise.presetName}
-                  </div>
-                )}
                 <ExerciseNameSelector
                   allExercises={allExercises}
                   exerciseName={exercise.name}
@@ -209,6 +198,15 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
                   onSelect={inputChangeHandler}
                 />
               </div>
+
+              {exercise.presetName && (
+                <div
+                  style={{ borderColor: exerciseColor }}
+                  className={style.presetName}
+                >
+                  Пресет: {exercise.presetName}
+                </div>
+              )}
             </div>
             <div
               className={style.liftedTotal}

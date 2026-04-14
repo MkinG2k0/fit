@@ -17,9 +17,9 @@ export const AllExercises = () => {
   const [openExerciseModal, setOpenExerciseModal] = useState(false);
   const [openCategoryModal, setOpenCategoryModal] = useState(false);
   const [openPresetModal, setOpenPresetModal] = useState(false);
-  const [editingPreset, setEditingPreset] = useState<TrainingPreset | undefined>(
-    undefined,
-  );
+  const [editingPreset, setEditingPreset] = useState<
+    TrainingPreset | undefined
+  >(undefined);
   const [preselectedCategory, setPreselectedCategory] = useState<
     string | undefined
   >(undefined);
@@ -65,7 +65,7 @@ export const AllExercises = () => {
   return (
     <div className="h-full min-h-0">
       <div className="flex h-full min-h-0 flex-col">
-        <div className="min-h-0 flex-1 pb-28">
+        <div className="min-h-0 flex-1 ">
           <FullExerciseCommand
             checkable={false}
             deletable={true}
