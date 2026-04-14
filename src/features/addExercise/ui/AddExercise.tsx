@@ -86,7 +86,7 @@ export const AddExercise = () => {
         <DrawerTrigger asChild>
           <Button
             variant="outline"
-            className="transition-colors text-xl justify-center w-full p-6 border-2 border-black rounded-xl bg-white hover:bg-gray-200 text-black"
+            className="transition-colors text-xl justify-center w-full p-6 border-2 rounded-xl  hover:bg-gray-200 "
           >
             Добавить тренировку
           </Button>

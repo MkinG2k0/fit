@@ -22,6 +22,8 @@ export const ExerciseBody = ({
   const onChangeHandler = useCalendarStore((store) => store.setExerciseValues);
   const addSetToExercise = useCalendarStore((store) => store.addSetToExercise);
   const deleteSet = useCalendarStore((store) => store.deleteSet);
+  const INPUT_CLASSNAME =
+    "rounded-full border-0 text-center text-xl text-foreground placeholder:text-muted-foreground ";
 
   const inputHandler = (
     event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
@@ -58,7 +60,7 @@ export const ExerciseBody = ({
                 <div className={style.setIndex}>{idx + 1}</div>
                 <div className={style.cell}>
                   <Input
-                    className="border-0 text-center text-xl text-foreground placeholder:text-muted-foreground"
+                    className={INPUT_CLASSNAME}
                     type={"number"}
                     placeholder={"Кол-во"}
                     name={"reps"}
@@ -70,7 +72,7 @@ export const ExerciseBody = ({
                 </div>
                 <div className={style.cell}>
                   <Input
-                    className="border-0 text-center text-xl text-foreground placeholder:text-muted-foreground"
+                    className={INPUT_CLASSNAME}
                     type={"number"}
                     placeholder={"Кг"}
                     name={"weight"}

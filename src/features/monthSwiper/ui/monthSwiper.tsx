@@ -51,7 +51,7 @@ export const MonthSwiper = ({
   };
 
   return (
-    <div className={"px-2"}>
+    <div className={"p-2"}>
       <Swiper
         key={"month"}
         ref={monthSwiperRef}

@@ -15,7 +15,7 @@ import { cn } from "@/shared/lib";
 dayjs.extend(isoWeek);
 dayjs.locale("ru");
 
-const CALENDAR_WRAPPER_CLASS = "z-20 bg-background text-foreground";
+const CALENDAR_WRAPPER_CLASS = "px-2 z-50 bg-background text-foreground";
 const CALENDAR_HEIGHT_CLASS = {
   expanded: "h-84",
   collapsed: "h-28",

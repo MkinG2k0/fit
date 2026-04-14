@@ -54,7 +54,7 @@ export const WeekSwiper = ({
   };
 
   return (
-    <div className={"px-2"}>
+    <div className={"p-2"}>
       <Swiper
         key={"week"}
         ref={weekSwiperRef}
