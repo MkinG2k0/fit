@@ -1,5 +1,5 @@
 import { ChevronDown, ChevronRight, Pipette } from "lucide-react";
-import { type ChangeEvent, useEffect, useMemo, useState } from "react";
+import { type ChangeEvent, useEffect, useState } from "react";
 import { type RgbaColor, RgbaColorPicker } from "react-colorful";
 import { type TrainingPreset, useExerciseStore } from "@/entities/exercise";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
@@ -26,8 +26,6 @@ interface CreatePresetProps {
 }
 
 const DEFAULT_PRESET_COLOR: RgbaColor = { r: 255, g: 0, b: 0, a: 1 };
-const normalizeExerciseKey = (exerciseName: string) =>
-  exerciseName.trim().toLowerCase();
 
 const createInitialPreset = (editingPreset?: TrainingPreset): NewPreset => {
   if (!editingPreset) {
@@ -154,42 +152,6 @@ export const CreatePreset = ({
 
   const normalizedSearchQuery = exerciseSearch.trim().toLowerCase();
   const isSearchActive = normalizedSearchQuery.length > 0;
-  const knownExerciseKeys = useMemo(() => {
-    const exerciseKeySet = new Set<string>();
-
-    allExercises.forEach((group) => {
-      group.exercises.forEach((exerciseName) => {
-        exerciseKeySet.add(normalizeExerciseKey(exerciseName));
-      });
-    });
-
-    return exerciseKeySet;
-  }, [allExercises]);
-
-  const legacyPresetExercises = useMemo(() => {
-    const uniqueLegacyExercises = new Map<string, string>();
-
-    newPreset.exercises.forEach((exerciseName) => {
-      const normalizedExerciseName = exerciseName.trim();
-
-      if (!normalizedExerciseName) {
-        return;
-      }
-
-      const exerciseKey = normalizeExerciseKey(normalizedExerciseName);
-
-      if (
-        knownExerciseKeys.has(exerciseKey) ||
-        uniqueLegacyExercises.has(exerciseKey)
-      ) {
-        return;
-      }
-
-      uniqueLegacyExercises.set(exerciseKey, normalizedExerciseName);
-    });
-
-    return Array.from(uniqueLegacyExercises.values());
-  }, [knownExerciseKeys, newPreset.exercises]);
 
   const filteredExerciseGroups = allExercises
     .map((group) => {
@@ -323,32 +285,6 @@ export const CreatePreset = ({
                 </div>
               ))}
 
-              {legacyPresetExercises.length > 0 && (
-                <div className="mb-2 rounded-md border border-dashed border-amber-400 p-2">
-                  <p className="mb-2 text-xs font-medium text-amber-700">
-                    Легаси упражнения (нет в текущем каталоге)
-                  </p>
-                  <div className="space-y-1">
-                    {legacyPresetExercises.map((exerciseName) => (
-                      <label
-                        key={exerciseName}
-                        className="flex items-center space-x-2 cursor-pointer"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={newPreset.exercises.includes(exerciseName)}
-                          onChange={(e) =>
-                            handleExerciseToggle(exerciseName, e.target.checked)
-                          }
-                        />
-                        <span className="text-sm truncate text-amber-700">
-                          {exerciseName}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>

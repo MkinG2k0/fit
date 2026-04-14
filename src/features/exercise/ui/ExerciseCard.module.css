@@ -38,11 +38,15 @@
 		flex-direction: row;
 		align-items: center;
 		padding-left: 10px;
+		flex: 1;
+		min-width: 0;
 }
 
 .exerciseName {
 		padding-left: 10px;
 		font-size: 1em;
+		flex: 1;
+		min-width: 0;
 }
 
 .img {
@@ -59,25 +63,51 @@
 }
 
 .row {
-		display: flex;
+		display: grid;
 		width: 100%;
-		flex-direction: row;
+		grid-template-columns: 28px minmax(0, 1fr) minmax(0, 1fr) 28px;
 		align-items: center;
-		justify-content: space-around;
-		gap: 20px;
-		padding: 15px 20px;
+		gap: 12px;
+		padding: 10px 16px;
+}
+
+.inputsHeader {
+		display: grid;
+		width: 100%;
+		grid-template-columns: 28px minmax(0, 1fr) minmax(0, 1fr) 28px;
+		align-items: center;
+		padding: 8px 16px 0;
+		gap: 12px;
+}
+
+.inputsHeaderSpacer {
+		width: 32px;
+}
+
+.inputLabel {
+		font-size: 0.9em;
+		font-weight: 600;
+		color: #5f5f5f;
+		text-align: center;
 }
 
 .cell {
 		background-color: black;
-		padding: 10px;
+		padding: 8px;
 		border-radius: 30px;
+		width: 100%;
 
 }
 
 .setIndex {
-		font-size: 1.5em;
+		font-size: 1.3em;
 		color: #787878;
+		text-align: center;
+}
+
+.deleteButtonCell {
+		display: flex;
+		justify-content: center;
 }
 
 .cardFooter {

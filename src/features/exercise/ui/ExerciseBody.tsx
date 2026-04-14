@@ -12,13 +12,16 @@ import { CustomButton } from "@/shared/ui";
 
 interface ExerciseBodyProps {
   exercise: Exercise;
+  onDeleteRequested: () => void;
 }
 
-export const ExerciseBody = ({ exercise }: ExerciseBodyProps) => {
+export const ExerciseBody = ({
+  exercise,
+  onDeleteRequested,
+}: ExerciseBodyProps) => {
   const onChangeHandler = useCalendarStore((store) => store.setExerciseValues);
   const addSetToExercise = useCalendarStore((store) => store.addSetToExercise);
   const deleteSet = useCalendarStore((store) => store.deleteSet);
-  const deleteExercise = useCalendarStore((store) => store.deleteExercise);
 
   const inputHandler = (
     event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
@@ -35,6 +38,12 @@ export const ExerciseBody = ({ exercise }: ExerciseBodyProps) => {
   };
   return (
     <>
+      <div className={style.inputsHeader}>
+        <span className={style.inputsHeaderSpacer} />
+        <span className={style.inputLabel}>Кол-во</span>
+        <span className={style.inputLabel}>Кг</span>
+        <span className={style.inputsHeaderSpacer} />
+      </div>
       <AnimatePresence>
         {exercise.sets.map((set, idx) => {
           return (
@@ -50,9 +59,9 @@ export const ExerciseBody = ({ exercise }: ExerciseBodyProps) => {
                 <div className={style.setIndex}>{idx + 1}</div>
                 <div className={style.cell}>
                   <Input
-                    className={"text-white border-0 text-center text-2xl"}
+                    className={"text-white border-0 text-center text-xl"}
                     type={"number"}
-                    placeholder={"Кол-во"}
+                    placeholder={""}
                     name={"reps"}
                     value={set.reps === 0 ? "" : set.reps}
                     onChange={(e) => {
@@ -62,9 +71,9 @@ export const ExerciseBody = ({ exercise }: ExerciseBodyProps) => {
                 </div>
                 <div className={style.cell}>
                   <Input
-                    className={"text-white border-0 text-center text-2xl"}
+                    className={"text-white border-0 text-center text-xl"}
                     type={"number"}
-                    placeholder={"Кг"}
+                    placeholder={""}
                     name={"weight"}
                     value={set.weight === 0 ? "" : set.weight}
                     onChange={(e) => {
@@ -72,7 +81,7 @@ export const ExerciseBody = ({ exercise }: ExerciseBodyProps) => {
                     }}
                   />
                 </div>
-                <div>
+                <div className={style.deleteButtonCell}>
                   <Button
                     className={"bg-transparent text-black"}
                     onClick={() => deleteSet(exercise, set)}
@@ -88,12 +97,14 @@ export const ExerciseBody = ({ exercise }: ExerciseBodyProps) => {
       <div className={style.cardFooter}>
         <StatisticCard exerciseName={exercise.name} />
         <CustomButton
-          classes={"text-xl"}
+          classes={"text-xl w-full"}
           buttonHandler={() => addSetToExercise(exercise)}
         >
           Добавить подход
         </CustomButton>
-        <Trash2 color={"red"} onClick={() => deleteExercise(exercise)} />
+        <Button variant="outline">
+          <Trash2 color={"red"} onClick={onDeleteRequested} />
+        </Button>
       </div>
     </>
   );

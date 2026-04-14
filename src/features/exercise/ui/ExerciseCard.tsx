@@ -7,6 +7,7 @@ import { type Exercise, useExerciseStore } from "@/entities/exercise";
 import * as motion from "motion/react-client";
 import { cn } from "../../../shared/lib";
 import { ExerciseBody } from "./ExerciseBody";
+import { ExerciseDeleteDialog } from "./ExerciseDeleteDialog";
 import { ExerciseNameSelector } from "./ExerciseNameSelector";
 import style from "./ExerciseCard.module.css";
 
@@ -18,6 +19,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
   const [isEditable, setIsEditable] = useState(false);
   const [modalVisibility, setModalVisibility] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const setExerciseName = useCalendarStore((store) => store.setExerciseName);
   const deleteExercise = useCalendarStore((store) => store.deleteExercise);
@@ -36,8 +38,17 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
   // 🧩 2. Функция удаления
   const cardDragHandler = (info: PanInfo) => {
     if (info.offset.x < -180) {
-      deleteExercise(exercise);
+      setIsDeleteDialogOpen(true);
     }
+  };
+
+  const handleDeleteRequest = () => {
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    deleteExercise(exercise);
+    setIsDeleteDialogOpen(false);
   };
 
   // ⚙️ 3. Обработка изменения названия упражнения
@@ -79,14 +90,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
                   alt="Icon"
                 />
               </div>
-              <div
-                onClick={(e) => {
-                  if (isEditable) {
-                    e.stopPropagation();
-                  }
-                }}
-                className={style.exerciseName}
-              >
+              <div className={style.exerciseName}>
                 {exercise.presetName && (
                   <div
                     style={{ borderColor: exerciseColor }}
@@ -119,7 +123,10 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
                 transition={{ duration: 0.3, ease: "easeInOut" }}
                 style={{ overflow: "hidden" }}
               >
-                <ExerciseBody exercise={exercise} />
+                <ExerciseBody
+                  exercise={exercise}
+                  onDeleteRequested={handleDeleteRequest}
+                />
               </motion.div>
             )}
           </AnimatePresence>
@@ -128,6 +135,12 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
           <Trash2 className="text-red-500" />
         </div>
       </motion.div>
+      <ExerciseDeleteDialog
+        open={isDeleteDialogOpen}
+        exerciseName={exercise.name}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 };

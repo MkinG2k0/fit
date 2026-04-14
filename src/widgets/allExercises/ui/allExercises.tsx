@@ -6,6 +6,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/shared/ui/shadCNComponents/ui/popover";
+import type { TrainingPreset } from "@/entities/exercise";
 import { CreateExercise } from "@/features/createExercise";
 import { CreateCategory } from "@/features/createCategory";
 import { CreatePreset } from "@/features/createPreset";
@@ -16,6 +17,9 @@ export const AllExercises = () => {
   const [openExerciseModal, setOpenExerciseModal] = useState(false);
   const [openCategoryModal, setOpenCategoryModal] = useState(false);
   const [openPresetModal, setOpenPresetModal] = useState(false);
+  const [editingPreset, setEditingPreset] = useState<TrainingPreset | undefined>(
+    undefined,
+  );
   const [preselectedCategory, setPreselectedCategory] = useState<
     string | undefined
   >(undefined);
@@ -41,7 +45,21 @@ export const AllExercises = () => {
 
   const handleOpenPresetModal = () => {
     setOpenAddPopover(false);
+    setEditingPreset(undefined);
     setOpenPresetModal(true);
+  };
+
+  const handleOpenPresetEditModal = (preset: TrainingPreset) => {
+    setOpenAddPopover(false);
+    setEditingPreset(preset);
+    setOpenPresetModal(true);
+  };
+
+  const handlePresetModalOpenChange = (open: boolean) => {
+    setOpenPresetModal(open);
+    if (!open) {
+      setEditingPreset(undefined);
+    }
   };
 
   return (
@@ -52,6 +70,7 @@ export const AllExercises = () => {
             checkable={false}
             deletable={true}
             onCreateExerciseInCategory={handleOpenExerciseModalByCategory}
+            onEditPreset={handleOpenPresetEditModal}
           />
         </div>
         {/* Кнопка добавления */}
@@ -107,7 +126,12 @@ export const AllExercises = () => {
       />
 
       {/* Модальное окно добавления пресета */}
-      <CreatePreset open={openPresetModal} onOpenChange={setOpenPresetModal} />
+      <CreatePreset
+        key={editingPreset?.presetName ?? "create-preset"}
+        open={openPresetModal}
+        onOpenChange={handlePresetModalOpenChange}
+        editingPreset={editingPreset}
+      />
     </div>
   );
 };

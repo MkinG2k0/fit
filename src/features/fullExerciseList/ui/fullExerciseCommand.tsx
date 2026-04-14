@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import {
   Command,
@@ -167,17 +167,6 @@ export const FullExerciseCommand = ({
 
   const existingCategories = allExercises.map((group) => group.category);
   const isSearchActive = searchValue.trim().length > 0;
-  const normalizedTrainingPreset = useMemo(
-    () =>
-      trainingPreset.map((preset) => ({
-        ...preset,
-        presetName: preset.presetName.trim(),
-        exercises: preset.exercises
-          .map((exerciseName) => exerciseName.trim())
-          .filter(Boolean),
-      })),
-    [trainingPreset],
-  );
 
   return (
     <>
@@ -240,7 +229,7 @@ export const FullExerciseCommand = ({
           </RadioGroup>
           {(variant === "presets" || variant === "all") && (
             <CommandGroup heading={"Пресеты"}>
-              {normalizedTrainingPreset.map((preset) => (
+              {trainingPreset.map((preset) => (
                 <PresetItem
                   key={preset.presetName}
                   preset={preset}
