@@ -66,6 +66,7 @@ export const Day = ({
 
   const setsProgress = isFutureDay ? 0 : ringMetrics.setsProgress;
   const volumeProgress = isFutureDay ? 0 : ringMetrics.volumeProgress;
+  const showVolumeRing = !isFutureDay && ringMetrics.hasExercises;
 
   const handleDateClick = () => {
     onClickDate(value);
@@ -102,7 +103,7 @@ export const Day = ({
             strokeWidth="3"
           />
 
-          {volumeProgress && (
+          {showVolumeRing && (
             <>
               <circle
                 cx={RING_CENTER}
@@ -143,8 +144,8 @@ export const Day = ({
         <div
           className={cn(
             "relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-base",
-            selectedFlag && "bg-black! text-white",
-            todayFlag && "bg-black/50 text-white",
+            selectedFlag && "bg-primary! text-primary-foreground",
+            todayFlag && "bg-primary/50! text-primary-foreground",
           )}
         >
           {value.format("D")}

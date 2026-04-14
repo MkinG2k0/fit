@@ -23,7 +23,7 @@ export const ExerciseBody = ({
   const addSetToExercise = useCalendarStore((store) => store.addSetToExercise);
   const deleteSet = useCalendarStore((store) => store.deleteSet);
   const INPUT_CLASSNAME =
-    "rounded-full border-0 text-center text-xl text-foreground placeholder:text-muted-foreground ";
+    "rounded-full border-0 bg-transparent shadow-none ring-0 outline-none focus-visible:ring-0 focus-visible:ring-offset-0 text-center text-xl text-foreground placeholder:text-muted-foreground";
 
   const inputHandler = (
     event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,

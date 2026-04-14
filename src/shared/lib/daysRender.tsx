@@ -17,6 +17,10 @@ interface DayStats {
 
 const clampProgress = (value: number) => Math.max(0, Math.min(1, value));
 
+/** Не от недели/месяца — иначе один день даёт разный % и разные цвета колец в разных режимах. */
+const RING_FULL_SET_COUNT = 20;
+const RING_FULL_VOLUME = 8000;
+
 const getDayStats = (exercises: Exercise[]): DayStats => {
   const exerciseCount = exercises.length;
   const setCount = exercises.reduce(
@@ -41,10 +45,7 @@ const getDayStats = (exercises: Exercise[]): DayStats => {
   };
 };
 
-const getRingMetrics = (
-  stats: DayStats,
-  maxStats: DayStats,
-): DayRingMetrics => {
+const getRingMetrics = (stats: DayStats): DayRingMetrics => {
   if (stats.exerciseCount === 0 && stats.setCount === 0 && stats.volume === 0) {
     return {
       setsProgress: 0,
@@ -54,8 +55,8 @@ const getRingMetrics = (
   }
 
   return {
-    setsProgress: clampProgress(stats.setCount / maxStats.setCount),
-    volumeProgress: clampProgress(stats.volume / maxStats.volume),
+    setsProgress: clampProgress(stats.setCount / RING_FULL_SET_COUNT),
+    volumeProgress: clampProgress(stats.volume / RING_FULL_VOLUME),
     hasExercises: true,
   };
 };
@@ -74,22 +75,6 @@ export const daysRender = (daysArray: daysArray[]) => {
       const dayExercises = days[dayKey]?.exercises ?? [];
       dayStatsByKey.set(dayKey, getDayStats(dayExercises));
     });
-
-    const maxStats = Array.from(dayStatsByKey.values()).reduce<DayStats>(
-      (maxValue, currentValue) => ({
-        exerciseCount: Math.max(
-          maxValue.exerciseCount,
-          currentValue.exerciseCount,
-        ),
-        setCount: Math.max(maxValue.setCount, currentValue.setCount),
-        volume: Math.max(maxValue.volume, currentValue.volume),
-      }),
-      {
-        exerciseCount: 1,
-        setCount: 1,
-        volume: 1,
-      },
-    );
 
     return (
       <SwiperSlide key={elem.start.toString()}>
@@ -110,7 +95,7 @@ export const daysRender = (daysArray: daysArray[]) => {
                   selectedDate={selectedDate}
                   dayName={index < 7 ? day.format("dd") : undefined}
                   onClickDate={setSelectedDate}
-                  ringMetrics={getRingMetrics(dayStats, maxStats)}
+                  ringMetrics={getRingMetrics(dayStats)}
                 />
               </div>
             );
