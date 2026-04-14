@@ -4,10 +4,12 @@ import { AllExercises } from "@/widgets/allExercises";
 
 export const ExercisePage = () => {
   return (
-    <div>
+    <div className="flex h-dvh flex-col overflow-hidden">
       <Header title="Список упражнений" navigateBack />
       <Separator />
-      <AllExercises />
+      <div className="min-h-0 flex-1">
+        <AllExercises />
+      </div>
     </div>
   );
 };

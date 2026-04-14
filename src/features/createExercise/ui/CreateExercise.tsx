@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
   Dialog,
@@ -11,15 +11,18 @@ import {
 import { Input } from "@/shared/ui/shadCNComponents/ui/input";
 import { useExerciseStore } from "@/entities/exercise";
 import type { NewExercise } from "../model/types";
-import { useCategorySelector } from "../lib/useCategorySelector";
-import { CategorySelector } from "./CategorySelector";
 
 interface CreateExerciseProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  defaultCategory?: string;
 }
 
-export const CreateExercise = ({ open, onOpenChange }: CreateExerciseProps) => {
+export const CreateExercise = ({
+  open,
+  onOpenChange,
+  defaultCategory,
+}: CreateExerciseProps) => {
   const [newExercise, setNewExercise] = useState<NewExercise>({
     category: "",
     name: "",
@@ -27,20 +30,23 @@ export const CreateExercise = ({ open, onOpenChange }: CreateExerciseProps) => {
   const [error, setError] = useState<string>("");
   const createExercise = useExerciseStore((state) => state.createExercise);
   const allExercises = useExerciseStore((state) => state.exercises);
-  const {
-    focused,
-    commandRef,
-    handleBlur,
-    handleFocus,
-    handleSelect,
-    setFocused,
-  } = useCategorySelector();
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    setNewExercise({
+      category: defaultCategory ?? "",
+      name: "",
+    });
+    setError("");
+  }, [defaultCategory, open]);
 
   const handleClose = () => {
     onOpenChange(false);
     setNewExercise({ category: "", name: "" });
     setError("");
-    setFocused(false);
   };
 
   const handleCreate = () => {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Command,
   CommandGroup,
@@ -11,11 +11,14 @@ import { DeleteDialog } from "./DeleteDialog";
 import { ExerciseItem } from "./ExerciseItem";
 import { PresetItem } from "./PresetItem";
 import { RadioGroup } from "@/shared/ui/shadCNComponents/ui/radio-group";
+import { CategoryActions } from "./CategoryActions";
+import { RenameCategoryDialog } from "./RenameCategoryDialog";
 
 interface BaseProps {
   checkable?: "checkbox" | "radio" | false;
   deletable?: boolean;
   variant?: "exercises" | "presets" | "all";
+  onCreateExerciseInCategory?: (categoryName: string) => void;
 }
 
 interface RadioProps extends BaseProps {
@@ -55,17 +58,20 @@ export const FullExerciseCommand = ({
   checkable = false,
   deletable = false,
   variant = "all",
+  onCreateExerciseInCategory,
 }: FullExerciseCommandProps) => {
   const allExercises = useExerciseStore((state) => state.exercises);
   const trainingPreset = useExerciseStore((state) => state.trainingPreset);
   const deleteExercise = useExerciseStore((state) => state.deleteExercise);
+  const deleteCategory = useExerciseStore((state) => state.deleteCategory);
+  const renameCategory = useExerciseStore((state) => state.renameCategory);
   const deleteTrainingPreset = useExerciseStore(
     (state) => state.deleteTrainingPreset,
   );
 
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
-    type: "exercise" | "preset";
+    type: "exercise" | "preset" | "category";
     name: string;
     category?: string;
   }>({
@@ -73,10 +79,34 @@ export const FullExerciseCommand = ({
     type: "exercise",
     name: "",
   });
+  const [renameCategoryDialog, setRenameCategoryDialog] = useState<{
+    open: boolean;
+    categoryName: string;
+  }>({
+    open: false,
+    categoryName: "",
+  });
+  const [expandedCategories, setExpandedCategories] = useState<
+    Record<string, boolean>
+  >({});
+
+  useEffect(() => {
+    setExpandedCategories((prevState) => {
+      const nextState: Record<string, boolean> = {};
+
+      allExercises.forEach((group) => {
+        nextState[group.category] = prevState[group.category] ?? false;
+      });
+
+      return nextState;
+    });
+  }, [allExercises]);
 
   const handleDeleteConfirm = () => {
     if (deleteDialog.type === "exercise" && deleteDialog.category) {
       deleteExercise(deleteDialog.name, deleteDialog.category);
+    } else if (deleteDialog.type === "category") {
+      deleteCategory(deleteDialog.name);
     } else if (deleteDialog.type === "preset") {
       deleteTrainingPreset(deleteDialog.name);
     }
@@ -84,37 +114,87 @@ export const FullExerciseCommand = ({
   };
 
   const openDeleteDialog = (
-    type: "exercise" | "preset",
+    type: "exercise" | "preset" | "category",
     name: string,
     category?: string,
   ) => {
     setDeleteDialog({ open: true, type, name, category });
   };
 
+  const handleExerciseDelete = (name: string, category: string) => {
+    openDeleteDialog("exercise", name, category);
+  };
+
+  const handlePresetDelete = (name: string) => {
+    openDeleteDialog("preset", name);
+  };
+
+  const handleCategoryDelete = (categoryName: string) => {
+    openDeleteDialog("category", categoryName);
+  };
+
+  const handleCategoryRenameOpen = (categoryName: string) => {
+    setRenameCategoryDialog({ open: true, categoryName });
+  };
+
+  const handleCategoryToggle = (categoryName: string) => {
+    setExpandedCategories((prevState) => ({
+      ...prevState,
+      [categoryName]: !(prevState[categoryName] ?? false),
+    }));
+  };
+
+  const handleCategoryRenameConfirm = (newCategoryName: string) => {
+    renameCategory(renameCategoryDialog.categoryName, newCategoryName);
+    setRenameCategoryDialog({ open: false, categoryName: "" });
+  };
+
+  const handleDeleteDialogOpenChange = (open: boolean) => {
+    setDeleteDialog({ ...deleteDialog, open });
+  };
+
+  const handleRenameDialogOpenChange = (open: boolean) => {
+    setRenameCategoryDialog((prevState) => ({ ...prevState, open }));
+  };
+
+  const existingCategories = allExercises.map((group) => group.category);
+
   return (
     <>
-      <Command className="w-full h-full">
+      <Command className="h-full min-h-0 w-full">
         <CommandInput placeholder="Поиск..." />
-        <CommandList className={"flex-1 overflow-y-scroll"}>
+        <CommandList className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
           <RadioGroup>
             {(variant === "exercises" || variant === "all") &&
               allExercises.map((group) => (
-                <CommandGroup heading={group.category} key={group.category}>
-                  <CommandSeparator />
-                  {group.exercises.map((name) => (
-                    <ExerciseItem
-                      key={name}
-                      name={name}
-                      category={group.category}
-                      checkable={checkable}
+                <CommandGroup
+                  heading={
+                    <CategoryActions
+                      categoryName={group.category}
+                      isExpanded={expandedCategories[group.category] ?? false}
                       deletable={deletable}
-                      selected={selectedExerciseCheckboxes.includes(name)}
-                      onSelect={exerciseSelectHandler}
-                      onDelete={(name, category) =>
-                        openDeleteDialog("exercise", name, category)
-                      }
+                      onCreateExerciseInCategory={onCreateExerciseInCategory}
+                      onToggleCategory={handleCategoryToggle}
+                      onEditCategory={handleCategoryRenameOpen}
+                      onDeleteCategory={handleCategoryDelete}
                     />
-                  ))}
+                  }
+                  key={group.category}
+                >
+                  <CommandSeparator />
+                  {(expandedCategories[group.category] ?? false) &&
+                    group.exercises.map((name) => (
+                      <ExerciseItem
+                        key={name}
+                        name={name}
+                        category={group.category}
+                        checkable={checkable}
+                        deletable={deletable}
+                        selected={selectedExerciseCheckboxes.includes(name)}
+                        onSelect={exerciseSelectHandler}
+                        onDelete={handleExerciseDelete}
+                      />
+                    ))}
                 </CommandGroup>
               ))}
           </RadioGroup>
@@ -130,7 +210,7 @@ export const FullExerciseCommand = ({
                     preset.presetName,
                   )}
                   onSelect={presetSelectHandler}
-                  onDelete={(name) => openDeleteDialog("preset", name)}
+                  onDelete={handlePresetDelete}
                 />
               ))}
             </CommandGroup>
@@ -140,10 +220,17 @@ export const FullExerciseCommand = ({
 
       <DeleteDialog
         open={deleteDialog.open}
-        onOpenChange={(open) => setDeleteDialog({ ...deleteDialog, open })}
+        onOpenChange={handleDeleteDialogOpenChange}
         type={deleteDialog.type}
         name={deleteDialog.name}
         onConfirm={handleDeleteConfirm}
+      />
+      <RenameCategoryDialog
+        open={renameCategoryDialog.open}
+        onOpenChange={handleRenameDialogOpenChange}
+        currentName={renameCategoryDialog.categoryName}
+        existingCategories={existingCategories}
+        onConfirm={handleCategoryRenameConfirm}
       />
     </>
   );

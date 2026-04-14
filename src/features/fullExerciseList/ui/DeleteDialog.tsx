@@ -11,7 +11,7 @@ import {
 interface DeleteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  type: "exercise" | "preset";
+  type: "exercise" | "preset" | "category";
   name: string;
   onConfirm: () => void;
 }
@@ -23,18 +23,30 @@ export const DeleteDialog = ({
   name,
   onConfirm,
 }: DeleteDialogProps) => {
+  const handleClose = () => {
+    onOpenChange(false);
+  };
+
+  const deleteTargetLabel =
+    type === "exercise"
+      ? "упражнение"
+      : type === "preset"
+        ? "пресет"
+        : "категорию";
+  const deleteDescription =
+    type === "category"
+      ? `Вы уверены, что хотите удалить категорию "${name}" вместе со всеми упражнениями внутри? Это действие нельзя отменить.`
+      : `Вы уверены, что хотите удалить ${deleteTargetLabel} "${name}"? Это действие нельзя отменить.`;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Подтвердите удаление</DialogTitle>
-          <DialogDescription>
-            Вы уверены, что хотите удалить {type === "exercise" ? "упражнение" : "пресет"} "{name}"?
-            Это действие нельзя отменить.
-          </DialogDescription>
+          <DialogDescription>{deleteDescription}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={handleClose}>
             Отмена
           </Button>
           <Button variant="destructive" onClick={onConfirm}>

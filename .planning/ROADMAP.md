@@ -23,7 +23,11 @@ Roadmap is built around the core user loop: quickly log sets, keep data safe loc
   2. User can add multiple sets to one exercise and edit/delete any set before finishing the session.
   3. User sees previous set values suggested when logging the same exercise again.
   4. User closes and reopens browser and still sees saved workout data.
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 01-PLAN-01.md — Test + storage reliability foundation for DATA-01
+- [ ] 01-PLAN-02.md — Domain quick-log actions, suggestions, and persistence wiring
+- [ ] 01-PLAN-03.md — Quick-log UI flow, copy contract, and UX verification
 **UI hint**: yes
 
 ### Phase 2: Exercise Categories & Assignment

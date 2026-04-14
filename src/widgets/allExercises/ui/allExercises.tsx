@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dumbbell, Zap } from "lucide-react";
+import { Dumbbell, FolderPlus, Zap } from "lucide-react";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
   Popover,
@@ -7,29 +7,58 @@ import {
   PopoverTrigger,
 } from "@/shared/ui/shadCNComponents/ui/popover";
 import { CreateExercise } from "@/features/createExercise";
+import { CreateCategory } from "@/features/createCategory";
 import { CreatePreset } from "@/features/createPreset";
 import { FullExerciseCommand } from "@/features/fullExerciseList/ui/fullExerciseCommand";
 
 export const AllExercises = () => {
-  // States for add functionality
   const [openAddPopover, setOpenAddPopover] = useState(false);
   const [openExerciseModal, setOpenExerciseModal] = useState(false);
+  const [openCategoryModal, setOpenCategoryModal] = useState(false);
   const [openPresetModal, setOpenPresetModal] = useState(false);
+  const [preselectedCategory, setPreselectedCategory] = useState<
+    string | undefined
+  >(undefined);
+  const addActionButtonClassName = "justify-start text-lg py-3";
+  const createButtonClassName =
+    "fixed bottom-0 left-1/2 right-0 mb-8 -translate-x-1/2 justify-center border-1 border-black bg-white p-6 text-xl text-black";
+
+  const handleOpenExerciseModal = () => {
+    setOpenAddPopover(false);
+    setPreselectedCategory(undefined);
+    setOpenExerciseModal(true);
+  };
+
+  const handleOpenExerciseModalByCategory = (categoryName: string) => {
+    setPreselectedCategory(categoryName);
+    setOpenExerciseModal(true);
+  };
+
+  const handleOpenCategoryModal = () => {
+    setOpenAddPopover(false);
+    setOpenCategoryModal(true);
+  };
+
+  const handleOpenPresetModal = () => {
+    setOpenAddPopover(false);
+    setOpenPresetModal(true);
+  };
 
   return (
-    <div className="h-[calc(100dvh-64px)] max-[330px]:h-[calc(100dvh-54px)]">
-      <div className="h-full grid grid-rows-[85%_15%]]">
-        <div className={"overflow-scroll"}>
-          <FullExerciseCommand checkable={false} deletable={true} />
+    <div className="h-full min-h-0">
+      <div className="flex h-full min-h-0 flex-col">
+        <div className="min-h-0 flex-1 pb-28">
+          <FullExerciseCommand
+            checkable={false}
+            deletable={true}
+            onCreateExerciseInCategory={handleOpenExerciseModalByCategory}
+          />
         </div>
         {/* Кнопка добавления */}
         <div className={"flex justify-center items-center"}>
           <Popover open={openAddPopover} onOpenChange={setOpenAddPopover}>
             <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="text-xl justify-center w-1/2 mb-8 p-6 border-1 border-black rounded-xl bg-white text-black"
-              >
+              <Button variant="outline" className={createButtonClassName}>
                 Создать
               </Button>
             </PopoverTrigger>
@@ -37,22 +66,24 @@ export const AllExercises = () => {
               <div className="flex flex-col gap-2">
                 <Button
                   variant="ghost"
-                  className="justify-start text-lg py-3"
-                  onClick={() => {
-                    setOpenAddPopover(false);
-                    setOpenExerciseModal(true);
-                  }}
+                  className={addActionButtonClassName}
+                  onClick={handleOpenExerciseModal}
                 >
                   <Dumbbell className="mr-2 h-5 w-5" />
                   Упражнение
                 </Button>
                 <Button
                   variant="ghost"
-                  className="justify-start text-lg py-3"
-                  onClick={() => {
-                    setOpenAddPopover(false);
-                    setOpenPresetModal(true);
-                  }}
+                  className={addActionButtonClassName}
+                  onClick={handleOpenCategoryModal}
+                >
+                  <FolderPlus className="mr-2 h-5 w-5" />
+                  Категорию
+                </Button>
+                <Button
+                  variant="ghost"
+                  className={addActionButtonClassName}
+                  onClick={handleOpenPresetModal}
                 >
                   <Zap className="mr-2 h-5 w-5" />
                   Тренировку
@@ -67,6 +98,12 @@ export const AllExercises = () => {
       <CreateExercise
         open={openExerciseModal}
         onOpenChange={setOpenExerciseModal}
+        defaultCategory={preselectedCategory}
+      />
+
+      <CreateCategory
+        open={openCategoryModal}
+        onOpenChange={setOpenCategoryModal}
       />
 
       {/* Модальное окно добавления пресета */}

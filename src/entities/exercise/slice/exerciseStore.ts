@@ -12,6 +12,8 @@ interface ExerciseStore {
   trainingPreset: TrainingPreset[];
   createExercise: (newExercise: { name: string; category: string }) => void;
   createCategory: (categoryName: string) => void;
+  renameCategory: (oldCategoryName: string, newCategoryName: string) => void;
+  deleteCategory: (categoryName: string) => void;
   createTrainingPreset: (newTrainingPreset: TrainingPreset) => void;
   deleteExercise: (exerciseName: string, category: string) => void;
   deleteTrainingPreset: (presetName: string) => void;
@@ -57,6 +59,42 @@ export const useExerciseStore = create<ExerciseStore>()(
               ...state.exercises,
               { category: normalizedCategoryName, exercises: [] },
             ],
+          };
+        }),
+      renameCategory: (oldCategoryName, newCategoryName) =>
+        set((state) => {
+          const normalizedNewCategoryName = newCategoryName.trim();
+
+          if (!normalizedNewCategoryName) {
+            return state;
+          }
+
+          const isCategoryExists = state.exercises.some(
+            (exerciseGroup) =>
+              exerciseGroup.category.toLowerCase() ===
+                normalizedNewCategoryName.toLowerCase() &&
+              exerciseGroup.category.toLowerCase() !==
+                oldCategoryName.toLowerCase(),
+          );
+
+          if (isCategoryExists) {
+            return state;
+          }
+
+          return {
+            exercises: state.exercises.map((exerciseGroup) =>
+              exerciseGroup.category === oldCategoryName
+                ? { ...exerciseGroup, category: normalizedNewCategoryName }
+                : exerciseGroup,
+            ),
+          };
+        }),
+      deleteCategory: (categoryName) =>
+        set((state) => {
+          return {
+            exercises: state.exercises.filter(
+              (exerciseGroup) => exerciseGroup.category !== categoryName,
+            ),
           };
         }),
       createTrainingPreset: (newTrainingPreset) =>
