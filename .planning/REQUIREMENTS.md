@@ -74,31 +74,31 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LOG-01 | TBD | Pending |
-| LOG-02 | TBD | Pending |
-| LOG-03 | TBD | Pending |
-| LOG-04 | TBD | Pending |
-| CAT-01 | TBD | Pending |
-| CAT-02 | TBD | Pending |
-| CAT-03 | TBD | Pending |
-| CAT-04 | TBD | Pending |
-| PROG-01 | TBD | Pending |
-| PROG-02 | TBD | Pending |
-| PROG-03 | TBD | Pending |
-| PROG-04 | TBD | Pending |
-| HIST-01 | TBD | Pending |
-| HIST-02 | TBD | Pending |
-| HIST-03 | TBD | Pending |
-| DATA-01 | TBD | Pending |
-| DATA-02 | TBD | Pending |
-| DATA-03 | TBD | Pending |
-| DATA-04 | TBD | Pending |
+| LOG-01 | Phase 1 | Pending |
+| LOG-02 | Phase 1 | Pending |
+| LOG-03 | Phase 1 | Pending |
+| LOG-04 | Phase 1 | Pending |
+| CAT-01 | Phase 2 | Pending |
+| CAT-02 | Phase 2 | Pending |
+| CAT-03 | Phase 2 | Pending |
+| CAT-04 | Phase 2 | Pending |
+| PROG-01 | Phase 4 | Pending |
+| PROG-02 | Phase 4 | Pending |
+| PROG-03 | Phase 4 | Pending |
+| PROG-04 | Phase 4 | Pending |
+| HIST-01 | Phase 3 | Pending |
+| HIST-02 | Phase 3 | Pending |
+| HIST-03 | Phase 3 | Pending |
+| DATA-01 | Phase 1 | Pending |
+| DATA-02 | Phase 5 | Pending |
+| DATA-03 | Phase 5 | Pending |
+| DATA-04 | Phase 5 | Pending |
 
 **Coverage:**
 - v1 requirements: 19 total
-- Mapped to phases: 0
-- Unmapped: 19 ⚠️
+- Mapped to phases: 19
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-14*
-*Last updated: 2026-04-14 after initial definition*
+*Last updated: 2026-04-14 after roadmap mapping*
