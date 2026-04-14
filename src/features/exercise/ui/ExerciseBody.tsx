@@ -58,7 +58,7 @@ export const ExerciseBody = ({
                 <div className={style.setIndex}>{idx + 1}</div>
                 <div className={style.cell}>
                   <Input
-                    className={"text-white border-0 text-center text-xl"}
+                    className="border-0 text-center text-xl text-foreground placeholder:text-muted-foreground"
                     type={"number"}
                     placeholder={"Кол-во"}
                     name={"reps"}
@@ -70,7 +70,7 @@ export const ExerciseBody = ({
                 </div>
                 <div className={style.cell}>
                   <Input
-                    className={"text-white border-0 text-center text-xl"}
+                    className="border-0 text-center text-xl text-foreground placeholder:text-muted-foreground"
                     type={"number"}
                     placeholder={"Кг"}
                     name={"weight"}
@@ -82,7 +82,7 @@ export const ExerciseBody = ({
                 </div>
                 <div className={style.deleteButtonCell}>
                   <Button
-                    className={"bg-transparent text-black hover:text-white"}
+                    className="bg-transparent text-muted-foreground hover:text-foreground"
                     onClick={() => deleteSet(exercise, set)}
                   >
                     <X />

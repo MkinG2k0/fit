@@ -18,7 +18,7 @@ export const CustomButton = ({
       onClick={() => buttonHandler()}
       className={twMerge(
         classes,
-        "text-black p-2 bg-transparent border-1 border-black",
+        "p-2 border border-border bg-secondary text-secondary-foreground hover:bg-secondary/80",
       )}
     >
       {children}
