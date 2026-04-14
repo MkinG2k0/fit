@@ -84,11 +84,8 @@ export const AddExercise = () => {
         onOpenChange={handleDrawerOpenChange}
       >
         <DrawerTrigger asChild>
-          <Button
-            variant="outline"
-            className="transition-colors text-xl justify-center w-full p-6 border-2 rounded-xl  hover:bg-gray-200 "
-          >
-            Добавить тренировку
+          <Button className="text-xl justify-center w-full rounded-xl p-6">
+            Добавить упражнение
           </Button>
         </DrawerTrigger>
         <DrawerContent className="grid h-dvh grid-rows-[auto_1fr_auto] overflow-hidden">

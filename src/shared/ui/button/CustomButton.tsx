@@ -15,11 +15,9 @@ export const CustomButton = ({
 }: CustomButtonProps) => {
   return (
     <Button
+      variant="outline"
       onClick={() => buttonHandler()}
-      className={twMerge(
-        classes,
-        "p-2 border border-border bg-secondary text-secondary-foreground hover:bg-secondary/80",
-      )}
+      className={twMerge(classes)}
     >
       {children}
     </Button>

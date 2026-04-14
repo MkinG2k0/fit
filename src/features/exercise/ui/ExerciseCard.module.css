@@ -1,16 +1,17 @@
 .card {
-  width: 95vw;
-  margin-left: 2.5vw;
+  width: 100vw;
+  margin: 0 0.5rem;
   align-self: flex-start;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 2px solid;
-  border-radius: 15px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
   position: relative;
-  margin-top: 12px;
-  margin-bottom: 10px;
+  background-color: var(--card);
+  color: var(--card-foreground);
+  box-shadow: 0 1px 0 color-mix(in oklch, var(--foreground) 6%, transparent);
 }
 
 .presetName {
@@ -62,8 +63,7 @@
 .liftedTotalValue {
   font-size: 1.05em;
   font-weight: 700;
-  color: var(--foreground);
-  font-variant-numeric: tabular-nums;
+  color: var(--primary);
 }
 
 .liftedTotalUnit {
@@ -81,16 +81,7 @@
   margin-right: 10px;
   align-self: center;
   font-size: 2em;
-  color: #bcbcbc;
-}
-
-.row {
-  display: grid;
-  width: 100%;
-  grid-template-columns: 28px minmax(0, 1fr) minmax(0, 1fr) 28px;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 16px;
+  color: var(--muted-foreground);
 }
 
 .inputsHeader {
@@ -98,7 +89,6 @@
   width: 100%;
   grid-template-columns: 28px minmax(0, 1fr) minmax(0, 1fr) 28px;
   align-items: center;
-  padding: 8px 16px 0;
   gap: 12px;
 }
 

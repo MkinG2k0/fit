@@ -46,8 +46,8 @@ const THEME_OPTIONS: ThemeOption[] = [
   },
   {
     value: "aggressive",
-    title: "Агрессивная",
-    description: "Контрастная тёмная палитра с ярким акцентом",
+    title: "Тренировочная",
+    description: "Тёмный экран с тёплым оранжевым акцентом на кнопках и прогрессе",
     icon: Flame,
   },
   {

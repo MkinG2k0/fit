@@ -183,7 +183,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
         <div className="pointer-events-none flex w-10 items-center h-full justify-center absolute -left-11.25 top-0 z-10">
           <ChartColumnBig className="text-primary" />
         </div>
-        <div style={{ borderColor: exerciseColor }} className={style.card}>
+        <div className={style.card}>
           <div
             onClick={handleCardHeadClick}
             className={cn(style.cardHead, "overflow-hidden ")}
@@ -220,7 +220,9 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
               className={style.liftedTotal}
               title="Суммарный объём: по каждому подходу умножаем повторения на вес (кг) и складываем"
             >
-              <span className={style.liftedTotalValue}>{totalLiftedLabel}</span>
+              <span className={cn(style.liftedTotalValue, "font-numeric")}>
+                {totalLiftedLabel}
+              </span>
               <span className={style.liftedTotalUnit}>кг</span>
             </div>
             <div className={"p-4"}>
@@ -247,7 +249,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
         </div>
 
         <div className="pointer-events-none flex w-10 items-center h-full justify-center absolute -right-11.25 top-0 z-10">
-          <Trash2 className="text-red-500/70" />
+          <Trash2 className="text-destructive/70" />
         </div>
       </motion.div>
 

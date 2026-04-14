@@ -10,6 +10,7 @@ import { StatisticCard } from "@/widgets/statisticCard";
 import style from "./ExerciseCard.module.css";
 import { CustomButton } from "@/shared/ui";
 import { useLastExerciseSession } from "../lib/useLastExerciseSession";
+import { cn } from "@/shared/lib/classMerge";
 
 interface ExerciseBodyProps {
   exercise: Exercise;
@@ -25,7 +26,7 @@ export const ExerciseBody = ({
   const addSetToExercise = useCalendarStore((store) => store.addSetToExercise);
   const deleteSet = useCalendarStore((store) => store.deleteSet);
   const INPUT_CLASSNAME =
-    "rounded-full border-0 bg-transparent shadow-none ring-0 outline-none focus-visible:ring-0 focus-visible:ring-offset-0 text-center text-xl text-foreground placeholder:text-muted-foreground";
+    "font-numeric shadow-none ring-0 outline-none focus-visible:ring-0 focus-visible:ring-offset-0 text-center text-2xl text-foreground placeholder:text-muted-foreground";
 
   const inputHandler = (
     event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
@@ -38,12 +39,12 @@ export const ExerciseBody = ({
       exercise,
     );
   };
-  console.log(lastSession);
+
   return (
-    <>
+    <div className="flex flex-col gap-2 p-4 pt-0">
       {lastSession !== null ? (
         <p
-          className="w-full px-4 pb-2 text-center text-xs leading-snug text-muted-foreground"
+          className="w-full px-4 text-center text-xs leading-snug text-muted-foreground"
           role="note"
         >
           Прошлый раз, {lastSession.dateLabel}: {lastSession.setsSummary}
@@ -67,11 +68,14 @@ export const ExerciseBody = ({
               transition={{ duration: 0.3, ease: "easeInOut" }}
               style={{ overflow: "hidden" }}
             >
-              <div className={style.row}>
+              <div className={cn("flex gap-2 items-center font-numeric")}>
                 <div className={style.setIndex}>{idx + 1}</div>
                 <div className={style.cell}>
                   <Input
-                    className={INPUT_CLASSNAME}
+                    className={cn(
+                      INPUT_CLASSNAME,
+                      "text-primary bg-background w-32 border-primary h-12 rounded-md",
+                    )}
                     type={"number"}
                     placeholder={"Кол-во"}
                     name={"reps"}
@@ -83,7 +87,10 @@ export const ExerciseBody = ({
                 </div>
                 <div className={style.cell}>
                   <Input
-                    className={INPUT_CLASSNAME}
+                    className={cn(
+                      INPUT_CLASSNAME,
+                      "text-primary bg-background w-32 border-primary h-12 rounded-md",
+                    )}
                     type={"number"}
                     placeholder={"Кг"}
                     name={"weight"}
@@ -106,18 +113,22 @@ export const ExerciseBody = ({
           );
         })}
       </AnimatePresence>
-      <div className={style.cardFooter}>
+      <div className={"flex gap-2 items-center justify-between"}>
         <StatisticCard exerciseName={exercise.name} />
         <CustomButton
-          classes={"text-xl w-full"}
+          classes={"flex-1"}
           buttonHandler={() => addSetToExercise(exercise)}
         >
           Добавить подход
         </CustomButton>
-        <Button variant="outline">
-          <Trash2 color={"red"} onClick={onDeleteRequested} />
+        <Button
+          variant="outline"
+          className="text-destructive"
+          onClick={onDeleteRequested}
+        >
+          <Trash2 />
         </Button>
       </div>
-    </>
+    </div>
   );
 };

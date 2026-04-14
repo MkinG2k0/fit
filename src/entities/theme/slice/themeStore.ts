@@ -13,7 +13,7 @@ interface ThemeActions {
 export const useThemeStore = create<ThemeState & ThemeActions>()(
   persist(
     (set) => ({
-      themeMode: "system",
+      themeMode: "aggressive",
       setThemeMode: (mode) => set({ themeMode: mode }),
     }),
     {

@@ -36,18 +36,18 @@ const getRingDash = (radius: number, progress: number) => {
 
 const getVolumeRingColor = (hasExercises: boolean, volumeProgress: number) => {
   if (!hasExercises) {
-    return "stroke-zinc-300";
+    return "stroke-muted-foreground/35";
   }
 
   if (volumeProgress >= HIGH_VOLUME_THRESHOLD) {
-    return "stroke-rose-500";
+    return "stroke-foreground";
   }
 
   if (volumeProgress >= LOW_VOLUME_THRESHOLD) {
-    return "stroke-orange-500";
+    return "stroke-primary";
   }
 
-  return "stroke-sky-500";
+  return "stroke-primary/55";
 };
 
 export const Day = ({
@@ -99,7 +99,7 @@ export const Day = ({
             cx={RING_CENTER}
             cy={RING_CENTER}
             r={OUTER_RING_RADIUS}
-            className="fill-none stroke-zinc-200"
+            className="fill-none stroke-border"
             strokeWidth="3"
           />
 
@@ -109,7 +109,7 @@ export const Day = ({
                 cx={RING_CENTER}
                 cy={RING_CENTER}
                 r={INNER_RING_RADIUS}
-                className="fill-none stroke-zinc-200"
+                className="fill-none stroke-border"
                 strokeWidth="3"
               />
               <circle
@@ -131,10 +131,7 @@ export const Day = ({
             cx={RING_CENTER}
             cy={RING_CENTER}
             r={OUTER_RING_RADIUS}
-            className={cn(
-              "fill-none stroke-emerald-500 transition-[stroke-dashoffset] duration-300",
-              selectedFlag && "stroke-emerald-400",
-            )}
+            className="fill-none stroke-primary transition-[stroke-dashoffset] duration-300"
             strokeWidth="3"
             strokeLinecap="round"
             {...getRingDash(OUTER_RING_RADIUS, setsProgress)}
