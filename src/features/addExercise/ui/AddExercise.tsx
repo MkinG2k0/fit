@@ -60,7 +60,7 @@ export const AddExercise = () => {
         <DrawerTrigger asChild>
           <Button
             variant="outline"
-            className="text-xl justify-center w-full p-6 border-1 border-black rounded-xl bg-white hover:bg-gray-50 text-black"
+            className="transition-colors text-xl justify-center w-full p-6 border-2 border-black rounded-xl bg-white hover:bg-gray-200 text-black"
             onClick={() => setDrawerOpen(true)}
           >
             Добавить тренировку

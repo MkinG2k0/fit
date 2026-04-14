@@ -95,7 +95,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
         animate={showHint ? { x: [-0, -80, 0] } : { x: 0 }}
         transition={showHint ? { duration: 1.2, ease: "easeInOut" } : undefined}
       >
-        <div className="pointer-events-none flex w-10 items-center h-full justify-center absolute left-[-45px] top-0 z-10">
+        <div className="pointer-events-none flex w-10 items-center h-full justify-center absolute -left-11.25 top-0 z-10">
           <ChartColumnBig className="text-blue-500" />
         </div>
         <div style={{ borderColor: exerciseColor }} className={style.card}>
@@ -153,7 +153,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
           </AnimatePresence>
         </div>
 
-        <div className="pointer-events-none flex w-10 items-center justify-center">
+        <div className="pointer-events-none flex w-10 items-center h-full justify-center absolute -right-11.25 top-0 z-10">
           <Trash2 className="text-red-500/70" />
         </div>
       </motion.div>

@@ -75,7 +75,7 @@ export const Day = ({
     <button
       type="button"
       className={cn(
-        "flex flex-col items-center w-full",
+        "flex flex-col items-center w-full cursor-pointer",
         !sameMonthFlag && "opacity-50",
       )}
       key={key}
@@ -101,13 +101,30 @@ export const Day = ({
             className="fill-none stroke-zinc-200"
             strokeWidth="3"
           />
-          <circle
-            cx={RING_CENTER}
-            cy={RING_CENTER}
-            r={INNER_RING_RADIUS}
-            className="fill-none stroke-zinc-200"
-            strokeWidth="3"
-          />
+
+          {volumeProgress && (
+            <>
+              <circle
+                cx={RING_CENTER}
+                cy={RING_CENTER}
+                r={INNER_RING_RADIUS}
+                className="fill-none stroke-zinc-200"
+                strokeWidth="3"
+              />
+              <circle
+                cx={RING_CENTER}
+                cy={RING_CENTER}
+                r={INNER_RING_RADIUS}
+                className={cn(
+                  "fill-none transition-[stroke-dashoffset] duration-300",
+                  getVolumeRingColor(ringMetrics.hasExercises, volumeProgress),
+                )}
+                strokeWidth={selectedFlag ? "3.5" : "3"}
+                strokeLinecap="round"
+                {...getRingDash(INNER_RING_RADIUS, volumeProgress)}
+              />
+            </>
+          )}
 
           <circle
             cx={RING_CENTER}
@@ -120,18 +137,6 @@ export const Day = ({
             strokeWidth="3"
             strokeLinecap="round"
             {...getRingDash(OUTER_RING_RADIUS, setsProgress)}
-          />
-          <circle
-            cx={RING_CENTER}
-            cy={RING_CENTER}
-            r={INNER_RING_RADIUS}
-            className={cn(
-              "fill-none transition-[stroke-dashoffset] duration-300",
-              getVolumeRingColor(ringMetrics.hasExercises, volumeProgress),
-            )}
-            strokeWidth={selectedFlag ? "3.5" : "3"}
-            strokeLinecap="round"
-            {...getRingDash(INNER_RING_RADIUS, volumeProgress)}
           />
         </svg>
 

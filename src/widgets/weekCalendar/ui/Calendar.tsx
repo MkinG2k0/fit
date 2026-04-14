@@ -51,7 +51,7 @@ export const WeekSlider = () => {
       >
         <div
           className={`${styles.calendar} relative overflow-hidden transition-all duration-1000 ${
-            calendarExpanded ? "h-[380px]" : "h-[105px]"
+            calendarExpanded ? "h-85" : "h-26.25"
           }`}
         >
           <AnimatePresence mode="wait">
@@ -80,7 +80,7 @@ export const WeekSlider = () => {
             )}
           </AnimatePresence>
         </div>
-        <div className={"flex justify-center relative bottom-8"}>
+        <div className={"flex justify-center relative bottom-8 cursor-pointer"}>
           <GripHorizontal />
         </div>
       </motion.div>
