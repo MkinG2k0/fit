@@ -27,15 +27,14 @@ export const ExerciseBody = ({
     event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
     set: ExerciseSet,
   ) => {
-    if (event.target.value.length <= 3) {
-      onChangeHandler(
-        event.target.value,
-        event.target.name as keyof ExerciseSet,
-        set.id,
-        exercise,
-      );
-    }
+    onChangeHandler(
+      event.target.value,
+      event.target.name as keyof ExerciseSet,
+      set.id,
+      exercise,
+    );
   };
+
   return (
     <>
       <div className={style.inputsHeader}>
