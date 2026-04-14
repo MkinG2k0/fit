@@ -84,7 +84,7 @@ export const AddExercise = () => {
         onOpenChange={handleDrawerOpenChange}
       >
         <DrawerTrigger asChild>
-          <Button className="text-xl justify-center w-full rounded-xl p-6">
+          <Button className="text-xl font-bold justify-center w-full rounded-xl p-6">
             Добавить упражнение
           </Button>
         </DrawerTrigger>
