@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import {
   Command,
   CommandGroup,
@@ -6,7 +7,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/shared/ui/shadCNComponents/ui/command";
-import { useExerciseStore } from "@/entities/exercise";
+import { type TrainingPreset, useExerciseStore } from "@/entities/exercise";
 import { DeleteDialog } from "./DeleteDialog";
 import { ExerciseItem } from "./ExerciseItem";
 import { PresetItem } from "./PresetItem";
@@ -19,6 +20,7 @@ interface BaseProps {
   deletable?: boolean;
   variant?: "exercises" | "presets" | "all";
   onCreateExerciseInCategory?: (categoryName: string) => void;
+  onEditPreset?: (preset: TrainingPreset) => void;
 }
 
 interface RadioProps extends BaseProps {
@@ -59,6 +61,7 @@ export const FullExerciseCommand = ({
   deletable = false,
   variant = "all",
   onCreateExerciseInCategory,
+  onEditPreset,
 }: FullExerciseCommandProps) => {
   const allExercises = useExerciseStore((state) => state.exercises);
   const trainingPreset = useExerciseStore((state) => state.trainingPreset);
@@ -89,6 +92,7 @@ export const FullExerciseCommand = ({
   const [expandedCategories, setExpandedCategories] = useState<
     Record<string, boolean>
   >({});
+  const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
     setExpandedCategories((prevState) => {
@@ -129,6 +133,10 @@ export const FullExerciseCommand = ({
     openDeleteDialog("preset", name);
   };
 
+  const handlePresetEdit = (preset: TrainingPreset) => {
+    onEditPreset?.(preset);
+  };
+
   const handleCategoryDelete = (categoryName: string) => {
     openDeleteDialog("category", categoryName);
   };
@@ -158,11 +166,27 @@ export const FullExerciseCommand = ({
   };
 
   const existingCategories = allExercises.map((group) => group.category);
+  const isSearchActive = searchValue.trim().length > 0;
+  const normalizedTrainingPreset = useMemo(
+    () =>
+      trainingPreset.map((preset) => ({
+        ...preset,
+        presetName: preset.presetName.trim(),
+        exercises: preset.exercises
+          .map((exerciseName) => exerciseName.trim())
+          .filter(Boolean),
+      })),
+    [trainingPreset],
+  );
 
   return (
     <>
       <Command className="h-full min-h-0 w-full">
-        <CommandInput placeholder="Поиск..." />
+        <CommandInput
+          placeholder="Поиск..."
+          value={searchValue}
+          onValueChange={setSearchValue}
+        />
         <CommandList className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
           <RadioGroup>
             {(variant === "exercises" || variant === "all") &&
@@ -171,7 +195,10 @@ export const FullExerciseCommand = ({
                   heading={
                     <CategoryActions
                       categoryName={group.category}
-                      isExpanded={expandedCategories[group.category] ?? false}
+                      isExpanded={
+                        (expandedCategories[group.category] ?? false) ||
+                        isSearchActive
+                      }
                       deletable={deletable}
                       onCreateExerciseInCategory={onCreateExerciseInCategory}
                       onToggleCategory={handleCategoryToggle}
@@ -182,25 +209,38 @@ export const FullExerciseCommand = ({
                   key={group.category}
                 >
                   <CommandSeparator />
-                  {(expandedCategories[group.category] ?? false) &&
-                    group.exercises.map((name) => (
-                      <ExerciseItem
-                        key={name}
-                        name={name}
-                        category={group.category}
-                        checkable={checkable}
-                        deletable={deletable}
-                        selected={selectedExerciseCheckboxes.includes(name)}
-                        onSelect={exerciseSelectHandler}
-                        onDelete={handleExerciseDelete}
-                      />
-                    ))}
+                  <AnimatePresence initial={false}>
+                    {((expandedCategories[group.category] ?? false) ||
+                      isSearchActive) && (
+                      <motion.div
+                        key={`${group.category}-content`}
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                      >
+                        {group.exercises.map((name) => (
+                          <ExerciseItem
+                            key={name}
+                            name={name}
+                            category={group.category}
+                            checkable={checkable}
+                            deletable={deletable}
+                            selected={selectedExerciseCheckboxes.includes(name)}
+                            onSelect={exerciseSelectHandler}
+                            onDelete={handleExerciseDelete}
+                          />
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </CommandGroup>
               ))}
           </RadioGroup>
           {(variant === "presets" || variant === "all") && (
             <CommandGroup heading={"Пресеты"}>
-              {trainingPreset.map((preset) => (
+              {normalizedTrainingPreset.map((preset) => (
                 <PresetItem
                   key={preset.presetName}
                   preset={preset}
@@ -211,6 +251,7 @@ export const FullExerciseCommand = ({
                   )}
                   onSelect={presetSelectHandler}
                   onDelete={handlePresetDelete}
+                  onEdit={handlePresetEdit}
                 />
               ))}
             </CommandGroup>

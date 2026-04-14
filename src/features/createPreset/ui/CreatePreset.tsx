@@ -1,5 +1,7 @@
-import { Pipette } from "lucide-react";
-import { useState } from "react";
+import { ChevronDown, ChevronRight, Pipette } from "lucide-react";
+import { type ChangeEvent, useEffect, useMemo, useState } from "react";
+import { type RgbaColor, RgbaColorPicker } from "react-colorful";
+import { type TrainingPreset, useExerciseStore } from "@/entities/exercise";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
   Dialog,
@@ -15,30 +17,69 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/shared/ui/shadCNComponents/ui/popover.tsx";
-import { useExerciseStore } from "@/entities/exercise";
-import { type RgbaColor, RgbaColorPicker } from "react-colorful";
 import type { NewPreset } from "../model/types";
 
 interface CreatePresetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  editingPreset?: TrainingPreset;
 }
 
 const DEFAULT_PRESET_COLOR: RgbaColor = { r: 255, g: 0, b: 0, a: 1 };
+const normalizeExerciseKey = (exerciseName: string) =>
+  exerciseName.trim().toLowerCase();
 
-export const CreatePreset = ({ open, onOpenChange }: CreatePresetProps) => {
-  const [newPreset, setNewPreset] = useState<NewPreset>({
-    presetName: "",
-    exercises: [],
-    presetColor: DEFAULT_PRESET_COLOR,
-  });
+const createInitialPreset = (editingPreset?: TrainingPreset): NewPreset => {
+  if (!editingPreset) {
+    return {
+      presetName: "",
+      exercises: [],
+      presetColor: DEFAULT_PRESET_COLOR,
+    };
+  }
+
+  return {
+    presetName: editingPreset.presetName,
+    exercises: [...editingPreset.exercises],
+    presetColor: editingPreset.presetColor,
+  };
+};
+
+export const CreatePreset = ({
+  open,
+  onOpenChange,
+  editingPreset,
+}: CreatePresetProps) => {
+  const isEditMode = Boolean(editingPreset);
+  const [newPreset, setNewPreset] = useState<NewPreset>(() =>
+    createInitialPreset(editingPreset),
+  );
   const [error, setError] = useState<string>("");
+  const [expandedCategories, setExpandedCategories] = useState<
+    Record<string, boolean>
+  >({});
+  const [exerciseSearch, setExerciseSearch] = useState("");
 
   const allExercises = useExerciseStore((state) => state.exercises);
   const trainingPresets = useExerciseStore((state) => state.trainingPreset);
   const createTrainingPreset = useExerciseStore(
     (state) => state.createTrainingPreset,
   );
+  const updateTrainingPreset = useExerciseStore(
+    (state) => state.updateTrainingPreset,
+  );
+
+  useEffect(() => {
+    setExpandedCategories((prevState) => {
+      const nextState: Record<string, boolean> = {};
+
+      allExercises.forEach((group) => {
+        nextState[group.category] = prevState[group.category] ?? false;
+      });
+
+      return nextState;
+    });
+  }, [allExercises]);
 
   const handleColorPicker = (newColor: RgbaColor) => {
     setNewPreset({ ...newPreset, presetColor: newColor });
@@ -46,21 +87,19 @@ export const CreatePreset = ({ open, onOpenChange }: CreatePresetProps) => {
 
   const handleClose = () => {
     onOpenChange(false);
-    setNewPreset({
-      presetName: "",
-      exercises: [],
-      presetColor: DEFAULT_PRESET_COLOR,
-    });
+    setNewPreset(createInitialPreset(editingPreset));
     setError("");
+    setExerciseSearch("");
   };
 
   const handleCreate = () => {
     if (newPreset.presetName && newPreset.exercises.length > 0) {
-      // Check if preset with this name already exists
       const existingPreset = trainingPresets.find(
         (preset) =>
           preset.presetName.toLowerCase() ===
-          newPreset.presetName.toLowerCase(),
+            newPreset.presetName.toLowerCase() &&
+          preset.presetName.toLowerCase() !==
+            (editingPreset?.presetName.toLowerCase() ?? ""),
       );
 
       if (existingPreset) {
@@ -68,32 +107,119 @@ export const CreatePreset = ({ open, onOpenChange }: CreatePresetProps) => {
         return;
       }
 
-      createTrainingPreset(newPreset);
+      if (editingPreset) {
+        updateTrainingPreset(editingPreset.presetName, newPreset);
+      } else {
+        createTrainingPreset(newPreset);
+      }
+
       handleClose();
     }
   };
 
   const handleExerciseToggle = (exercise: string, checked: boolean) => {
     if (checked) {
-      setNewPreset({
-        ...newPreset,
-        exercises: [...newPreset.exercises, exercise],
-      });
-    } else {
-      setNewPreset({
-        ...newPreset,
-        exercises: newPreset.exercises.filter((ex) => ex !== exercise),
-      });
+      setNewPreset((prevState) => ({
+        ...prevState,
+        exercises: [...prevState.exercises, exercise],
+      }));
+      return;
     }
+
+    setNewPreset((prevState) => ({
+      ...prevState,
+      exercises: prevState.exercises.filter((ex) => ex !== exercise),
+    }));
   };
 
+  const handleCategoryToggle = (categoryName: string) => {
+    setExpandedCategories((prevState) => ({
+      ...prevState,
+      [categoryName]: !(prevState[categoryName] ?? false),
+    }));
+  };
+
+  const handleCategoryClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const categoryName = e.currentTarget.dataset.category;
+    if (!categoryName) {
+      return;
+    }
+
+    handleCategoryToggle(categoryName);
+  };
+
+  const handleExerciseSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setExerciseSearch(e.target.value);
+  };
+
+  const normalizedSearchQuery = exerciseSearch.trim().toLowerCase();
+  const isSearchActive = normalizedSearchQuery.length > 0;
+  const knownExerciseKeys = useMemo(() => {
+    const exerciseKeySet = new Set<string>();
+
+    allExercises.forEach((group) => {
+      group.exercises.forEach((exerciseName) => {
+        exerciseKeySet.add(normalizeExerciseKey(exerciseName));
+      });
+    });
+
+    return exerciseKeySet;
+  }, [allExercises]);
+
+  const legacyPresetExercises = useMemo(() => {
+    const uniqueLegacyExercises = new Map<string, string>();
+
+    newPreset.exercises.forEach((exerciseName) => {
+      const normalizedExerciseName = exerciseName.trim();
+
+      if (!normalizedExerciseName) {
+        return;
+      }
+
+      const exerciseKey = normalizeExerciseKey(normalizedExerciseName);
+
+      if (
+        knownExerciseKeys.has(exerciseKey) ||
+        uniqueLegacyExercises.has(exerciseKey)
+      ) {
+        return;
+      }
+
+      uniqueLegacyExercises.set(exerciseKey, normalizedExerciseName);
+    });
+
+    return Array.from(uniqueLegacyExercises.values());
+  }, [knownExerciseKeys, newPreset.exercises]);
+
+  const filteredExerciseGroups = allExercises
+    .map((group) => {
+      const categoryMatches = group.category
+        .toLowerCase()
+        .includes(normalizedSearchQuery);
+      const filteredExercises = categoryMatches
+        ? group.exercises
+        : group.exercises.filter((exercise) =>
+            exercise.toLowerCase().includes(normalizedSearchQuery),
+          );
+
+      return {
+        ...group,
+        exercises: filteredExercises,
+      };
+    })
+    .filter((group) => !isSearchActive || group.exercises.length > 0);
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange} >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Добавить пресет тренировки</DialogTitle>
+          <DialogTitle>
+            {isEditMode ? "Редактировать пресет тренировки" : "Добавить пресет тренировки"}
+          </DialogTitle>
           <DialogDescription>
-            Введите название и выберите упражнения для нового пресета
+            {isEditMode
+              ? "Измените название, цвет и состав упражнений в пресете"
+              : "Введите название и выберите упражнения для нового пресета"}
           </DialogDescription>
         </DialogHeader>
 
@@ -142,33 +268,87 @@ export const CreatePreset = ({ open, onOpenChange }: CreatePresetProps) => {
             </p>
           )}
 
-          <div className="space-y-2 max-[330px]:h-30">
+          <div className="space-y-2">
             <label className="text-sm font-medium">Выберите упражнения</label>
-            <div className="max-h-64 overflow-y-auto border rounded-md p-2">
-              {allExercises.map((group) => (
+            <div className="h-80 overflow-y-auto border rounded-md p-2">
+              <Input
+                placeholder="Поиск упражнения или категории"
+                value={exerciseSearch}
+                onChange={handleExerciseSearchChange}
+                className="mb-2"
+              />
+
+              {filteredExerciseGroups.length === 0 && (
+                <p className="px-2 py-4 text-sm text-muted-foreground">
+                  Ничего не найдено
+                </p>
+              )}
+
+              {filteredExerciseGroups.map((group) => (
                 <div key={group.category} className="mb-4">
-                  <h4 className="font-medium text-sm text-muted-foreground mb-2">
-                    {group.category}
-                  </h4>
+                  <button
+                    type="button"
+                    data-category={group.category}
+                    className="flex w-full items-center gap-1 text-left text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    onClick={handleCategoryClick}
+                  >
+                    {(expandedCategories[group.category] ?? false) ||
+                    isSearchActive ? (
+                      <ChevronDown className="h-3.5 w-3.5" />
+                    ) : (
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    )}
+                    <span>{group.category}</span>
+                  </button>
+                  {((expandedCategories[group.category] ?? false) ||
+                    isSearchActive) && (
+                    <div className="mt-2 space-y-1">
+                      {group.exercises.map((exercise) => (
+                        <label
+                          key={exercise}
+                          className="flex items-center space-x-2 cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={newPreset.exercises.includes(exercise)}
+                            onChange={(e) =>
+                              handleExerciseToggle(exercise, e.target.checked)
+                            }
+                          />
+                          <span className="text-sm truncate">{exercise}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {legacyPresetExercises.length > 0 && (
+                <div className="mb-2 rounded-md border border-dashed border-amber-400 p-2">
+                  <p className="mb-2 text-xs font-medium text-amber-700">
+                    Легаси упражнения (нет в текущем каталоге)
+                  </p>
                   <div className="space-y-1">
-                    {group.exercises.map((exercise) => (
+                    {legacyPresetExercises.map((exerciseName) => (
                       <label
-                        key={exercise}
+                        key={exerciseName}
                         className="flex items-center space-x-2 cursor-pointer"
                       >
                         <input
                           type="checkbox"
-                          checked={newPreset.exercises.includes(exercise)}
+                          checked={newPreset.exercises.includes(exerciseName)}
                           onChange={(e) =>
-                            handleExerciseToggle(exercise, e.target.checked)
+                            handleExerciseToggle(exerciseName, e.target.checked)
                           }
                         />
-                        <span className="text-sm truncate">{exercise}</span>
+                        <span className="text-sm truncate text-amber-700">
+                          {exerciseName}
+                        </span>
                       </label>
                     ))}
                   </div>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
@@ -181,7 +361,7 @@ export const CreatePreset = ({ open, onOpenChange }: CreatePresetProps) => {
             onClick={handleCreate}
             disabled={!newPreset.presetName || newPreset.exercises.length === 0}
           >
-            Создать
+            {isEditMode ? "Сохранить" : "Создать"}
           </Button>
         </DialogFooter>
       </DialogContent>
