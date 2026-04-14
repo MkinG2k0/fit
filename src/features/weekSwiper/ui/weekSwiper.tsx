@@ -54,14 +54,16 @@ export const WeekSwiper = ({
   };
 
   return (
-    <Swiper
-      key={"week"}
-      ref={weekSwiperRef}
-      slidesPerView={1}
-      onSlideChange={handleWeekSlideChange}
-      initialSlide={PRELOAD_WEEKS}
-    >
-      {daysRender(weeks)}
-    </Swiper>
+    <div className={"px-2"}>
+      <Swiper
+        key={"week"}
+        ref={weekSwiperRef}
+        slidesPerView={1}
+        onSlideChange={handleWeekSlideChange}
+        initialSlide={PRELOAD_WEEKS}
+      >
+        {daysRender(weeks)}
+      </Swiper>
+    </div>
   );
 };

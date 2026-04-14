@@ -47,7 +47,6 @@ export const WeekSlider = () => {
         dragConstraints={{ top: 0, right: 0, bottom: 0, left: 0 }}
         dragTransition={{ bounceStiffness: 800, bounceDamping: 25 }}
         dragElastic={0.15}
-        whileDrag={{ scale: 1.05 }}
         className={"bg-white z-20"}
       >
         <div

@@ -1,12 +1,22 @@
 import dayjs, { Dayjs } from "dayjs";
-import { Dot } from "lucide-react";
 import { cn, firstLetterToUpperCase } from "@/shared/lib";
-import styles from "./Day.module.css";
 
-// import {} from "@/";
+const RING_SIZE = 44;
+const RING_CENTER = 22;
+const OUTER_RING_RADIUS = 19;
+const INNER_RING_RADIUS = 14.5;
+
+const LOW_VOLUME_THRESHOLD = 0.33;
+const HIGH_VOLUME_THRESHOLD = 0.66;
+
+interface DayRingMetrics {
+  setsProgress: number;
+  volumeProgress: number;
+  hasExercises: boolean;
+}
 
 interface DayProps {
-  hasExercises: (date: Dayjs) => boolean;
+  ringMetrics: DayRingMetrics;
   value: Dayjs;
   selectedDate: Dayjs;
   onClickDate: (date: Dayjs) => void;
@@ -14,36 +24,127 @@ interface DayProps {
   observableDate: Dayjs;
 }
 
+const getCircleLength = (radius: number) => 2 * Math.PI * radius;
+
+const getRingDash = (radius: number, progress: number) => {
+  const ringLength = getCircleLength(radius);
+  return {
+    strokeDasharray: ringLength,
+    strokeDashoffset: ringLength * (1 - progress),
+  };
+};
+
+const getVolumeRingColor = (hasExercises: boolean, volumeProgress: number) => {
+  if (!hasExercises) {
+    return "stroke-zinc-300";
+  }
+
+  if (volumeProgress >= HIGH_VOLUME_THRESHOLD) {
+    return "stroke-rose-500";
+  }
+
+  if (volumeProgress >= LOW_VOLUME_THRESHOLD) {
+    return "stroke-orange-500";
+  }
+
+  return "stroke-sky-500";
+};
+
 export const Day = ({
   selectedDate,
   value,
-  hasExercises,
+  ringMetrics,
   onClickDate,
   dayName,
   observableDate,
 }: DayProps) => {
-  const hasExercisesFlag = hasExercises(value);
   const key = value.format("DD-MM-YYYY");
   const todayFlag = dayjs().isSame(value, "day");
   const sameMonthFlag = observableDate.isSame(value, "month");
   const selectedFlag = dayjs(selectedDate).isSame(value, "day");
+  const isFutureDay = value.isAfter(dayjs(), "day");
+
+  const setsProgress = isFutureDay ? 0 : ringMetrics.setsProgress;
+  const volumeProgress = isFutureDay ? 0 : ringMetrics.volumeProgress;
+
+  const handleDateClick = () => {
+    onClickDate(value);
+  };
+
   return (
-    <div className={styles.day} key={key} onClick={() => onClickDate(value)}>
-      <div className={styles.dayName}>
+    <button
+      type="button"
+      className={cn(
+        "flex flex-col items-center w-full",
+        !sameMonthFlag && "opacity-50",
+      )}
+      key={key}
+      onClick={handleDateClick}
+    >
+      <div className="font-bold">
         {dayName ? firstLetterToUpperCase(dayName) : ""}
       </div>
-      <div
-        className={cn(
-          selectedFlag && !todayFlag && styles.selectedDay,
-          todayFlag && styles.today,
-          !sameMonthFlag && styles.anotherMonth,
-          styles.dayNumber,
-        )}
-      >
-        {value.format("D")}
-      </div>
 
-      {hasExercisesFlag && <Dot className={"mb-[-20px] mt-[-5px]"} />}
-    </div>
+      <div className="relative flex h-11 w-11 items-center justify-center">
+        <svg
+          viewBox={`0 0 ${RING_SIZE} ${RING_SIZE}`}
+          className={cn(
+            "absolute inset-0 h-full w-full -rotate-90",
+            selectedFlag && "drop-shadow-[0_0_2px_rgba(0,0,0,0.15)]",
+          )}
+          aria-hidden
+        >
+          <circle
+            cx={RING_CENTER}
+            cy={RING_CENTER}
+            r={OUTER_RING_RADIUS}
+            className="fill-none stroke-zinc-200"
+            strokeWidth="3"
+          />
+          <circle
+            cx={RING_CENTER}
+            cy={RING_CENTER}
+            r={INNER_RING_RADIUS}
+            className="fill-none stroke-zinc-200"
+            strokeWidth="3"
+          />
+
+          <circle
+            cx={RING_CENTER}
+            cy={RING_CENTER}
+            r={OUTER_RING_RADIUS}
+            className={cn(
+              "fill-none stroke-emerald-500 transition-[stroke-dashoffset] duration-300",
+              selectedFlag && "stroke-emerald-400",
+            )}
+            strokeWidth="3"
+            strokeLinecap="round"
+            {...getRingDash(OUTER_RING_RADIUS, setsProgress)}
+          />
+          <circle
+            cx={RING_CENTER}
+            cy={RING_CENTER}
+            r={INNER_RING_RADIUS}
+            className={cn(
+              "fill-none transition-[stroke-dashoffset] duration-300",
+              getVolumeRingColor(ringMetrics.hasExercises, volumeProgress),
+            )}
+            strokeWidth={selectedFlag ? "3.5" : "3"}
+            strokeLinecap="round"
+            {...getRingDash(INNER_RING_RADIUS, volumeProgress)}
+          />
+        </svg>
+
+        <div
+          className={cn(
+            "relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-base",
+            selectedFlag && "bg-black! text-white",
+            todayFlag && "bg-black/50 text-white",
+          )}
+        >
+          {value.format("D")}
+        </div>
+      </div>
+    </button>
   );
 };
