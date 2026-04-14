@@ -3,14 +3,12 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
-import { visualizer } from "rollup-plugin-visualizer";
 import { pwaManifest, pwaWorkBoxOptions } from "./pwa.config.ts";
 
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    visualizer(),
     VitePWA({
       strategies: "injectManifest",
       registerType: "autoUpdate",

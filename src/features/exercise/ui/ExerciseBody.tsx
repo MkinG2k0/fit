@@ -9,6 +9,7 @@ import type { Exercise, ExerciseSet } from "@/entities/exercise";
 import { StatisticCard } from "@/widgets/statisticCard";
 import style from "./ExerciseCard.module.css";
 import { CustomButton } from "@/shared/ui";
+import { useLastExerciseSession } from "../lib/useLastExerciseSession";
 
 interface ExerciseBodyProps {
   exercise: Exercise;
@@ -19,6 +20,7 @@ export const ExerciseBody = ({
   exercise,
   onDeleteRequested,
 }: ExerciseBodyProps) => {
+  const lastSession = useLastExerciseSession(exercise.name);
   const onChangeHandler = useCalendarStore((store) => store.setExerciseValues);
   const addSetToExercise = useCalendarStore((store) => store.addSetToExercise);
   const deleteSet = useCalendarStore((store) => store.deleteSet);
@@ -36,15 +38,24 @@ export const ExerciseBody = ({
       exercise,
     );
   };
-
+  console.log(lastSession);
   return (
     <>
+      {lastSession !== null ? (
+        <p
+          className="w-full px-4 pb-2 text-center text-xs leading-snug text-muted-foreground"
+          role="note"
+        >
+          Прошлый раз, {lastSession.dateLabel}: {lastSession.setsSummary}
+        </p>
+      ) : null}
       <div className={style.inputsHeader}>
         <span className={style.inputsHeaderSpacer} />
         <span className={style.inputLabel}>Кол-во</span>
         <span className={style.inputLabel}>Кг</span>
         <span className={style.inputsHeaderSpacer} />
       </div>
+
       <AnimatePresence>
         {exercise.sets.map((set, idx) => {
           return (
