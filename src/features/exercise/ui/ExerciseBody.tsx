@@ -68,7 +68,7 @@ export const ExerciseBody = ({
               transition={{ duration: 0.3, ease: "easeInOut" }}
               style={{ overflow: "hidden" }}
             >
-              <div className={cn("flex gap-2 items-center font-numeric")}>
+              <div className={cn("flex gap-3 items-center font-numeric")}>
                 <div className={style.setIndex}>{idx + 1}</div>
                 <div className={style.cell}>
                   <Input
@@ -113,7 +113,7 @@ export const ExerciseBody = ({
           );
         })}
       </AnimatePresence>
-      <div className={"flex gap-2 items-center justify-between"}>
+      <div className={"flex gap-3 items-center justify-between"}>
         <StatisticCard exerciseName={exercise.name} />
         <CustomButton
           classes={"flex-1"}

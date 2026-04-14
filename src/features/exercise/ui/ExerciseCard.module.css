@@ -87,13 +87,13 @@
 .inputsHeader {
   display: grid;
   width: 100%;
-  grid-template-columns: 28px minmax(0, 1fr) minmax(0, 1fr) 28px;
+  grid-template-columns: 6px minmax(0, 1fr) minmax(0, 1fr) 36px;
   align-items: center;
   gap: 12px;
 }
 
 .inputsHeaderSpacer {
-  width: 32px;
+  width: 3px;
 }
 
 .inputLabel {
@@ -105,7 +105,6 @@
 
 .cell {
   background-color: var(--muted);
-  padding: 8px;
   border-radius: 30px;
   width: 100%;
 }

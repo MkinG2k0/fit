@@ -1,12 +1,6 @@
 import type { PanInfo } from "motion";
 import { AnimatePresence } from "motion/react";
-import {
-  useState,
-  useEffect,
-  useMemo,
-  useRef,
-  type MouseEvent,
-} from "react";
+import { useState, useEffect, useMemo, useRef, type MouseEvent } from "react";
 import { ChartColumnBig, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { useCalendarStore } from "@/entities/calendarDay";
 import { type Exercise, useExerciseStore } from "@/entities/exercise";
