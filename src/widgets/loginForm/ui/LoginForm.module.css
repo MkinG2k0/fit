@@ -1,0 +1,59 @@
+.wrapper {
+		width: 100dvw;
+		height: 100dvh;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-direction: column;
+		padding: 10px;
+}
+
+.form {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 10px;
+		padding: 15px;
+		border-radius: 15px;
+		border: 1px solid;
+		box-shadow: 0 8px 10px #dcdcdc;
+		box-sizing: border-box;
+		font-size: 1.2em;
+}
+
+.form input, .form button {
+		font-family: inherit;
+		width: 100%;
+}
+
+.form input {
+		padding: 10px;
+		border-radius: 10px;
+		border: 1px solid;
+		font-size: 1em;
+		font-weight: bold;
+		transition: all 0.3s ease;
+}
+
+.form button {
+		background-color: black;
+		color: white;
+		border: none;
+		padding: 10px;
+		border-radius: 10px;
+		cursor: pointer;
+		font-size: 1em;
+		font-weight: bold;
+		transition: all 0.3s ease;
+}
+
+.form button:hover {
+		background-color: white;
+		color: black;
+		transform: scale(1.05);
+}
+
+.form button {
+		-webkit-tap-highlight-color: transparent; /* 💡 отключает синий подсвет */
+}
+

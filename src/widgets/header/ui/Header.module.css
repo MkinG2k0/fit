@@ -1,0 +1,47 @@
+.header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.5em;
+		text-align: center;
+		font-weight: bold;
+}
+
+.days {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-around;
+		height: 100%;
+		width: 100dvw;
+		padding-bottom: 2em;
+		padding-top: 0.5em;
+}
+
+.title {
+		display: flex;
+		align-items: baseline;
+		gap: 10px;
+}
+
+@media (max-width: 320px) {
+		.title {
+				font-size: 0.8em;
+		}
+}
+
+.pageName {
+		text-align: left;
+		font-size: 2em;
+}
+
+.month {
+	font-size: 1em;
+	color: #787878;
+}
+
+@media (max-width: 320px) {
+		.month {
+				font-size: 0.8em;
+		}
+}
+
