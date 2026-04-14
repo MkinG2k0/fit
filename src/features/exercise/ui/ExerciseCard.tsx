@@ -90,7 +90,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
         dragConstraints={{ top: 0, right: 0, bottom: 0, left: 0 }}
         dragTransition={{ bounceStiffness: 500, bounceDamping: 15 }}
         dragElastic={0.3}
-        className="w-[calc(100dvw+60px)] flex items-center justify-start gap-2"
+        className=" flex items-center justify-start gap-2"
         initial={showHint ? { x: 0 } : false}
         animate={showHint ? { x: [-0, -80, 0] } : { x: 0 }}
         transition={showHint ? { duration: 1.2, ease: "easeInOut" } : undefined}
