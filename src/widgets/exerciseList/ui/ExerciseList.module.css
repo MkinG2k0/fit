@@ -1,27 +1,29 @@
 .menu {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: space-between;
-		margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
 }
 
 .list {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		overflow-x: hidden;
-		width: 100%;
-		max-height: calc(100dvh - 185px);
-		border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+  width: 100%;
+  max-height: calc(100dvh - 185px);
+  border-radius: 10px;
+  gap: 1rem;
+  flex: auto;
 }
 
 .footer {
-		position: fixed;
-		bottom: 0;
-		padding: 15px;
-		margin-bottom: 20px;
-		width: 100%;
-		display: grid;
-		justify-items: center;
+  position: fixed;
+  bottom: 0;
+  padding: 15px;
+  margin-bottom: 20px;
+  width: 100%;
+  display: grid;
+  justify-items: center;
 }
