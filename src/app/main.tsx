@@ -3,11 +3,14 @@ import { BrowserRouter } from "react-router-dom";
 import "./styles/index.css";
 import { AppRoutes } from "./router/routes.tsx";
 import { registerServiceWorker } from "./providers/pwa/register.ts";
+import { ThemeProvider } from "./providers/theme";
 
 registerServiceWorker();
 
 createRoot(document.getElementById("root")!).render(
-  <BrowserRouter>
-    <AppRoutes />
-  </BrowserRouter>,
+  <ThemeProvider>
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
+  </ThemeProvider>,
 );

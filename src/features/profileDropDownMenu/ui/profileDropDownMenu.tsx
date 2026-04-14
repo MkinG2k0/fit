@@ -1,5 +1,6 @@
 import {
   ChartColumnBig,
+  Cog,
   Menu,
   ScrollText,
   Timer as TimerIcon,
@@ -25,6 +26,10 @@ export const ProfileDropDownMenu = () => {
 
   const handleAnalyticsNavigate = () => {
     navigate("/analytics");
+  };
+
+  const handleSettingsNavigate = () => {
+    navigate("/settings");
   };
 
   return (
@@ -61,6 +66,15 @@ export const ProfileDropDownMenu = () => {
           >
             <ChartColumnBig />
             <div>Аналитика</div>
+          </Button>
+          <Separator />
+          <Button
+            variant="ghost"
+            className="justify-start"
+            onClick={handleSettingsNavigate}
+          >
+            <Cog />
+            <div>Настройки</div>
           </Button>
         </div>
       </PopoverContent>

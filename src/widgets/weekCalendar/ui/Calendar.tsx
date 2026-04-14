@@ -10,10 +10,21 @@ import isoWeek from "dayjs/plugin/isoWeek";
 import { useCalendarStore } from "@/entities/calendarDay";
 import { MonthSwiper } from "@/features/monthSwiper";
 import { WeekSwiper } from "@/features/weekSwiper";
-import styles from "./WeekCalendar.module.css";
+import { cn } from "@/shared/lib";
 
 dayjs.extend(isoWeek);
 dayjs.locale("ru");
+
+const CALENDAR_WRAPPER_CLASS = "z-20 bg-background text-foreground";
+const CALENDAR_HEIGHT_CLASS = {
+  expanded: "h-84",
+  collapsed: "h-28",
+};
+const CALENDAR_CONTAINER_CLASS =
+  "relative overflow-hidden rounded-xl border border-border bg-background shadow-sm transition-[height] duration-300";
+const CALENDAR_CONTENT_CLASS = "absolute inset-0";
+const DRAG_HANDLE_CLASS =
+  "relative bottom-8 flex cursor-pointer justify-center text-muted-foreground";
 
 export const WeekSlider = () => {
   const setObservableDate = useCalendarStore(
@@ -43,16 +54,22 @@ export const WeekSlider = () => {
       <motion.div
         drag="y"
         dragDirectionLock
-        onDragEnd={(_, info) => calendarPullHandler(info)}
+        onDragEnd={(event, info) => {
+          void event;
+          calendarPullHandler(info);
+        }}
         dragConstraints={{ top: 0, right: 0, bottom: 0, left: 0 }}
         dragTransition={{ bounceStiffness: 800, bounceDamping: 25 }}
         dragElastic={0.15}
-        className={"bg-white z-20"}
+        className={CALENDAR_WRAPPER_CLASS}
       >
         <div
-          className={`${styles.calendar} relative overflow-hidden transition-all duration-1000 ${
-            calendarExpanded ? "h-85" : "h-26.25"
-          }`}
+          className={cn(
+            CALENDAR_CONTAINER_CLASS,
+            calendarExpanded
+              ? CALENDAR_HEIGHT_CLASS.expanded
+              : CALENDAR_HEIGHT_CLASS.collapsed,
+          )}
         >
           <AnimatePresence mode="wait">
             {!calendarExpanded ? (
@@ -62,7 +79,7 @@ export const WeekSlider = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
                 transition={{ duration: 0.4, ease: "easeOut" }}
-                className={"absolute inset-0"}
+                className={CALENDAR_CONTENT_CLASS}
               >
                 <WeekSwiper {...props} />
               </motion.div>
@@ -73,14 +90,14 @@ export const WeekSlider = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.4, ease: "easeIn" }}
-                className={"absolute inset-0"}
+                className={CALENDAR_CONTENT_CLASS}
               >
                 <MonthSwiper {...props} />
               </motion.div>
             )}
           </AnimatePresence>
         </div>
-        <div className={"flex justify-center relative bottom-8 cursor-pointer"}>
+        <div className={DRAG_HANDLE_CLASS}>
           <GripHorizontal />
         </div>
       </motion.div>

@@ -1,6 +1,12 @@
 import type { PanInfo } from "motion";
 import { AnimatePresence } from "motion/react";
-import { useState, useEffect } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  type MouseEvent,
+  type SyntheticEvent,
+} from "react";
 import { ChartColumnBig, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { useCalendarStore } from "@/entities/calendarDay";
 import { type Exercise, useExerciseStore } from "@/entities/exercise";
@@ -18,6 +24,18 @@ interface ExerciseCardProps {
 
 const SWIPE_DISTANCE_THRESHOLD = 140;
 const SWIPE_VELOCITY_THRESHOLD = 250;
+const DRAG_CLICK_SUPPRESS_DELAY_MS = 120;
+const FALLBACK_ICON_PATH = "/muscles-category/другое.png";
+
+const getExerciseIconPath = (category: string | undefined) => {
+  const normalizedCategory = category?.trim().toLowerCase();
+
+  if (!normalizedCategory) {
+    return FALLBACK_ICON_PATH;
+  }
+
+  return `/muscles-category/${normalizedCategory}.png`;
+};
 
 export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
   const [isEditable, setIsEditable] = useState(false);
@@ -25,6 +43,10 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
   const [showHint, setShowHint] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isStatisticOpen, setIsStatisticOpen] = useState(false);
+  const [iconPath, setIconPath] = useState(() =>
+    getExerciseIconPath(exercise.category),
+  );
+  const isCardDraggingRef = useRef(false);
 
   const setExerciseName = useCalendarStore((store) => store.setExerciseName);
   const deleteExercise = useCalendarStore((store) => store.deleteExercise);
@@ -39,6 +61,10 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
       localStorage.setItem("exerciseSwipeHintShown", "true");
     }
   }, []);
+
+  useEffect(() => {
+    setIconPath(getExerciseIconPath(exercise.category));
+  }, [exercise.category]);
 
   // 🧩 2. Функция удаления
   const cardDragHandler = (info: PanInfo) => {
@@ -60,6 +86,28 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
     }
   };
 
+  const handleCardDragStart = () => {
+    isCardDraggingRef.current = true;
+  };
+
+  const handleCardDragEnd = (info: PanInfo) => {
+    cardDragHandler(info);
+
+    window.setTimeout(() => {
+      isCardDraggingRef.current = false;
+    }, DRAG_CLICK_SUPPRESS_DELAY_MS);
+  };
+
+  const handleCardHeadClick = (event: MouseEvent<HTMLDivElement>) => {
+    if (isCardDraggingRef.current) {
+      event.stopPropagation();
+
+      return;
+    }
+
+    setIsEditable((p) => !p);
+  };
+
   const handleDeleteRequest = () => {
     setIsDeleteDialogOpen(true);
   };
@@ -67,6 +115,12 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
   const handleDeleteConfirm = () => {
     deleteExercise(exercise);
     setIsDeleteDialogOpen(false);
+  };
+
+  const handleIconLoadingError = (_event: SyntheticEvent<HTMLImageElement>) => {
+    setIconPath((previousPath) =>
+      previousPath === FALLBACK_ICON_PATH ? previousPath : FALLBACK_ICON_PATH,
+    );
   };
 
   // ⚙️ 3. Обработка изменения названия упражнения
@@ -86,7 +140,8 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
     <div className="relative w-screen overflow-hidden">
       <motion.div
         drag="x"
-        onDragEnd={(_, info) => cardDragHandler(info)}
+        onDragStart={handleCardDragStart}
+        onDragEnd={(_, info) => handleCardDragEnd(info)}
         dragConstraints={{ top: 0, right: 0, bottom: 0, left: 0 }}
         dragTransition={{ bounceStiffness: 500, bounceDamping: 15 }}
         dragElastic={0.3}
@@ -100,15 +155,16 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
         </div>
         <div style={{ borderColor: exerciseColor }} className={style.card}>
           <div
-            onClick={() => setIsEditable((p) => !p)}
+            onClick={handleCardHeadClick}
             className={cn(style.cardHead, "overflow-hidden ")}
           >
             <div className={style.info}>
               <div className={style.icon}>
                 <img
                   className={style.img}
-                  src={`/muscles-category/${exercise.category.toLowerCase()}.png`}
-                  alt="Icon"
+                  src={iconPath}
+                  onError={handleIconLoadingError}
+                  alt={`Иконка упражнения ${exercise.name}`}
                 />
               </div>
               <div className={style.exerciseName}>

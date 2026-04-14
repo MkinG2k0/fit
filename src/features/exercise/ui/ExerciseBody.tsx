@@ -60,7 +60,7 @@ export const ExerciseBody = ({
                   <Input
                     className={"text-white border-0 text-center text-xl"}
                     type={"number"}
-                    placeholder={""}
+                    placeholder={"Кол-во"}
                     name={"reps"}
                     value={set.reps === 0 ? "" : set.reps}
                     onChange={(e) => {
@@ -72,7 +72,7 @@ export const ExerciseBody = ({
                   <Input
                     className={"text-white border-0 text-center text-xl"}
                     type={"number"}
-                    placeholder={""}
+                    placeholder={"Кг"}
                     name={"weight"}
                     value={set.weight === 0 ? "" : set.weight}
                     onChange={(e) => {
@@ -82,7 +82,7 @@ export const ExerciseBody = ({
                 </div>
                 <div className={style.deleteButtonCell}>
                   <Button
-                    className={"bg-transparent text-black"}
+                    className={"bg-transparent text-black hover:text-white"}
                     onClick={() => deleteSet(exercise, set)}
                   >
                     <X />
