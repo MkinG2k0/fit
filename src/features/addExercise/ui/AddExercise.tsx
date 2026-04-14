@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
   Drawer,
@@ -19,12 +20,17 @@ import { useExerciseSelection } from "../lib/useExerciseSelection";
 import { submitExercises } from "../lib/submitExercises";
 import { CreateButtons } from "./CreateButtons";
 
+const DRAWER_QUERY_PARAM = "add-exercise";
+const DRAWER_QUERY_VALUE = "1";
+
 export const AddExercise = () => {
-  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [openAddPopover, setOpenAddPopover] = useState(false);
   const [openExerciseModal, setOpenExerciseModal] = useState(false);
   const [openCategoryModal, setOpenCategoryModal] = useState(false);
   const [openPresetModal, setOpenPresetModal] = useState(false);
+  const isDrawerOpen =
+    searchParams.get(DRAWER_QUERY_PARAM) === DRAWER_QUERY_VALUE;
 
   const addExercise = useCalendarStore((state) => state.addExercise);
   const allExercises = useExerciseStore((state) => state.exercises);
@@ -47,27 +53,46 @@ export const AddExercise = () => {
       addExercise,
     );
     reset();
-    setDrawerOpen(false);
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.delete(DRAWER_QUERY_PARAM);
+    setSearchParams(nextSearchParams, { replace: true });
+  };
+
+  const handleDrawerOpenChange = (open: boolean) => {
+    if (open) {
+      if (isDrawerOpen) {
+        return;
+      }
+      const nextSearchParams = new URLSearchParams(searchParams);
+      nextSearchParams.set(DRAWER_QUERY_PARAM, DRAWER_QUERY_VALUE);
+      setSearchParams(nextSearchParams);
+      return;
+    }
+    if (!isDrawerOpen) {
+      return;
+    }
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.delete(DRAWER_QUERY_PARAM);
+    setSearchParams(nextSearchParams, { replace: true });
   };
 
   return (
     <>
       <Drawer
         direction="right"
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        open={isDrawerOpen}
+        onOpenChange={handleDrawerOpenChange}
       >
         <DrawerTrigger asChild>
           <Button
             variant="outline"
             className="transition-colors text-xl justify-center w-full p-6 border-2 border-black rounded-xl bg-white hover:bg-gray-200 text-black"
-            onClick={() => setDrawerOpen(true)}
           >
             Добавить тренировку
           </Button>
         </DrawerTrigger>
-        <DrawerContent className="grid grid-rows-[auto_1fr_auto] h-[100dvh] overflow-hidden">
-          <div className="flex-shrink-0">
+        <DrawerContent className="grid h-dvh grid-rows-[auto_1fr_auto] overflow-hidden">
+          <div className="shrink-0">
             <DrawerHeader>
               <DrawerTitle
                 className={"text-2xl w-full flex justify-between items-center"}
@@ -94,7 +119,7 @@ export const AddExercise = () => {
             />
           </div>
 
-          <DrawerFooter className="w-full flex-shrink-0">
+          <DrawerFooter className="w-full shrink-0">
             <Button
               disabled={
                 selectedExerciseCheckboxes.length === 0 &&
@@ -104,7 +129,10 @@ export const AddExercise = () => {
             >
               Добавить
             </Button>
-            <Button variant="outline" onClick={() => setDrawerOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => handleDrawerOpenChange(false)}
+            >
               Отмена
             </Button>
           </DrawerFooter>

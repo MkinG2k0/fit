@@ -1,4 +1,9 @@
-import { ChartColumnBig, Menu, ScrollText, Timer as TimerIcon } from "lucide-react";
+import {
+  ChartColumnBig,
+  Menu,
+  ScrollText,
+  Timer as TimerIcon,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button.tsx";
 import {
@@ -33,6 +38,7 @@ export const ProfileDropDownMenu = () => {
         <div className="flex flex-col gap-2">
           <Button
             variant="ghost"
+            className="justify-start"
             onClick={handleTimerNavigate}
           >
             <TimerIcon />
@@ -41,13 +47,18 @@ export const ProfileDropDownMenu = () => {
           <Separator />
           <Button
             variant="ghost"
+            className="justify-start"
             onClick={handleExercisesNavigate}
           >
             <ScrollText />
             <div>Список упражнений</div>
           </Button>
           <Separator />
-          <Button variant="ghost" onClick={handleAnalyticsNavigate}>
+          <Button
+            variant="ghost"
+            className="justify-start"
+            onClick={handleAnalyticsNavigate}
+          >
             <ChartColumnBig />
             <div>Аналитика</div>
           </Button>
