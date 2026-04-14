@@ -10,6 +10,7 @@ import {
   DrawerTrigger,
 } from "@/shared/ui/shadCNComponents/ui/drawer";
 import { CreateExercise } from "@/features/createExercise";
+import { CreateCategory } from "@/features/createCategory";
 import { CreatePreset } from "@/features/createPreset";
 import { useCalendarStore } from "@/entities/calendarDay";
 import { useExerciseStore } from "@/entities/exercise";
@@ -22,6 +23,7 @@ export const AddExercise = () => {
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [openAddPopover, setOpenAddPopover] = useState(false);
   const [openExerciseModal, setOpenExerciseModal] = useState(false);
+  const [openCategoryModal, setOpenCategoryModal] = useState(false);
   const [openPresetModal, setOpenPresetModal] = useState(false);
 
   const addExercise = useCalendarStore((state) => state.addExercise);
@@ -75,6 +77,7 @@ export const AddExercise = () => {
                   openAddPopover={openAddPopover}
                   onOpenAddPopoverChange={setOpenAddPopover}
                   onOpenExerciseModal={() => setOpenExerciseModal(true)}
+                  onOpenCategoryModal={() => setOpenCategoryModal(true)}
                   onOpenPresetModal={() => setOpenPresetModal(true)}
                 />
               </DrawerTitle>
@@ -111,6 +114,10 @@ export const AddExercise = () => {
       <CreateExercise
         open={openExerciseModal}
         onOpenChange={setOpenExerciseModal}
+      />
+      <CreateCategory
+        open={openCategoryModal}
+        onOpenChange={setOpenCategoryModal}
       />
       <CreatePreset open={openPresetModal} onOpenChange={setOpenPresetModal} />
     </>

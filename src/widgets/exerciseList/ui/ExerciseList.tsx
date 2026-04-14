@@ -38,7 +38,7 @@ export const ExerciseList = () => {
         </AnimatePresence>
         <div className={"mb-26"}></div>
       </div>
-      <div className={style.footer}>
+      <div className={"fixed bottom-0 left-0 right-0 p-2"}>
         <div>
           <AddExercise />
         </div>

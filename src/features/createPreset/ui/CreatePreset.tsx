@@ -24,11 +24,13 @@ interface CreatePresetProps {
   onOpenChange: (open: boolean) => void;
 }
 
+const DEFAULT_PRESET_COLOR: RgbaColor = { r: 255, g: 0, b: 0, a: 1 };
+
 export const CreatePreset = ({ open, onOpenChange }: CreatePresetProps) => {
   const [newPreset, setNewPreset] = useState<NewPreset>({
     presetName: "",
     exercises: [],
-    presetColor: { r: 0, g: 0, b: 0, a: 1 },
+    presetColor: DEFAULT_PRESET_COLOR,
   });
   const [error, setError] = useState<string>("");
 
@@ -47,7 +49,7 @@ export const CreatePreset = ({ open, onOpenChange }: CreatePresetProps) => {
     setNewPreset({
       presetName: "",
       exercises: [],
-      presetColor: { r: 0, g: 0, b: 0, a: 1 },
+      presetColor: DEFAULT_PRESET_COLOR,
     });
     setError("");
   };
@@ -127,7 +129,10 @@ export const CreatePreset = ({ open, onOpenChange }: CreatePresetProps) => {
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-full border-2 border-black rounded-md p-2">
-                <RgbaColorPicker onChange={handleColorPicker} />
+                <RgbaColorPicker
+                  color={newPreset.presetColor}
+                  onChange={handleColorPicker}
+                />
               </PopoverContent>
             </Popover>
           </div>

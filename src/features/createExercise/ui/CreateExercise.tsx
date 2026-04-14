@@ -46,10 +46,11 @@ export const CreateExercise = ({ open, onOpenChange }: CreateExerciseProps) => {
   const handleCreate = () => {
     if (newExercise.category && newExercise.name) {
       // Check if exercise with this name already exists in any category
-      const existingExercise = allExercises.some(category =>
-        category.exercises.some(exercise =>
-          exercise.toLowerCase() === newExercise.name.toLowerCase()
-        )
+      const existingExercise = allExercises.some((category) =>
+        category.exercises.some(
+          (exercise) =>
+            exercise.toLowerCase() === newExercise.name.toLowerCase(),
+        ),
       );
 
       if (existingExercise) {
@@ -77,7 +78,7 @@ export const CreateExercise = ({ open, onOpenChange }: CreateExerciseProps) => {
             <label htmlFor="category" className="text-sm font-medium">
               Категория
             </label>
-            <CategorySelector
+            {/* <CategorySelector
               value={newExercise.category}
               onValueChange={(value) =>
                 setNewExercise({ ...newExercise, category: value })
@@ -88,7 +89,27 @@ export const CreateExercise = ({ open, onOpenChange }: CreateExerciseProps) => {
               focused={focused}
               commandRef={commandRef}
               allExercises={allExercises}
-            />
+            /> */}
+            <div className="flex gap-2 flex-wrap">
+              {allExercises.map((category) => (
+                <Button
+                  key={category.category}
+                  variant={
+                    newExercise.category === category.category
+                      ? "default"
+                      : "outline"
+                  }
+                  onClick={() =>
+                    setNewExercise({
+                      ...newExercise,
+                      category: category.category,
+                    })
+                  }
+                >
+                  {category.category}
+                </Button>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -104,9 +125,7 @@ export const CreateExercise = ({ open, onOpenChange }: CreateExerciseProps) => {
                 if (error) setError("");
               }}
             />
-            {error && (
-              <p className="text-sm text-red-500 mt-1">{error}</p>
-            )}
+            {error && <p className="text-sm text-red-500 mt-1">{error}</p>}
           </div>
         </div>
 

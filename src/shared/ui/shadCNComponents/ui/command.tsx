@@ -74,7 +74,7 @@ function CommandInput({
         max={24}
         data-slot="command-input"
         className={cn(
-          "placeholder:text-muted-foreground text-ellipsis w-full" +
+          "placeholder:text-muted-foreground text-ellipsis w-full pl-2" +
             " disabled:cursor-not-allowed disabled:opacity-50",
           className,
         )}

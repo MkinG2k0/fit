@@ -11,6 +11,7 @@ interface ExerciseStore {
   exercises: ExerciseCategory[];
   trainingPreset: TrainingPreset[];
   createExercise: (newExercise: { name: string; category: string }) => void;
+  createCategory: (categoryName: string) => void;
   createTrainingPreset: (newTrainingPreset: TrainingPreset) => void;
   deleteExercise: (exerciseName: string, category: string) => void;
   deleteTrainingPreset: (presetName: string) => void;
@@ -32,6 +33,31 @@ export const useExerciseStore = create<ExerciseStore>()(
               : exerciseGroup,
           );
           return { exercises: newExerciseArray };
+        }),
+      createCategory: (categoryName) =>
+        set((state) => {
+          const normalizedCategoryName = categoryName.trim();
+
+          if (!normalizedCategoryName) {
+            return state;
+          }
+
+          const isCategoryExists = state.exercises.some(
+            (exerciseGroup) =>
+              exerciseGroup.category.toLowerCase() ===
+              normalizedCategoryName.toLowerCase(),
+          );
+
+          if (isCategoryExists) {
+            return state;
+          }
+
+          return {
+            exercises: [
+              ...state.exercises,
+              { category: normalizedCategoryName, exercises: [] },
+            ],
+          };
         }),
       createTrainingPreset: (newTrainingPreset) =>
         set((state) => {
