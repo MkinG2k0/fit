@@ -4,6 +4,7 @@ import { useCalendarStore } from "@/entities/calendarDay";
 import { firstLetterToUpperCase } from "@/shared/lib";
 import style from "./Header.module.css";
 import { ProfileDropDownMenu } from "@/features/profileDropDownMenu";
+import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 
 interface HeaderProps {
   date?: boolean;
@@ -17,7 +18,11 @@ export const Header = ({ date, title, navigateBack }: HeaderProps) => {
   return (
     <div className={style.header}>
       <div className={style.title}>
-        {navigateBack && <ArrowLeft onClick={() => navigate("/")} />}
+        {navigateBack && (
+          <Button variant="outline" onClick={() => navigate("/")}>
+            <ArrowLeft />
+          </Button>
+        )}
         <div className={style.pageName}>{title}</div>
         {date && (
           <div className={style.month}>

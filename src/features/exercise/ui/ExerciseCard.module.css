@@ -49,6 +49,28 @@
   min-width: 0;
 }
 
+.liftedTotal {
+  display: flex;
+  flex-shrink: 0;
+  align-items: baseline;
+  gap: 4px;
+  padding: 0 8px;
+  white-space: nowrap;
+  color: var(--muted-foreground);
+}
+
+.liftedTotalValue {
+  font-size: 1.05em;
+  font-weight: 700;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.liftedTotalUnit {
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
 .img {
   max-width: 40px;
   max-height: 40px;

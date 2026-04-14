@@ -3,9 +3,9 @@ import { AnimatePresence } from "motion/react";
 import {
   useState,
   useEffect,
+  useMemo,
   useRef,
   type MouseEvent,
-  type SyntheticEvent,
 } from "react";
 import { ChartColumnBig, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { useCalendarStore } from "@/entities/calendarDay";
@@ -26,6 +26,25 @@ const SWIPE_DISTANCE_THRESHOLD = 140;
 const SWIPE_VELOCITY_THRESHOLD = 250;
 const DRAG_CLICK_SUPPRESS_DELAY_MS = 120;
 const FALLBACK_ICON_PATH = "/muscles-category/другое.png";
+
+const formatTotalLiftedKg = (totalKg: number): string => {
+  if (!Number.isFinite(totalKg) || totalKg <= 0) {
+    return "0";
+  }
+
+  const roundedTenths = Math.round(totalKg * 10) / 10;
+
+  if (Number.isInteger(roundedTenths)) {
+    return roundedTenths.toLocaleString("ru-RU", {
+      maximumFractionDigits: 0,
+    });
+  }
+
+  return roundedTenths.toLocaleString("ru-RU", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+};
 
 const getExerciseIconPath = (category: string | undefined) => {
   const normalizedCategory = category?.trim().toLowerCase();
@@ -117,7 +136,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
     setIsDeleteDialogOpen(false);
   };
 
-  const handleIconLoadingError = (_event: SyntheticEvent<HTMLImageElement>) => {
+  const handleIconLoadingError = () => {
     setIconPath((previousPath) =>
       previousPath === FALLBACK_ICON_PATH ? previousPath : FALLBACK_ICON_PATH,
     );
@@ -136,8 +155,19 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
 
   const exerciseColor = `rgba(${exercise.presetColor?.r},${exercise.presetColor?.g},${exercise.presetColor?.b},${exercise.presetColor?.a}`;
 
+  const totalLiftedKg = useMemo(() => {
+    return exercise.sets.reduce((sum, set) => {
+      const reps = Number.isFinite(set.reps) ? set.reps : 0;
+      const weight = Number.isFinite(set.weight) ? set.weight : 0;
+
+      return sum + reps * weight;
+    }, 0);
+  }, [exercise.sets]);
+
+  const totalLiftedLabel = formatTotalLiftedKg(totalLiftedKg);
+
   return (
-    <div className="relative w-screen overflow-hidden">
+    <div className="relative w-screen overflow-hidden cursor-pointer">
       <motion.div
         drag="x"
         onDragStart={handleCardDragStart}
@@ -151,7 +181,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
         transition={showHint ? { duration: 1.2, ease: "easeInOut" } : undefined}
       >
         <div className="pointer-events-none flex w-10 items-center h-full justify-center absolute -left-11.25 top-0 z-10">
-          <ChartColumnBig className="text-blue-500" />
+          <ChartColumnBig className="text-primary" />
         </div>
         <div style={{ borderColor: exerciseColor }} className={style.card}>
           <div
@@ -185,6 +215,13 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
                   onSelect={inputChangeHandler}
                 />
               </div>
+            </div>
+            <div
+              className={style.liftedTotal}
+              title="Суммарный объём: по каждому подходу умножаем повторения на вес (кг) и складываем"
+            >
+              <span className={style.liftedTotalValue}>{totalLiftedLabel}</span>
+              <span className={style.liftedTotalUnit}>кг</span>
             </div>
             <div className={"p-4"}>
               {isEditable ? <ChevronUp /> : <ChevronDown />}
