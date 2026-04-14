@@ -1,4 +1,4 @@
-import { Menu, ScrollText, Timer as TimerIcon } from "lucide-react";
+import { ChartColumnBig, Menu, ScrollText, Timer as TimerIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button.tsx";
 import {
@@ -10,6 +10,17 @@ import { Separator } from "@/shared/ui/shadCNComponents/ui/separator.tsx";
 
 export const ProfileDropDownMenu = () => {
   const navigate = useNavigate();
+  const handleTimerNavigate = () => {
+    navigate("/timer");
+  };
+
+  const handleExercisesNavigate = () => {
+    navigate("/exercises");
+  };
+
+  const handleAnalyticsNavigate = () => {
+    navigate("/analytics");
+  };
 
   return (
     <Popover>
@@ -22,9 +33,7 @@ export const ProfileDropDownMenu = () => {
         <div className="flex flex-col gap-2">
           <Button
             variant="ghost"
-            onClick={() => {
-              navigate("/timer");
-            }}
+            onClick={handleTimerNavigate}
           >
             <TimerIcon />
             <div>Таймер</div>
@@ -32,12 +41,15 @@ export const ProfileDropDownMenu = () => {
           <Separator />
           <Button
             variant="ghost"
-            onClick={() => {
-              navigate("/exercises/");
-            }}
+            onClick={handleExercisesNavigate}
           >
             <ScrollText />
             <div>Список упражнений</div>
+          </Button>
+          <Separator />
+          <Button variant="ghost" onClick={handleAnalyticsNavigate}>
+            <ChartColumnBig />
+            <div>Аналитика</div>
           </Button>
         </div>
       </PopoverContent>

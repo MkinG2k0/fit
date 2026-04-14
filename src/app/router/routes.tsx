@@ -10,6 +10,9 @@ const TimerPage = lazy(() =>
 const ExercisePage = lazy(() =>
   import("@/pages/ExercisePage").then((m) => ({ default: m.ExercisePage })),
 );
+const AnalyticsPage = lazy(() =>
+  import("@/pages/AnalyticsPage").then((m) => ({ default: m.AnalyticsPage })),
+);
 
 export const AppRoutes = () => {
   return (
@@ -35,6 +38,14 @@ export const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <TimerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/analytics"
+        element={
+          <ProtectedRoute>
+            <AnalyticsPage />
           </ProtectedRoute>
         }
       />

@@ -17,7 +17,7 @@ import type { TonnageData } from "../lib/calculateTonnage";
 const chartConfig = {
   tonnage: {
     label: "КГ",
-    color: "black",
+    color: "var(--color-chart-1)",
   },
 } satisfies ChartConfig;
 

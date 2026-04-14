@@ -1,10 +1,11 @@
 .header {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;
-		padding: 0.5em;
+		align-items: flex-start;
+		padding: 0.5rem 0.75rem;
 		text-align: center;
 		font-weight: bold;
+		gap: 0.5rem;
 }
 
 .days {
@@ -19,19 +20,24 @@
 
 .title {
 		display: flex;
-		align-items: baseline;
+		align-items: center;
 		gap: 10px;
-}
-
-@media (max-width: 320px) {
-		.title {
-				font-size: 0.8em;
-		}
+		min-width: 0;
 }
 
 .pageName {
 		text-align: left;
-		font-size: 2em;
+		font-size: clamp(1.75rem, 7vw, 2rem);
+		line-height: 1.05;
+}
+
+@media (max-width: 480px) {
+		.title {
+				gap: 0.5rem;
+		}
+		.pageName {
+				font-size: clamp(1.5rem, 8vw, 1.875rem);
+		}
 }
 
 .month {

@@ -1,6 +1,6 @@
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { ChartColumnBig } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
   Dialog,
@@ -9,39 +9,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/ui/shadCNComponents/ui/dialog";
-import type { CalendarDay } from "@/entities/calendarDay";
-import { getAllExercisesFromStorage } from "@/shared/lib/storage";
+import { readAllTrainingDaysFromStorage } from "@/shared/lib/analyticsStorage";
 import { calculateTonnageForExercise } from "../lib/calculateTonnage";
 import { TonnageChart } from "./TonnageChart";
 
 export const StatisticCard = ({ exerciseName }: { exerciseName: string }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [exerciseObj, setExerciseObj] = useState<Record<string, CalendarDay>>(
-    {},
-  );
-  const [chartData, setChartData] = useState<
-    { date: string; tonnage: number }[]
-  >([]);
 
-  useEffect(() => {
-    if (dialogOpen) {
-      const allExercises: Record<string, CalendarDay> =
-        getAllExercisesFromStorage().reduce((result, currentValue) => {
-          return {
-            ...result,
-            ...currentValue,
-          };
-        }, {});
-      setExerciseObj(allExercises);
+  const chartData = useMemo(() => {
+    if (!dialogOpen) {
+      return [];
     }
-  }, [dialogOpen]);
 
-  useEffect(() => {
-    if (Object.keys(exerciseObj).length > 0) {
-      const tonnageData = calculateTonnageForExercise(exerciseObj, exerciseName);
-      setChartData(tonnageData);
-    }
-  }, [exerciseObj, exerciseName]);
+    const allTrainingDays = readAllTrainingDaysFromStorage();
+    return calculateTonnageForExercise(allTrainingDays, exerciseName);
+  }, [dialogOpen, exerciseName]);
 
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -51,7 +33,7 @@ export const StatisticCard = ({ exerciseName }: { exerciseName: string }) => {
             <ChartColumnBig />
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Статистика упражнения</DialogTitle>
             <DialogDescription>
