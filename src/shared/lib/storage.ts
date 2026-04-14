@@ -1,7 +1,10 @@
 import dayjs from "dayjs";
 import type { CalendarDay } from "@/entities/calendarDay";
 
-const monthYearRegex = /^(0[1-9]|1[0-2])-\d{4}$/;
+/** Ключи месяцев тренировочного журнала в localStorage (`MM-YYYY`). */
+export const MONTH_YEAR_STORAGE_KEY_REGEX = /^(0[1-9]|1[0-2])-\d{4}$/;
+
+const monthYearRegex = MONTH_YEAR_STORAGE_KEY_REGEX;
 
 export const getDaysFromLocalStorage = (date: dayjs.Dayjs) => {
   const prevDate = dayjs(date.add(-1, "month"));
@@ -40,7 +43,7 @@ export const getAllExercisesFromStorage = () => {
     monthYearRegex.test(key),
   );
 
-  let allExercises = [];
+  const allExercises = [];
   for (const key of keys) {
     const value = localStorage.getItem(key);
     if (value) {
@@ -48,5 +51,35 @@ export const getAllExercisesFromStorage = () => {
     }
   }
   return allExercises;
+};
+
+/** Снимок всех сохранённых месяцев журнала (объект дней по ключу `DD-MM-YYYY`). */
+export const readAllWorkoutMonthBuckets = (): Record<string, unknown> | null => {
+  const keys = Object.keys(localStorage).filter((key) =>
+    MONTH_YEAR_STORAGE_KEY_REGEX.test(key),
+  );
+  if (keys.length === 0) {
+    return null;
+  }
+  const months: Record<string, unknown> = {};
+  for (const key of keys) {
+    const raw = localStorage.getItem(key);
+    if (!raw) {
+      continue;
+    }
+    try {
+      months[key] = JSON.parse(raw) as unknown;
+    } catch {
+      continue;
+    }
+  }
+  return Object.keys(months).length > 0 ? months : null;
+};
+
+export const writeWorkoutMonthBucket = (monthKey: string, bucket: unknown) => {
+  if (!MONTH_YEAR_STORAGE_KEY_REGEX.test(monthKey)) {
+    throw new Error(`Некорректный ключ месяца: ${monthKey}`);
+  }
+  localStorage.setItem(monthKey, JSON.stringify(bucket));
 };
 

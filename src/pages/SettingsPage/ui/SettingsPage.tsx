@@ -1,6 +1,7 @@
 import { Header } from "@/widgets";
 import { Separator } from "@/shared/ui/shadCNComponents/ui/separator";
 import { ThemeSettingsCard } from "@/features/themeSwitcher";
+import { SettingsTransferCard } from "@/features/appSettingsTransfer";
 import {
   Card,
   CardContent,
@@ -57,17 +58,7 @@ export const SettingsPage = () => {
             </CardContent>
           </Card>
 
-          <Card className={CARD_CLASS}>
-            <CardHeader className={CARD_HEADER_CLASS}>
-              <CardTitle>Данные</CardTitle>
-              <CardDescription>
-                Экспорт и очистка локальных данных будут вынесены в этот раздел
-              </CardDescription>
-            </CardHeader>
-            <CardContent className={CARD_CONTENT_CLASS}>
-              <p className="text-sm text-muted-foreground">Статус: скоро</p>
-            </CardContent>
-          </Card>
+          <SettingsTransferCard />
         </div>
       </div>
     </div>

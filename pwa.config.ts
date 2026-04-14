@@ -3,8 +3,8 @@ import { type GenerateSWOptions } from "workbox-build";
 
 export const pwaManifest: Partial<ManifestOptions> = {
   id: "/",
-  name: "MagFitDiary",
-  short_name: "MagFitDiary",
+  name: "Fit",
+  short_name: "Fit",
   description: "Фитнес-дневник тренировок",
   theme_color: "#000000",
   background_color: "#ffffff",
@@ -69,7 +69,7 @@ export const pwaWorkBoxOptions: Partial<GenerateSWOptions> = {
   globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
   runtimeCaching: [
     {
-      urlPattern: /^https:\/\/magfit-diary-backend\.onrender\.com\//,
+      urlPattern: /^https:\/\/fit-backend\.onrender\.com\//,
       handler: "NetworkFirst",
       options: {
         cacheName: "api-cache",
