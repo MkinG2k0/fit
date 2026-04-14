@@ -41,7 +41,10 @@ export const AnalyticsDashboard = ({
       <AnalyticsKpiGrid summary={analytics.summary} />
       <div className="grid gap-4 lg:grid-cols-2">
         <AnalyticsProgressChart trends={analytics.trends} />
-        <AnalyticsFrequencyChart trends={analytics.trends} />
+        <AnalyticsFrequencyChart
+          trends={analytics.trends}
+          comparison={analytics.tonnageComparison}
+        />
       </div>
       <AnalyticsPeriodCompareCard
         period={period}

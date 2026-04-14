@@ -1,5 +1,5 @@
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
-import type { TrendPoint } from "@/entities/analytics";
+import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis } from "recharts";
+import type { PeriodComparison, TrendPoint } from "@/entities/analytics";
 import {
   Card,
   CardContent,
@@ -13,52 +13,126 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/shared/ui/shadCNComponents/ui/chart";
+import { cn } from "@/shared/ui/lib/utils";
 
 interface AnalyticsFrequencyChartProps {
   trends: TrendPoint[];
+  comparison: PeriodComparison;
 }
 
 const chartConfig = {
-  sessions: {
-    label: "Подходы",
-    color: "var(--color-chart-3)",
-  },
   maxWeight: {
     label: "Максимальный вес",
     color: "var(--color-chart-4)",
   },
+  tonnage: {
+    label: "Объем",
+    color: "var(--color-chart-1)",
+  },
 } satisfies ChartConfig;
 
-const chartClassName = "h-56 w-full aspect-auto sm:h-72 sm:aspect-video";
+const weightChartClassName = "h-40 w-full aspect-auto";
+const tonnageChartClassName = "h-40 w-full aspect-auto";
+const positiveDeltaClassName = "text-primary";
+const negativeDeltaClassName = "text-destructive";
+const neutralDeltaClassName = "text-muted-foreground";
 
 export const AnalyticsFrequencyChart = ({
   trends,
+  comparison,
 }: AnalyticsFrequencyChartProps) => {
+  const trainingDays = trends.length;
+  const totalTonnage = trends.reduce((acc, point) => acc + point.tonnage, 0);
+  const avgTonnage = trainingDays > 0 ? totalTonnage / trainingDays : 0;
+  const maxWeight = trends.reduce(
+    (acc, point) => Math.max(acc, point.maxWeight),
+    0,
+  );
+  const deltaText =
+    comparison.deltaPercent === null
+      ? "новый период"
+      : `${comparison.deltaPercent > 0 ? "+" : ""}${comparison.deltaPercent.toFixed(1)}%`;
+  const deltaClassName =
+    comparison.delta > 0
+      ? positiveDeltaClassName
+      : comparison.delta < 0
+        ? negativeDeltaClassName
+        : neutralDeltaClassName;
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Частота и интенсивность</CardTitle>
+        <CardTitle>Прогресс нагрузки</CardTitle>
         <CardDescription>
-          Количество сессий по дням и пик рабочего веса
+          Максимальный вес и объем по тренировочным дням
         </CardDescription>
       </CardHeader>
-      <CardContent className="px-2 pb-3 sm:px-6 sm:pb-6">
-        <ChartContainer config={chartConfig} className={chartClassName}>
-          <BarChart data={trends} margin={{ left: 12, right: 12 }}>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="date"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              minTickGap={24}
-              tickFormatter={(value) => value.slice(0, 5)}
-            />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <Bar dataKey="sessions" fill="var(--color-sessions)" radius={4} />
-            <Bar dataKey="maxWeight" fill="var(--color-maxWeight)" radius={4} />
-          </BarChart>
-        </ChartContainer>
+      <CardContent className="grid gap-4 px-2 pb-3 sm:px-6 sm:pb-6">
+        <div className="grid gap-2 sm:grid-cols-3">
+          <div className="rounded-md border p-2">
+            <div className="text-xs text-muted-foreground">Тренировок</div>
+            <div className="text-lg font-semibold">{trainingDays}</div>
+          </div>
+          <div className="rounded-md border p-2">
+            <div className="text-xs text-muted-foreground">Средний объем</div>
+            <div className="text-lg font-semibold">{avgTonnage.toFixed(0)} кг</div>
+          </div>
+          <div className="rounded-md border p-2">
+            <div className="text-xs text-muted-foreground">Изм. к прошлому</div>
+            <div className={cn("text-lg font-semibold", deltaClassName)}>
+              {deltaText}
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-md border p-2">
+          <div className="mb-1 text-xs text-muted-foreground">
+            Максимальный вес: {maxWeight.toFixed(0)} кг
+          </div>
+          <ChartContainer config={chartConfig} className={weightChartClassName}>
+            <LineChart data={trends} margin={{ left: 8, right: 8 }}>
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="date"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                minTickGap={24}
+                tickFormatter={(value) => value.slice(0, 5)}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent indicator="line" />}
+              />
+              <Line
+                dataKey="maxWeight"
+                type="monotone"
+                stroke="var(--color-maxWeight)"
+                strokeWidth={2}
+                dot={false}
+              />
+            </LineChart>
+          </ChartContainer>
+        </div>
+
+        <div className="rounded-md border p-2">
+          <div className="mb-1 text-xs text-muted-foreground">Объем по датам</div>
+          <ChartContainer config={chartConfig} className={tonnageChartClassName}>
+            <BarChart data={trends} margin={{ left: 8, right: 8 }}>
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="date"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                minTickGap={24}
+                tickFormatter={(value) => value.slice(0, 5)}
+              />
+              <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+              <Bar dataKey="tonnage" fill="var(--color-tonnage)" radius={4} />
+            </BarChart>
+          </ChartContainer>
+        </div>
       </CardContent>
     </Card>
   );

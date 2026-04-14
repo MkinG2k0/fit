@@ -1,11 +1,11 @@
 import { RotateCcw } from "lucide-react";
-import type { ChangeEvent } from "react";
+import { useMemo } from "react";
 import type {
   AnalyticsFilters as AnalyticsFiltersState,
   AnalyticsPeriod,
 } from "@/entities/analytics";
+import { allExercises } from "@/shared/config/constants";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
-import { Input } from "@/shared/ui/shadCNComponents/ui/input";
 import { Label } from "@/shared/ui/shadCNComponents/ui/label";
 import {
   RadioGroup,
@@ -13,6 +13,7 @@ import {
 } from "@/shared/ui/shadCNComponents/ui/radio-group";
 import { cn } from "@/shared/ui/lib/utils";
 import { ANALYTICS_PERIOD_OPTIONS } from "../model/types";
+import { SearchableSelect, type SearchableSelectOption } from "./SearchableSelect";
 
 interface AnalyticsFiltersProps {
   filters: AnalyticsFiltersState;
@@ -23,10 +24,9 @@ interface AnalyticsFiltersProps {
   className?: string;
 }
 
-const inputClassName = "h-9";
-const radioGroupClassName = "grid-cols-1 sm:grid-cols-3";
+const periodGroupClassName = "flex gap-2";
 const periodOptionClassName =
-  "flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm";
+  "flex flex-1 cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm";
 
 export const AnalyticsFilters = ({
   filters,
@@ -36,16 +36,47 @@ export const AnalyticsFilters = ({
   onReset,
   className,
 }: AnalyticsFiltersProps) => {
-  const handleExerciseInputChange = (
-    event: ChangeEvent<HTMLInputElement>,
-  ) => {
-    onExerciseNameChange(event.target.value);
+  const categoryOptions = useMemo<SearchableSelectOption[]>(() => {
+    return allExercises.map((category) => ({
+      value: category.category,
+      label: category.category,
+    }));
+  }, []);
+
+  const exercisesByCategory = useMemo(() => {
+    return allExercises.reduce<Record<string, string[]>>((acc, category) => {
+      acc[category.category] = category.exercises;
+      return acc;
+    }, {});
+  }, []);
+
+  const exerciseOptions = useMemo<SearchableSelectOption[]>(() => {
+    const exercises =
+      filters.category.length > 0
+        ? exercisesByCategory[filters.category] ?? []
+        : allExercises.flatMap((category) => category.exercises);
+    const uniqueExercises = Array.from(new Set(exercises));
+
+    return uniqueExercises.map((exercise) => ({
+      value: exercise,
+      label: exercise,
+    }));
+  }, [exercisesByCategory, filters.category]);
+
+  const handleExerciseSelect = (exerciseName: string) => {
+    onExerciseNameChange(exerciseName);
   };
 
-  const handleCategoryInputChange = (
-    event: ChangeEvent<HTMLInputElement>,
-  ) => {
-    onCategoryChange(event.target.value);
+  const handleCategorySelect = (category: string) => {
+    onCategoryChange(category);
+    if (category.length === 0) {
+      return;
+    }
+
+    const categoryExercises = exercisesByCategory[category] ?? [];
+    if (!categoryExercises.includes(filters.exerciseName)) {
+      onExerciseNameChange("");
+    }
   };
 
   const handlePeriodValueChange = (value: string) => {
@@ -56,7 +87,7 @@ export const AnalyticsFilters = ({
 
   return (
     <section className={cn("rounded-lg border p-3 sm:p-4", className)}>
-      <div className="mb-3 flex flex-col items-start justify-between gap-2 sm:mb-4 sm:flex-row sm:items-center">
+      <div className="mb-3 flex items-start justify-between gap-2 sm:mb-4 sm:flex-row sm:items-center">
         <h2 className="text-lg font-semibold">Фильтры аналитики</h2>
         <Button variant="ghost" size="sm" onClick={onReset}>
           <RotateCcw className="size-4" />
@@ -65,29 +96,31 @@ export const AnalyticsFilters = ({
       </div>
       <div className="grid gap-4">
         <div className="grid gap-2">
-          <Label htmlFor="analytics-exercise">Упражнение</Label>
-          <Input
-            id="analytics-exercise"
-            className={inputClassName}
-            placeholder="Например: Жим лежа"
+          <Label>Упражнение</Label>
+          <SearchableSelect
             value={filters.exerciseName}
-            onChange={handleExerciseInputChange}
+            options={exerciseOptions}
+            placeholder="Например: Жим лежа"
+            searchPlaceholder="Поиск упражнения..."
+            emptyText="Упражнения не найдены"
+            onValueChange={handleExerciseSelect}
           />
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="analytics-category">Категория</Label>
-          <Input
-            id="analytics-category"
-            className={inputClassName}
-            placeholder="Например: Грудь"
+          <Label>Категория</Label>
+          <SearchableSelect
             value={filters.category}
-            onChange={handleCategoryInputChange}
+            options={categoryOptions}
+            placeholder="Например: Грудь"
+            searchPlaceholder="Поиск категории..."
+            emptyText="Категории не найдены"
+            onValueChange={handleCategorySelect}
           />
         </div>
         <div className="grid gap-2">
           <Label>Период</Label>
           <RadioGroup
-            className={radioGroupClassName}
+            className={periodGroupClassName}
             value={filters.period}
             onValueChange={handlePeriodValueChange}
           >
@@ -110,4 +143,3 @@ export const AnalyticsFilters = ({
     </section>
   );
 };
-

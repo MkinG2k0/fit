@@ -13,8 +13,29 @@ import { readAllTrainingDaysFromStorage } from "@/shared/lib/analyticsStorage";
 import { calculateTonnageForExercise } from "../lib/calculateTonnage";
 import { TonnageChart } from "./TonnageChart";
 
-export const StatisticCard = ({ exerciseName }: { exerciseName: string }) => {
-  const [dialogOpen, setDialogOpen] = useState(false);
+interface StatisticCardProps {
+  exerciseName: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  showTrigger?: boolean;
+}
+
+export const StatisticCard = ({
+  exerciseName,
+  open,
+  onOpenChange,
+  showTrigger = true,
+}: StatisticCardProps) => {
+  const [internalDialogOpen, setInternalDialogOpen] = useState(false);
+  const isControlled = typeof open === "boolean";
+  const dialogOpen = isControlled ? open : internalDialogOpen;
+
+  const handleDialogOpenChange = (nextOpen: boolean) => {
+    if (!isControlled) {
+      setInternalDialogOpen(nextOpen);
+    }
+    onOpenChange?.(nextOpen);
+  };
 
   const chartData = useMemo(() => {
     if (!dialogOpen) {
@@ -26,13 +47,15 @@ export const StatisticCard = ({ exerciseName }: { exerciseName: string }) => {
   }, [dialogOpen, exerciseName]);
 
   return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+    <Dialog open={dialogOpen} onOpenChange={handleDialogOpenChange}>
       <form>
-        <DialogTrigger asChild>
-          <Button variant="outline">
-            <ChartColumnBig />
-          </Button>
-        </DialogTrigger>
+        {showTrigger && (
+          <DialogTrigger asChild>
+            <Button variant="outline">
+              <ChartColumnBig />
+            </Button>
+          </DialogTrigger>
+        )}
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Статистика упражнения</DialogTitle>

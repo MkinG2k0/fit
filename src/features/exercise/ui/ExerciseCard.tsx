@@ -1,7 +1,7 @@
 import type { PanInfo } from "motion";
 import { AnimatePresence } from "motion/react";
 import { useState, useEffect } from "react";
-import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
+import { ChartColumnBig, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { useCalendarStore } from "@/entities/calendarDay";
 import { type Exercise, useExerciseStore } from "@/entities/exercise";
 import * as motion from "motion/react-client";
@@ -9,17 +9,22 @@ import { cn } from "../../../shared/lib";
 import { ExerciseBody } from "./ExerciseBody";
 import { ExerciseDeleteDialog } from "./ExerciseDeleteDialog";
 import { ExerciseNameSelector } from "./ExerciseNameSelector";
+import { StatisticCard } from "@/widgets/statisticCard";
 import style from "./ExerciseCard.module.css";
 
 interface ExerciseCardProps {
   exercise: Exercise;
 }
 
+const SWIPE_DISTANCE_THRESHOLD = 140;
+const SWIPE_VELOCITY_THRESHOLD = 250;
+
 export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
   const [isEditable, setIsEditable] = useState(false);
   const [modalVisibility, setModalVisibility] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isStatisticOpen, setIsStatisticOpen] = useState(false);
 
   const setExerciseName = useCalendarStore((store) => store.setExerciseName);
   const deleteExercise = useCalendarStore((store) => store.deleteExercise);
@@ -37,7 +42,20 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
 
   // 🧩 2. Функция удаления
   const cardDragHandler = (info: PanInfo) => {
-    if (info.offset.x < -180) {
+    const isSwipeRight =
+      info.offset.x > SWIPE_DISTANCE_THRESHOLD &&
+      info.velocity.x > SWIPE_VELOCITY_THRESHOLD;
+    const isSwipeLeft =
+      info.offset.x < -SWIPE_DISTANCE_THRESHOLD &&
+      info.velocity.x < -SWIPE_VELOCITY_THRESHOLD;
+
+    if (isSwipeRight) {
+      setIsStatisticOpen(true);
+
+      return;
+    }
+
+    if (isSwipeLeft) {
       setIsDeleteDialogOpen(true);
     }
   };
@@ -65,18 +83,21 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
   const exerciseColor = `rgba(${exercise.presetColor?.r},${exercise.presetColor?.g},${exercise.presetColor?.b},${exercise.presetColor?.a}`;
 
   return (
-    <div className="w-screen overflow-hidden">
+    <div className="relative w-screen overflow-hidden">
       <motion.div
         drag="x"
         onDragEnd={(_, info) => cardDragHandler(info)}
         dragConstraints={{ top: 0, right: 0, bottom: 0, left: 0 }}
         dragTransition={{ bounceStiffness: 500, bounceDamping: 15 }}
         dragElastic={0.3}
-        className="w-[calc(100dvw+50px)] flex justify-start gap-10"
+        className="w-[calc(100dvw+60px)] flex items-center justify-start gap-2"
         initial={showHint ? { x: 0 } : false}
         animate={showHint ? { x: [-0, -80, 0] } : { x: 0 }}
         transition={showHint ? { duration: 1.2, ease: "easeInOut" } : undefined}
       >
+        <div className="pointer-events-none flex w-10 items-center h-full justify-center absolute left-[-45px] top-0 z-10">
+          <ChartColumnBig className="text-blue-500" />
+        </div>
         <div style={{ borderColor: exerciseColor }} className={style.card}>
           <div
             onClick={() => setIsEditable((p) => !p)}
@@ -131,15 +152,23 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
             )}
           </AnimatePresence>
         </div>
-        <div className="flex justify-center items-center">
-          <Trash2 className="text-red-500" />
+
+        <div className="pointer-events-none flex w-10 items-center justify-center">
+          <Trash2 className="text-red-500/70" />
         </div>
       </motion.div>
+
       <ExerciseDeleteDialog
         open={isDeleteDialogOpen}
         exerciseName={exercise.name}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
+      />
+      <StatisticCard
+        exerciseName={exercise.name}
+        open={isStatisticOpen}
+        onOpenChange={setIsStatisticOpen}
+        showTrigger={false}
       />
     </div>
   );
