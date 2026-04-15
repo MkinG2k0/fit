@@ -7,7 +7,11 @@ import { pwaManifest, pwaWorkBoxOptions } from "./pwa.config.ts";
 
 export default defineConfig({
   plugins: [
-    react(),
+    react({
+      babel: {
+        plugins: [["babel-plugin-react-compiler", { target: "19" }]],
+      },
+    }),
     tailwindcss(),
     VitePWA({
       strategies: "injectManifest",
