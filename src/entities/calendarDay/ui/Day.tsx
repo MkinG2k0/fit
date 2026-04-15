@@ -62,11 +62,9 @@ export const Day = ({
   const todayFlag = dayjs().isSame(value, "day");
   const sameMonthFlag = observableDate.isSame(value, "month");
   const selectedFlag = dayjs(selectedDate).isSame(value, "day");
-  const isFutureDay = value.isAfter(dayjs(), "day");
-
-  const setsProgress = isFutureDay ? 0 : ringMetrics.setsProgress;
-  const volumeProgress = isFutureDay ? 0 : ringMetrics.volumeProgress;
-  const showVolumeRing = !isFutureDay && ringMetrics.hasExercises;
+  const setsProgress = ringMetrics.setsProgress;
+  const volumeProgress = ringMetrics.volumeProgress;
+  const showVolumeRing = ringMetrics.hasExercises;
 
   const handleDateClick = () => {
     onClickDate(value);
@@ -141,7 +139,7 @@ export const Day = ({
         <div
           className={cn(
             "relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-base",
-            selectedFlag && "bg-primary text-primary-foreground",
+            selectedFlag && "bg-primary! text-primary-foreground",
             todayFlag && "bg-primary/50 text-primary-foreground",
           )}
         >
