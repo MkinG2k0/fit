@@ -82,6 +82,7 @@ MagFitDiary is a workout tracking web app focused on fast logging for beginners 
 - Инструмент: `ESLint` c flat config в `eslint.config.js`.
 - База правил: `@eslint/js`, `typescript-eslint`, `eslint-plugin-react-hooks`, `eslint-plugin-react-refresh`, `eslint-plugin-react-x`, `eslint-plugin-react-dom`.
 - В конфиге нет кастомных локальных правил (`rules: {}`), опора на preset-ы.
+- Tailwind-классы оставлять inline в JSX/TSX; не выносить className-строки в переменные/константы, кроме случаев переиспользования через `cva`.
 ## Import Organization
 - Основной алиас `@/*` задан в `tsconfig.json`, `tsconfig.app.json`, `vite.config.ts`.
 - Дополнительный алиас `"@/ui"` задан в `vite.config.ts`.

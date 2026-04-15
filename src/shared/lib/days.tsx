@@ -19,7 +19,7 @@ const clampProgress = (value: number) => Math.max(0, Math.min(1, value));
 
 /** Не от недели/месяца — иначе один день даёт разный % и разные цвета колец в разных режимах. */
 const RING_FULL_SET_COUNT = 20;
-const RING_FULL_VOLUME = 8000;
+const RING_FULL_VOLUME = 6000;
 
 const getDayStats = (exercises: Exercise[]): DayStats => {
   const exerciseCount = exercises.length;
