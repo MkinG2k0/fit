@@ -22,7 +22,7 @@ const CALENDAR_HEIGHT_CLASS = {
 };
 const CALENDAR_CONTAINER_CLASS =
   "relative overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-[height] duration-300";
-const CALENDAR_CONTENT_CLASS = "absolute inset-0";
+const CALENDAR_CONTENT_CLASS = "absolute inset-0 z-50";
 const DRAG_HANDLE_CLASS =
   "relative bottom-8 flex cursor-pointer justify-center text-muted-foreground";
 

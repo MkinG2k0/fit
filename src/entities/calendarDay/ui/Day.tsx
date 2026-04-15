@@ -141,8 +141,8 @@ export const Day = ({
         <div
           className={cn(
             "relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-base",
-            selectedFlag && "bg-primary! text-primary-foreground",
-            todayFlag && "bg-primary/50! text-primary-foreground",
+            selectedFlag && "bg-primary text-primary-foreground",
+            todayFlag && "bg-primary/50 text-primary-foreground",
           )}
         >
           {value.format("D")}
