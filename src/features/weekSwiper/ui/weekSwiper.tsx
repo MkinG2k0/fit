@@ -1,8 +1,9 @@
 import dayjs from "dayjs";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Swiper } from "swiper/react";
+import type { Swiper as SwiperType } from "swiper/types";
 import type { daysArray } from "@/entities/calendarDay";
-import { daysRender } from "@/shared/lib";
+import { Days } from "@/shared/lib";
 import { generateWeek, PRELOAD_WEEKS } from "../lib";
 
 interface WeekSwiperProps {
@@ -14,7 +15,7 @@ export const WeekSwiper = ({
   selectedDate,
   setObservableDate,
 }: WeekSwiperProps) => {
-  const weekSwiperRef = useRef<any>(null);
+  const weekSwiperRef = useRef<{ swiper: SwiperType } | null>(null);
   const [weeks, setWeeks] = useState<daysArray[]>(() => {
     const current = selectedDate.startOf("isoWeek"); // 👉 Понедельник
     const initialWeeks: daysArray[] = [];
@@ -26,7 +27,31 @@ export const WeekSwiper = ({
     return initialWeeks;
   });
 
-  const handleWeekSlideChange = (swiper: any) => {
+  // useEffect(() => {
+  //   const targetWeekStart = selectedDate.startOf("isoWeek");
+  //   const targetWeekIndex = weeks.findIndex((week) =>
+  //     week.start.isSame(targetWeekStart, "day"),
+  //   );
+
+  //   if (targetWeekIndex !== -1) {
+  //     weekSwiperRef.current?.swiper?.slideTo(targetWeekIndex, 300);
+  //     return;
+  //   }
+
+  //   const nextWeeks: daysArray[] = [];
+  //   for (let i = -PRELOAD_WEEKS; i <= PRELOAD_WEEKS; i++) {
+  //     nextWeeks.push(generateWeek(targetWeekStart.add(i, "week")));
+  //   }
+
+  //   setWeeks(nextWeeks);
+
+  //   // Дожидаемся рендера нового массива и центрируемся на текущей неделе.
+  //   setTimeout(() => {
+  //     weekSwiperRef.current?.swiper?.slideTo(PRELOAD_WEEKS, 0);
+  //   }, 0);
+  // }, [selectedDate, weeks]);
+
+  const handleWeekSlideChange = (swiper: SwiperType) => {
     const { activeIndex } = swiper;
     const lastIndex = weeks.length - 1;
     setObservableDate(weeks[activeIndex].start.add(6, "day"));
@@ -62,7 +87,7 @@ export const WeekSwiper = ({
         onSlideChange={handleWeekSlideChange}
         initialSlide={PRELOAD_WEEKS}
       >
-        {daysRender(weeks)}
+        <Days daysArray={weeks} />
       </Swiper>
     </div>
   );

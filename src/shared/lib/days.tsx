@@ -61,7 +61,7 @@ const getRingMetrics = (stats: DayStats): DayRingMetrics => {
   };
 };
 
-export const daysRender = (daysArray: daysArray[]) => {
+export const Days = ({ daysArray }: { daysArray: daysArray[] }) => {
   const observableDate = useCalendarStore((state) => state.observableDate);
   const selectedDate = useCalendarStore((state) => state.selectedDate);
   const setSelectedDate = useCalendarStore((state) => state.setSelectedDate);
