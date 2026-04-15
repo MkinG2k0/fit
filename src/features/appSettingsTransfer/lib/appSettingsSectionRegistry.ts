@@ -1,7 +1,12 @@
 import { useExerciseStore } from "@/entities/exercise";
 import { useThemeStore } from "@/entities/theme";
 import { useUserStore } from "@/entities/user";
-import type { IUser, IUserPersonalData } from "@/entities/user";
+import {
+  DEFAULT_RING_GOALS,
+  type IUser,
+  type IUserPersonalData,
+  type RingGoalsSettings,
+} from "@/entities/user";
 import { isPlainObject, isZustandPersistBlob } from "@/shared/lib/appSettingsTransfer";
 import type { AppSettingsSectionDefinition } from "../model/types";
 import { exportWorkoutJournalSnapshot, importWorkoutJournalSnapshot } from "./workoutJournalTransfer";
@@ -39,9 +44,34 @@ const assertPersistBlob = (value: unknown, label: string): void => {
   }
 };
 
+const isRingGoalsSettings = (value: unknown): value is RingGoalsSettings => {
+  if (!isPlainObject(value)) {
+    return false;
+  }
+  if (
+    typeof value.fullSetCount !== "number" ||
+    !Number.isFinite(value.fullSetCount) ||
+    value.fullSetCount < 1
+  ) {
+    return false;
+  }
+  if (
+    typeof value.fullVolume !== "number" ||
+    !Number.isFinite(value.fullVolume) ||
+    value.fullVolume < 1
+  ) {
+    return false;
+  }
+  return true;
+};
+
 const isUserProfileExport = (
   value: unknown,
-): value is { user: IUser; personalData: IUserPersonalData } => {
+): value is {
+  user: IUser;
+  personalData: IUserPersonalData;
+  ringGoals: RingGoalsSettings;
+} => {
   if (!isPlainObject(value)) {
     return false;
   }
@@ -49,6 +79,9 @@ const isUserProfileExport = (
     return false;
   }
   if (!isPlainObject(value.personalData)) {
+    return false;
+  }
+  if (!isRingGoalsSettings(value.ringGoals)) {
     return false;
   }
   return true;
@@ -99,10 +132,12 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
       const state = parsed.state as {
         user?: IUser;
         personalData?: IUserPersonalData;
+        ringGoals?: RingGoalsSettings;
       };
       return {
         user: state.user ?? { userName: "" },
         personalData: state.personalData ?? {},
+        ringGoals: state.ringGoals ?? DEFAULT_RING_GOALS,
       };
     },
     importSnapshot: (payload: unknown) => {
@@ -126,6 +161,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
               ...existing.state,
               user: payload.user,
               personalData: payload.personalData,
+              ringGoals: payload.ringGoals,
             },
           };
           writeJsonToLocalStorage(USER_STORAGE_KEY, next);
@@ -139,6 +175,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
           state: {
             user: payload.user,
             personalData: payload.personalData,
+            ringGoals: payload.ringGoals,
             accessToken: "",
           },
         });

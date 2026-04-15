@@ -1,5 +1,6 @@
 import { SwiperSlide } from "swiper/react";
 import type { Exercise } from "@/entities/exercise";
+import { MIN_RING_GOAL_VALUE, useUserStore } from "@/entities/user";
 import { Day } from "@/entities/calendarDay/ui/Day";
 import { type daysArray, useCalendarStore } from "@/entities/calendarDay";
 
@@ -17,9 +18,10 @@ interface DayStats {
 
 const clampProgress = (value: number) => Math.max(0, Math.min(1, value));
 
-/** Не от недели/месяца — иначе один день даёт разный % и разные цвета колец в разных режимах. */
-const RING_FULL_SET_COUNT = 20;
-const RING_FULL_VOLUME = 6000;
+const getSafeGoal = (value: number) =>
+  Number.isFinite(value) && value >= MIN_RING_GOAL_VALUE
+    ? value
+    : MIN_RING_GOAL_VALUE;
 
 const getDayStats = (exercises: Exercise[]): DayStats => {
   const exerciseCount = exercises.length;
@@ -45,7 +47,11 @@ const getDayStats = (exercises: Exercise[]): DayStats => {
   };
 };
 
-const getRingMetrics = (stats: DayStats): DayRingMetrics => {
+const getRingMetrics = (
+  stats: DayStats,
+  fullSetCountGoal: number,
+  fullVolumeGoal: number,
+): DayRingMetrics => {
   if (stats.exerciseCount === 0 && stats.setCount === 0 && stats.volume === 0) {
     return {
       setsProgress: 0,
@@ -55,8 +61,8 @@ const getRingMetrics = (stats: DayStats): DayRingMetrics => {
   }
 
   return {
-    setsProgress: clampProgress(stats.setCount / RING_FULL_SET_COUNT),
-    volumeProgress: clampProgress(stats.volume / RING_FULL_VOLUME),
+    setsProgress: clampProgress(stats.setCount / fullSetCountGoal),
+    volumeProgress: clampProgress(stats.volume / fullVolumeGoal),
     hasExercises: true,
   };
 };
@@ -66,6 +72,9 @@ export const useDaysSlides = (daysArray: daysArray[]) => {
   const selectedDate = useCalendarStore((state) => state.selectedDate);
   const setSelectedDate = useCalendarStore((state) => state.setSelectedDate);
   const days = useCalendarStore((state) => state.days);
+  const ringGoals = useUserStore((state) => state.ringGoals);
+  const fullSetCountGoal = getSafeGoal(ringGoals.fullSetCount);
+  const fullVolumeGoal = getSafeGoal(ringGoals.fullVolume);
 
   return daysArray.map((elem) => {
     const dayStatsByKey = new Map<string, DayStats>();
@@ -95,7 +104,11 @@ export const useDaysSlides = (daysArray: daysArray[]) => {
                   selectedDate={selectedDate}
                   dayName={index < 7 ? day.format("dd") : undefined}
                   onClickDate={setSelectedDate}
-                  ringMetrics={getRingMetrics(dayStats)}
+                  ringMetrics={getRingMetrics(
+                    dayStats,
+                    fullSetCountGoal,
+                    fullVolumeGoal,
+                  )}
                 />
               </div>
             );

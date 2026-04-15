@@ -2,6 +2,7 @@ import { Header } from "@/widgets";
 import { Separator } from "@/shared/ui/shadCNComponents/ui/separator";
 import { ThemeSettingsCard } from "@/features/themeSwitcher";
 import { SettingsTransferCard } from "@/features/appSettingsTransfer";
+import { ProfileRingGoalsSettingsCard } from "@/features/profileRingGoalsSettings";
 import {
   Card,
   CardContent,
@@ -33,18 +34,7 @@ export const SettingsPage = () => {
 
           <ThemeSettingsCard />
 
-          <Card className={CARD_CLASS}>
-            <CardHeader className={CARD_HEADER_CLASS}>
-              <CardTitle>Профиль</CardTitle>
-              <CardDescription>
-                Изменение имени и фото профиля будет доступно в следующих
-                обновлениях
-              </CardDescription>
-            </CardHeader>
-            <CardContent className={CARD_CONTENT_CLASS}>
-              <p className="text-sm text-muted-foreground">Статус: скоро</p>
-            </CardContent>
-          </Card>
+          <ProfileRingGoalsSettingsCard />
 
           <Card className={CARD_CLASS}>
             <CardHeader className={CARD_HEADER_CLASS}>
