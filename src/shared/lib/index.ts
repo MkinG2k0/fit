@@ -1,4 +1,5 @@
 export * from "./classMerge";
 export * from "./stringFormat";
 export * from "./storage";
-export * from "./days.tsx";
+export * from "./daysRender";
+

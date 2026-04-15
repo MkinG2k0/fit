@@ -1,9 +1,8 @@
 import dayjs from "dayjs";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Swiper } from "swiper/react";
-import type { Swiper as SwiperType } from "swiper/types";
 import type { daysArray } from "@/entities/calendarDay";
-import { Days } from "@/shared/lib";
+import { daysRender } from "@/shared/lib";
 import { PRELOAD_MONTHS, generateMonth } from "../lib";
 
 interface MonthSwiperProps {
@@ -15,44 +14,18 @@ export const MonthSwiper = ({
   selectedDate,
   setObservableDate,
 }: MonthSwiperProps) => {
-  const [months, setMonths] = useState<daysArray[]>(() => {
+  const [months, setMonths] = useState(() => {
     const current = selectedDate.startOf("month");
-    const initialMonths: daysArray[] = [];
+    const initialMonths = [];
     for (let i = -PRELOAD_MONTHS; i <= PRELOAD_MONTHS; i++) {
       initialMonths.push(generateMonth(current.add(i, "month")));
     }
     return initialMonths;
   });
 
-  const monthSwiperRef = useRef<{ swiper: SwiperType } | null>(null);
+  const monthSwiperRef = useRef<any>(null);
 
-  useEffect(() => {
-    const targetMonthStart = selectedDate.startOf("month").startOf("isoWeek");
-    const targetMonthIndex = months.findIndex((month) =>
-      month.start.isSame(targetMonthStart, "day"),
-    );
-
-    if (targetMonthIndex !== -1) {
-      monthSwiperRef.current?.swiper?.slideTo(targetMonthIndex, 300);
-      return;
-    }
-
-    const nextMonths: daysArray[] = [];
-    for (let i = -PRELOAD_MONTHS; i <= PRELOAD_MONTHS; i++) {
-      nextMonths.push(
-        generateMonth(selectedDate.startOf("month").add(i, "month")),
-      );
-    }
-
-    setMonths(nextMonths);
-
-    // Дожидаемся рендера нового массива и центрируемся на текущем месяце.
-    setTimeout(() => {
-      monthSwiperRef.current?.swiper?.slideTo(PRELOAD_MONTHS, 0);
-    }, 0);
-  }, [selectedDate, months]);
-
-  const handleMonthSlideChange = (swiper: SwiperType) => {
+  const handleMonthSlideChange = (swiper: any) => {
     const { activeIndex } = swiper;
     const lastIndex = months.length - 1;
     setObservableDate(months[activeIndex].start.add(15, "day"));
@@ -86,7 +59,7 @@ export const MonthSwiper = ({
         onSlideChange={handleMonthSlideChange}
         initialSlide={PRELOAD_MONTHS}
       >
-        <Days daysArray={months} />
+        {daysRender(months)}
       </Swiper>
     </div>
   );
