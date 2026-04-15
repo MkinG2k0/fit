@@ -3,7 +3,7 @@ import { useCallback, useRef, useState } from "react";
 import { Swiper } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper/types";
 import type { daysArray } from "@/entities/calendarDay";
-import { daysRender, useSyncCalendarSwiperToDate } from "@/shared/lib";
+import { useDaysSlides, useSyncCalendarSwiperToDate } from "@/shared/lib";
 import { PRELOAD_MONTHS, generateMonth } from "../lib";
 
 interface MonthSwiperProps {
@@ -40,6 +40,7 @@ export const MonthSwiper = ({
     getTargetStart: getTargetMonthStart,
     buildSlidesAroundTarget: buildMonthsAroundTarget,
   });
+  const monthSlides = useDaysSlides(months);
 
   const handleMonthSlideChange = (swiper: SwiperType) => {
     const { activeIndex } = swiper;
@@ -75,7 +76,7 @@ export const MonthSwiper = ({
         onSlideChange={handleMonthSlideChange}
         initialSlide={PRELOAD_MONTHS}
       >
-        {daysRender(months)}
+        {monthSlides}
       </Swiper>
     </div>
   );

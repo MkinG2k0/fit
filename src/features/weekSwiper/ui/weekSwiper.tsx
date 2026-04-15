@@ -3,7 +3,7 @@ import { useCallback, useRef, useState } from "react";
 import { Swiper } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper/types";
 import type { daysArray } from "@/entities/calendarDay";
-import { daysRender, useSyncCalendarSwiperToDate } from "@/shared/lib";
+import { useDaysSlides, useSyncCalendarSwiperToDate } from "@/shared/lib";
 import { generateWeek, PRELOAD_WEEKS } from "../lib";
 
 interface WeekSwiperProps {
@@ -40,6 +40,7 @@ export const WeekSwiper = ({
     getTargetStart: getTargetWeekStart,
     buildSlidesAroundTarget: buildWeeksAroundTarget,
   });
+  const weekSlides = useDaysSlides(weeks);
 
   const handleWeekSlideChange = (swiper: SwiperType) => {
     const { activeIndex } = swiper;
@@ -77,7 +78,7 @@ export const WeekSwiper = ({
         onSlideChange={handleWeekSlideChange}
         initialSlide={PRELOAD_WEEKS}
       >
-        {daysRender(weeks)}
+        {weekSlides}
       </Swiper>
     </div>
   );
