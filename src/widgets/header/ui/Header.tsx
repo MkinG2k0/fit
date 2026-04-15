@@ -17,7 +17,9 @@ export const Header = ({ date, title, navigateBack }: HeaderProps) => {
   const observableDate = useCalendarStore((state) => state.observableDate);
   const selectedDate = useCalendarStore((state) => state.selectedDate);
   const setSelectedDate = useCalendarStore((state) => state.setSelectedDate);
-  const setObservableDate = useCalendarStore((state) => state.setObservableDate);
+  const setObservableDate = useCalendarStore(
+    (state) => state.setObservableDate,
+  );
   const navigate = useNavigate();
   const isTodaySelected = selectedDate.isSame(dayjs(), "day");
 
