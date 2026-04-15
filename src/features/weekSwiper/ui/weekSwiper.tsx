@@ -1,8 +1,9 @@
 import dayjs from "dayjs";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Swiper } from "swiper/react";
+import type { Swiper as SwiperType } from "swiper/types";
 import type { daysArray } from "@/entities/calendarDay";
-import { daysRender } from "@/shared/lib";
+import { daysRender, useSyncCalendarSwiperToDate } from "@/shared/lib";
 import { generateWeek, PRELOAD_WEEKS } from "../lib";
 
 interface WeekSwiperProps {
@@ -14,19 +15,33 @@ export const WeekSwiper = ({
   selectedDate,
   setObservableDate,
 }: WeekSwiperProps) => {
-  const weekSwiperRef = useRef<any>(null);
-  const [weeks, setWeeks] = useState<daysArray[]>(() => {
-    const current = selectedDate.startOf("isoWeek"); // 👉 Понедельник
+  const weekSwiperRef = useRef<{ swiper: SwiperType } | null>(null);
+  const buildWeeksAroundTarget = useCallback((targetStart: dayjs.Dayjs) => {
     const initialWeeks: daysArray[] = [];
-
-    // предзагрузка 5 недель до и после
     for (let i = -PRELOAD_WEEKS; i <= PRELOAD_WEEKS; i++) {
-      initialWeeks.push(generateWeek(current.add(i, "week")));
+      initialWeeks.push(generateWeek(targetStart.add(i, "week")));
     }
     return initialWeeks;
+  }, []);
+  const getTargetWeekStart = useCallback(
+    (date: dayjs.Dayjs) => date.startOf("isoWeek"),
+    [],
+  );
+  const [weeks, setWeeks] = useState<daysArray[]>(() =>
+    buildWeeksAroundTarget(getTargetWeekStart(selectedDate)),
+  );
+
+  useSyncCalendarSwiperToDate({
+    selectedDate,
+    slides: weeks,
+    setSlides: setWeeks,
+    swiperRef: weekSwiperRef,
+    preloadCount: PRELOAD_WEEKS,
+    getTargetStart: getTargetWeekStart,
+    buildSlidesAroundTarget: buildWeeksAroundTarget,
   });
 
-  const handleWeekSlideChange = (swiper: any) => {
+  const handleWeekSlideChange = (swiper: SwiperType) => {
     const { activeIndex } = swiper;
     const lastIndex = weeks.length - 1;
     setObservableDate(weeks[activeIndex].start.add(6, "day"));

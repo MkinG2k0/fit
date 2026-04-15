@@ -1,8 +1,9 @@
 import dayjs from "dayjs";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Swiper } from "swiper/react";
+import type { Swiper as SwiperType } from "swiper/types";
 import type { daysArray } from "@/entities/calendarDay";
-import { daysRender } from "@/shared/lib";
+import { daysRender, useSyncCalendarSwiperToDate } from "@/shared/lib";
 import { PRELOAD_MONTHS, generateMonth } from "../lib";
 
 interface MonthSwiperProps {
@@ -14,18 +15,33 @@ export const MonthSwiper = ({
   selectedDate,
   setObservableDate,
 }: MonthSwiperProps) => {
-  const [months, setMonths] = useState(() => {
-    const current = selectedDate.startOf("month");
-    const initialMonths = [];
+  const monthSwiperRef = useRef<{ swiper: SwiperType } | null>(null);
+  const buildMonthsAroundTarget = useCallback((targetStart: dayjs.Dayjs) => {
+    const initialMonths: daysArray[] = [];
     for (let i = -PRELOAD_MONTHS; i <= PRELOAD_MONTHS; i++) {
-      initialMonths.push(generateMonth(current.add(i, "month")));
+      initialMonths.push(generateMonth(targetStart.add(i, "month")));
     }
     return initialMonths;
+  }, []);
+  const getTargetMonthStart = useCallback(
+    (date: dayjs.Dayjs) => date.startOf("month").startOf("isoWeek"),
+    [],
+  );
+  const [months, setMonths] = useState<daysArray[]>(() =>
+    buildMonthsAroundTarget(getTargetMonthStart(selectedDate)),
+  );
+
+  useSyncCalendarSwiperToDate({
+    selectedDate,
+    slides: months,
+    setSlides: setMonths,
+    swiperRef: monthSwiperRef,
+    preloadCount: PRELOAD_MONTHS,
+    getTargetStart: getTargetMonthStart,
+    buildSlidesAroundTarget: buildMonthsAroundTarget,
   });
 
-  const monthSwiperRef = useRef<any>(null);
-
-  const handleMonthSlideChange = (swiper: any) => {
+  const handleMonthSlideChange = (swiper: SwiperType) => {
     const { activeIndex } = swiper;
     const lastIndex = months.length - 1;
     setObservableDate(months[activeIndex].start.add(15, "day"));
