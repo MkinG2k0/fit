@@ -62,12 +62,15 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
         state.selectedDate,
         state.days,
       );
-      oldExercises.push(generateExercise(name, group, presetName, presetColor));
+      const newExercises = [
+        ...oldExercises,
+        generateExercise(name, group, presetName, presetColor),
+      ];
       const newDays = replaceExercises(
         state.selectedDate,
         state.days,
         dateKey,
-        oldExercises,
+        newExercises,
       );
       return { days: newDays };
     }),

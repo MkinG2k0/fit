@@ -41,7 +41,7 @@ export const CategoryActions = ({
 
   return (
     <div
-      className="flex items-center justify-between gap-2 cursor-pointer"
+      className="flex items-center justify-between gap-2 cursor-pointer p-1 "
       onClick={handleToggleCategory}
     >
       <button

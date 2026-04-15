@@ -177,7 +177,7 @@ export const FullExerciseCommand = ({
           onValueChange={setSearchValue}
         />
         <CommandList className="min-h-0 flex-1 overflow-y-auto overscroll-contain ">
-          <RadioGroup>
+          <RadioGroup className={"gap-0"}>
             {(variant === "exercises" || variant === "all") &&
               allExercises.map((group) => (
                 <CommandGroup
