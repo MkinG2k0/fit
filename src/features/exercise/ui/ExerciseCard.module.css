@@ -6,7 +6,6 @@
 		align-items: center;
 		justify-content: center;
 		border: 1px solid var(--border);
-		border-radius: 20px;
 		position: relative;
 		background-color: var(--card);
 		color: var(--card-foreground);

@@ -193,7 +193,10 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
         <div className="pointer-events-none flex w-10 items-center h-full justify-center absolute -left-11.25 top-0 z-10">
           <ChartColumnBig className="text-primary" />
         </div>
-        <div className={style.card} style={{ borderColor: exerciseColor }}>
+        <div
+          className={cn(style.card, "rounded-xl")}
+          style={{ borderColor: exerciseColor }}
+        >
           <div onClick={handleCardHeadClick} className={style.cardHead}>
             <div className={style.info}>
               <div className={style.icon}>

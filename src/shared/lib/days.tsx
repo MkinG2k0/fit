@@ -87,7 +87,7 @@ export const useDaysSlides = (daysArray: daysArray[]) => {
 
     return (
       <SwiperSlide key={elem.start.toString()} virtualIndex={slideIndex}>
-        <div className={"mb-4 grid grid-cols-7 gap-y-3"}>
+        <div className={"mb-2 grid grid-cols-7 gap-y-3"}>
           {elem.days.map((day, index) => {
             const dayKey = day.format("DD-MM-YYYY");
             const dayStats = dayStatsByKey.get(dayKey) ?? {
