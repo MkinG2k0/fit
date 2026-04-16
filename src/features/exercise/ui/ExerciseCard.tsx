@@ -29,8 +29,7 @@ interface ExerciseCardProps {
   exercise: Exercise;
 }
 
-const SWIPE_DISTANCE_THRESHOLD = 140;
-const SWIPE_VELOCITY_THRESHOLD = 250;
+const SWIPE_DISTANCE_THRESHOLD = 100;
 const DRAG_CLICK_SUPPRESS_DELAY_MS = 120;
 const DEFAULT_EXERCISE_ICON: LucideIcon = Dumbbell;
 
@@ -101,12 +100,8 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
 
   // 🧩 2. Функция удаления
   const cardDragHandler = (info: PanInfo) => {
-    const isSwipeRight =
-      info.offset.x > SWIPE_DISTANCE_THRESHOLD &&
-      info.velocity.x > SWIPE_VELOCITY_THRESHOLD;
-    const isSwipeLeft =
-      info.offset.x < -SWIPE_DISTANCE_THRESHOLD &&
-      info.velocity.x < -SWIPE_VELOCITY_THRESHOLD;
+    const isSwipeRight = info.offset.x > SWIPE_DISTANCE_THRESHOLD;
+    const isSwipeLeft = info.offset.x < -SWIPE_DISTANCE_THRESHOLD;
 
     if (isSwipeRight) {
       setIsStatisticOpen(true);
@@ -185,7 +180,10 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
         onDragStart={handleCardDragStart}
         onDragEnd={(_, info) => handleCardDragEnd(info)}
         dragConstraints={{ top: 0, right: 0, bottom: 0, left: 0 }}
-        dragTransition={{ bounceStiffness: 500, bounceDamping: 15 }}
+        dragTransition={{
+          bounceStiffness: 50,
+          bounceDamping: 15,
+        }}
         dragElastic={0.3}
         className=" flex items-center justify-start gap-2"
         initial={showHint ? { x: 0 } : false}

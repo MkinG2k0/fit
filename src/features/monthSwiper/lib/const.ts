@@ -1,1 +1,1 @@
-export const PRELOAD_MONTHS = 5;
+export const PRELOAD_MONTHS = 3;

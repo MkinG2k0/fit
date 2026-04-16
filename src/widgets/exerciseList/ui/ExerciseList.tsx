@@ -43,9 +43,7 @@ export const ExerciseList = () => {
         <div className={"mb-26"}></div>
       </div>
       <div className={"fixed bottom-0 left-0 right-0 p-2"}>
-        <div>
-          <AddExercise />
-        </div>
+        <AddExercise />
       </div>
     </div>
   );
