@@ -20,8 +20,12 @@ export const ExerciseList = () => {
   }, [observableDate, loadDaysFromLocalStorage]);
 
   return (
-    <div className={""}>
-      <div className={"flex flex-1 gap-2 flex-col px-2 overflow-x-auto"}>
+    <div className="relative flex min-h-0 flex-1 flex-col">
+      <div
+        className={
+          "min-h-0 flex flex-1 flex-col gap-2 overflow-x-hidden overflow-y-auto "
+        }
+      >
         <AnimatePresence>
           {exerciseArray.map((ex, index, array) => (
             <motion.div

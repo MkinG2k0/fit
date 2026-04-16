@@ -68,16 +68,14 @@ export const MonthSwiper = ({
   };
 
   return (
-    <div className={"p-2"}>
-      <Swiper
-        key={"month"}
-        ref={monthSwiperRef}
-        slidesPerView={1}
-        onSlideChange={handleMonthSlideChange}
-        initialSlide={PRELOAD_MONTHS}
-      >
-        {monthSlides}
-      </Swiper>
-    </div>
+    <Swiper
+      key={"month"}
+      ref={monthSwiperRef}
+      slidesPerView={1}
+      onSlideChange={handleMonthSlideChange}
+      initialSlide={PRELOAD_MONTHS}
+    >
+      {monthSlides}
+    </Swiper>
   );
 };

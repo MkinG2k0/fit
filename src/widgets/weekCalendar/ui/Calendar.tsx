@@ -15,17 +15,6 @@ import { cn } from "@/shared/lib";
 dayjs.extend(isoWeek);
 dayjs.locale("ru");
 
-const CALENDAR_WRAPPER_CLASS = "px-2 z-50 bg-background text-foreground";
-const CALENDAR_HEIGHT_CLASS = {
-  expanded: "h-84",
-  collapsed: "h-28",
-};
-const CALENDAR_CONTAINER_CLASS =
-  "relative overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-[height] duration-300";
-const CALENDAR_CONTENT_CLASS = "absolute inset-0 z-50";
-const DRAG_HANDLE_CLASS =
-  "relative bottom-8 flex cursor-pointer justify-center text-muted-foreground";
-
 export const WeekSlider = () => {
   const setObservableDate = useCalendarStore(
     (state) => state.setObservableDate,
@@ -50,57 +39,55 @@ export const WeekSlider = () => {
   };
 
   return (
-    <div>
-      <motion.div
-        drag="y"
-        dragDirectionLock
-        onDragEnd={(event, info) => {
-          void event;
-          calendarPullHandler(info);
-        }}
-        dragConstraints={{ top: 0, right: 0, bottom: 0, left: 0 }}
-        dragTransition={{ bounceStiffness: 800, bounceDamping: 25 }}
-        dragElastic={0.15}
-        className={CALENDAR_WRAPPER_CLASS}
+    <motion.div
+      drag="y"
+      dragDirectionLock
+      onDragEnd={(event, info) => {
+        void event;
+        calendarPullHandler(info);
+      }}
+      dragConstraints={{ top: 0, right: 0, bottom: 0, left: 0 }}
+      dragTransition={{ bounceStiffness: 800, bounceDamping: 25 }}
+      dragElastic={0.15}
+      className={"z-50 bg-background text-foreground"}
+    >
+      <div
+        className={cn(
+          "relative overflow-hidden rounded-xl p-2 border border-border bg-card shadow-sm transition-[height] duration-300",
+          calendarExpanded ? "h-87.5" : "h-30",
+        )}
       >
-        <div
-          className={cn(
-            CALENDAR_CONTAINER_CLASS,
-            calendarExpanded
-              ? CALENDAR_HEIGHT_CLASS.expanded
-              : CALENDAR_HEIGHT_CLASS.collapsed,
+        <AnimatePresence mode="wait">
+          {!calendarExpanded ? (
+            <motion.div
+              key="week"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+              <WeekSwiper {...props} />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="month"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2, ease: "easeIn" }}
+            >
+              <MonthSwiper {...props} />
+            </motion.div>
           )}
+        </AnimatePresence>
+        <div
+          className={
+            "absolute bottom-2 w-full flex cursor-pointer justify-center text-muted-foreground"
+          }
         >
-          <AnimatePresence mode="wait">
-            {!calendarExpanded ? (
-              <motion.div
-                key="week"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
-                className={CALENDAR_CONTENT_CLASS}
-              >
-                <WeekSwiper {...props} />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="month"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2, ease: "easeIn" }}
-                className={CALENDAR_CONTENT_CLASS}
-              >
-                <MonthSwiper {...props} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-        <div className={DRAG_HANDLE_CLASS}>
           <GripHorizontal />
         </div>
-      </motion.div>
-    </div>
+      </div>
+    </motion.div>
   );
 };

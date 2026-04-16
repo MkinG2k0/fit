@@ -70,16 +70,14 @@ export const WeekSwiper = ({
   };
 
   return (
-    <div className={"p-2"}>
-      <Swiper
-        key={"week"}
-        ref={weekSwiperRef}
-        slidesPerView={1}
-        onSlideChange={handleWeekSlideChange}
-        initialSlide={PRELOAD_WEEKS}
-      >
-        {weekSlides}
-      </Swiper>
-    </div>
+    <Swiper
+      key={"week"}
+      ref={weekSwiperRef}
+      slidesPerView={1}
+      onSlideChange={handleWeekSlideChange}
+      initialSlide={PRELOAD_WEEKS}
+    >
+      {weekSlides}
+    </Swiper>
   );
 };
