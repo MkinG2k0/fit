@@ -1,5 +1,4 @@
 import type { ManifestOptions } from "vite-plugin-pwa";
-import { type GenerateSWOptions } from "workbox-build";
 
 const SCREENSHOT_SIZE = "488x1055";
 const SCREENSHOT_TYPE = "image/png";
@@ -9,15 +8,33 @@ export const pwaManifest: Partial<ManifestOptions> = {
   name: "Fit",
   short_name: "Fit",
   description: "Фитнес-дневник тренировок",
+  lang: "ru",
   theme_color: "#000000",
   background_color: "#ffffff",
   display: "standalone",
+  scope: "/",
   start_url: "/",
   icons: [
     {
+      src: "/pwa-192x192.png",
+      type: "image/png",
+      sizes: "192x192",
+    },
+    {
+      src: "/pwa-512x512.png",
+      type: "image/png",
+      sizes: "512x512",
+    },
+    {
+      src: "/pwa-512x512-maskable.png",
+      type: "image/png",
+      sizes: "512x512",
+      purpose: "any maskable",
+    },
+    {
       src: "/logo.svg",
       type: "image/svg+xml",
-      sizes: "512x512",
+      sizes: "any",
     },
   ],
   shortcuts: [
@@ -118,38 +135,6 @@ export const pwaManifest: Partial<ManifestOptions> = {
       type: SCREENSHOT_TYPE,
       sizes: SCREENSHOT_SIZE,
       form_factor: "narrow",
-    },
-  ],
-};
-
-export const pwaWorkBoxOptions: Partial<GenerateSWOptions> = {
-  globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
-  runtimeCaching: [
-    {
-      urlPattern: /^https:\/\/fit-backend\.onrender\.com\//,
-      handler: "NetworkFirst",
-      options: {
-        cacheName: "api-cache",
-        networkTimeoutSeconds: 3,
-        expiration: {
-          maxEntries: 50,
-          maxAgeSeconds: 60 * 60 * 24,
-        },
-      },
-    },
-    {
-      urlPattern: ({ request }) =>
-        ["document", "script", "style", "image", "font"].includes(
-          request.destination,
-        ),
-      handler: "CacheFirst",
-      options: {
-        cacheName: "assets-cache",
-        expiration: {
-          maxEntries: 100,
-          maxAgeSeconds: 60 * 60 * 24 * 7,
-        },
-      },
     },
   ],
 };

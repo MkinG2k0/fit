@@ -3,7 +3,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
-import { pwaManifest, pwaWorkBoxOptions } from "./pwa.config.ts";
+import { pwaManifest } from "./pwa.config.ts";
 
 export default defineConfig({
   plugins: [
@@ -16,14 +16,16 @@ export default defineConfig({
     VitePWA({
       strategies: "injectManifest",
       registerType: "autoUpdate",
-      includeAssets: ["logo.svg"],
+      includeAssets: [
+        "logo.svg",
+        "logo.png",
+        "pwa-192x192.png",
+        "pwa-512x512.png",
+        "pwa-512x512-maskable.png",
+      ],
       manifest: pwaManifest,
-      workbox: pwaWorkBoxOptions,
       srcDir: "src/app/providers/pwa",
       filename: "sw.js",
-      injectManifest: {
-        injectionPoint: undefined,
-      },
     }),
   ],
   server: {
