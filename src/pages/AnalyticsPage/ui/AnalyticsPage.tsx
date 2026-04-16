@@ -5,7 +5,6 @@ import {
   useAnalyticsFilters,
 } from "@/features/analyticsFilters";
 import { readAllTrainingDaysFromStorage } from "@/shared/lib/analyticsStorage";
-import { Separator } from "@/shared/ui/shadCNComponents/ui/separator";
 import { AnalyticsDashboard } from "@/widgets/analyticsDashboard";
 import { Header } from "@/widgets/header";
 
