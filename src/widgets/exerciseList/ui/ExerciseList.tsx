@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { AddExercise } from "@/features/addExercise";
 import { ExerciseCard } from "@/features/exercise";
 import { useCalendarStore } from "@/entities/calendarDay";
-import style from "./ExerciseList.module.css";
+import { cn } from "../../../shared/lib";
 
 export const ExerciseList = () => {
   const days = useCalendarStore((state) => state.days);
@@ -20,8 +20,8 @@ export const ExerciseList = () => {
   }, [observableDate, loadDaysFromLocalStorage]);
 
   return (
-    <div className={style.menu}>
-      <div className={style.list}>
+    <div className={""}>
+      <div className={"flex flex-1 gap-2 flex-col px-2"}>
         <AnimatePresence>
           {exerciseArray.map((ex, index, array) => (
             <motion.div
@@ -30,7 +30,7 @@ export const ExerciseList = () => {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className={index === array.length ? "mb-8" : ""}
+              className={cn("", index === array.length ? "mb-8" : "")}
             >
               <ExerciseCard key={ex.id} exercise={ex} />
             </motion.div>

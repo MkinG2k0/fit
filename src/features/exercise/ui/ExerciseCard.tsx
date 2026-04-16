@@ -1,7 +1,20 @@
 import type { PanInfo } from "motion";
 import { AnimatePresence } from "motion/react";
 import { useState, useEffect, useMemo, useRef, type MouseEvent } from "react";
-import { ChartColumnBig, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
+import {
+  Bike,
+  ChartColumnBig,
+  ChevronDown,
+  ChevronUp,
+  Dumbbell,
+  Footprints,
+  Hand,
+  HeartPulse,
+  Move,
+  Shield,
+  Trash2,
+  type LucideIcon,
+} from "lucide-react";
 import { useCalendarStore } from "@/entities/calendarDay";
 import { type Exercise, useExerciseStore } from "@/entities/exercise";
 import * as motion from "motion/react-client";
@@ -19,7 +32,21 @@ interface ExerciseCardProps {
 const SWIPE_DISTANCE_THRESHOLD = 140;
 const SWIPE_VELOCITY_THRESHOLD = 250;
 const DRAG_CLICK_SUPPRESS_DELAY_MS = 120;
-const FALLBACK_ICON_PATH = "/muscles-category/другое.png";
+const DEFAULT_EXERCISE_ICON: LucideIcon = Dumbbell;
+
+const EXERCISE_CATEGORY_ICONS: Record<string, LucideIcon> = {
+  ноги: Footprints,
+  ягодицы: Dumbbell,
+  спина: Dumbbell,
+  грудь: HeartPulse,
+  плечи: Dumbbell,
+  руки: Hand,
+  пресс: Shield,
+  кардио: Bike,
+  икры: Footprints,
+  предплечья: Hand,
+  мобильность: Move,
+};
 
 const formatTotalLiftedKg = (totalKg: number): string => {
   if (!Number.isFinite(totalKg) || totalKg <= 0) {
@@ -40,14 +67,14 @@ const formatTotalLiftedKg = (totalKg: number): string => {
   });
 };
 
-const getExerciseIconPath = (category: string | undefined) => {
+const getExerciseIcon = (category: string | undefined): LucideIcon => {
   const normalizedCategory = category?.trim().toLowerCase();
 
   if (!normalizedCategory) {
-    return FALLBACK_ICON_PATH;
+    return DEFAULT_EXERCISE_ICON;
   }
 
-  return `/muscles-category/${normalizedCategory}.png`;
+  return EXERCISE_CATEGORY_ICONS[normalizedCategory] ?? DEFAULT_EXERCISE_ICON;
 };
 
 export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
@@ -56,9 +83,6 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
   const [showHint, setShowHint] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isStatisticOpen, setIsStatisticOpen] = useState(false);
-  const [iconPath, setIconPath] = useState(() =>
-    getExerciseIconPath(exercise.category),
-  );
   const isCardDraggingRef = useRef(false);
 
   const setExerciseName = useCalendarStore((store) => store.setExerciseName);
@@ -74,10 +98,6 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
       localStorage.setItem("exerciseSwipeHintShown", "true");
     }
   }, []);
-
-  useEffect(() => {
-    setIconPath(getExerciseIconPath(exercise.category));
-  }, [exercise.category]);
 
   // 🧩 2. Функция удаления
   const cardDragHandler = (info: PanInfo) => {
@@ -130,12 +150,6 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
     setIsDeleteDialogOpen(false);
   };
 
-  const handleIconLoadingError = () => {
-    setIconPath((previousPath) =>
-      previousPath === FALLBACK_ICON_PATH ? previousPath : FALLBACK_ICON_PATH,
-    );
-  };
-
   // ⚙️ 3. Обработка изменения названия упражнения
   const inputChangeHandler = (name: string) => {
     const category = allExercises.find((group) =>
@@ -159,9 +173,13 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
   }, [exercise.sets]);
 
   const totalLiftedLabel = formatTotalLiftedKg(totalLiftedKg);
+  const ExerciseIcon = useMemo(
+    () => getExerciseIcon(exercise.category),
+    [exercise.category],
+  );
 
   return (
-    <div className="relative w-screen overflow-hidden cursor-pointer">
+    <div className="relative overflow-hidden cursor-pointer">
       <motion.div
         drag="x"
         onDragStart={handleCardDragStart}
@@ -181,11 +199,9 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
           <div onClick={handleCardHeadClick} className={style.cardHead}>
             <div className={style.info}>
               <div className={style.icon}>
-                <img
-                  className={style.img}
-                  src={iconPath}
-                  onError={handleIconLoadingError}
-                  alt={`Иконка упражнения ${exercise.name}`}
+                <ExerciseIcon
+                  className={style.iconGraphic}
+                  aria-hidden="true"
                 />
               </div>
               <div className={style.exerciseName}>
