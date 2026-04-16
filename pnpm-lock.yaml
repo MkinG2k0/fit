@@ -110,6 +110,9 @@ importers:
       workbox-build:
         specifier: ^7.4.0
         version: 7.4.0(@types/babel__core@7.20.5)
+      workbox-window:
+        specifier: ^7.4.0
+        version: 7.4.0
       zustand:
         specifier: ^5.0.8
         version: 5.0.12(@types/react@19.2.14)(react@19.2.5)
