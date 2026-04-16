@@ -3,7 +3,7 @@ self.addEventListener("push", (event) => {
 
   const data = event.data.json();
 
-  const title = data.title || "MagFitDiary";
+  const title = data.title || "Fit";
   const options = {
     body: data.body,
     icon: "/logo.svg",
@@ -35,4 +35,3 @@ self.addEventListener("message", (event) => {
     event.waitUntil(self.registration.showNotification(title, options));
   }
 });
-

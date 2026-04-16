@@ -1,5 +1,4 @@
 import { Header } from "@/widgets";
-import { Separator } from "@/shared/ui/shadCNComponents/ui/separator";
 import { ThemeSettingsCard } from "@/features/themeSwitcher";
 import { SettingsTransferCard } from "@/features/appSettingsTransfer";
 import { ProfileRingGoalsSettingsCard } from "@/features/profileRingGoalsSettings";
@@ -13,8 +12,7 @@ import {
 
 const PAGE_WRAPPER_CLASS =
   "flex h-dvh flex-col overflow-hidden bg-background text-foreground";
-const SCROLL_AREA_CLASS =
-  "min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-3 sm:px-4 sm:py-4";
+const SCROLL_AREA_CLASS = "min-h-0 flex-1 overflow-x-hidden overflow-y-auto";
 const CONTENT_GRID_CLASS = "mx-auto grid w-full max-w-3xl gap-3 sm:gap-4";
 const CARD_CLASS = "gap-3 py-4";
 const CARD_HEADER_CLASS = "px-4";
@@ -24,7 +22,6 @@ export const SettingsPage = () => {
   return (
     <div className={PAGE_WRAPPER_CLASS}>
       <Header title="Настройки" navigateBack />
-      <Separator />
 
       <div className={SCROLL_AREA_CLASS}>
         <div className={CONTENT_GRID_CLASS}>

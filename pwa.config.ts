@@ -1,6 +1,9 @@
 import type { ManifestOptions } from "vite-plugin-pwa";
 import { type GenerateSWOptions } from "workbox-build";
 
+const SCREENSHOT_SIZE = "488x1055";
+const SCREENSHOT_TYPE = "image/png";
+
 export const pwaManifest: Partial<ManifestOptions> = {
   id: "/",
   name: "Fit",
@@ -24,43 +27,97 @@ export const pwaManifest: Partial<ManifestOptions> = {
       url: "/",
       icons: [
         {
-          src: "/pageScreen/trainingDay.png",
-          sizes: "1170x2532",
-          type: "image/png",
+          src: "/screen/training_week_exercise_list.png",
+          sizes: SCREENSHOT_SIZE,
+          type: SCREENSHOT_TYPE,
         },
       ],
     },
   ],
   screenshots: [
     {
-      src: "/pageScreen/trainingDay.png",
-      type: "image/png",
-      sizes: "1170x2532",
+      src: "/screen/analytics_filters_kpis.png",
+      type: SCREENSHOT_TYPE,
+      sizes: SCREENSHOT_SIZE,
       form_factor: "narrow",
     },
     {
-      src: "/pageScreen/exerciseList.png",
-      type: "image/png",
-      sizes: "1170x2532",
+      src: "/screen/analytics_load_progress_chart.png",
+      type: SCREENSHOT_TYPE,
+      sizes: SCREENSHOT_SIZE,
       form_factor: "narrow",
     },
     {
-      src: "/pageScreen/timer.png",
-      type: "image/png",
-      sizes: "1170x2532",
+      src: "/screen/exercises_categories_legs_expanded.png",
+      type: SCREENSHOT_TYPE,
+      sizes: SCREENSHOT_SIZE,
       form_factor: "narrow",
     },
     {
-      src: "/pageScreen/addExercise.png",
-      type: "image/png",
-      sizes: "1170x2532",
+      src: "/screen/exercises_categories_with_presets.png",
+      type: SCREENSHOT_TYPE,
+      sizes: SCREENSHOT_SIZE,
       form_factor: "narrow",
     },
     {
-      src: "/pageScreen/trainingWide.png",
-      type: "image/png",
-      sizes: "2360x1640",
-      form_factor: "wide",
+      src: "/screen/exercises_create_modal.png",
+      type: SCREENSHOT_TYPE,
+      sizes: SCREENSHOT_SIZE,
+      form_factor: "narrow",
+    },
+    {
+      src: "/screen/exercises_edit_preset_modal.png",
+      type: SCREENSHOT_TYPE,
+      sizes: SCREENSHOT_SIZE,
+      form_factor: "narrow",
+    },
+    {
+      src: "/screen/exercises_presets_list.png",
+      type: SCREENSHOT_TYPE,
+      sizes: SCREENSHOT_SIZE,
+      form_factor: "narrow",
+    },
+    {
+      src: "/screen/settings_calendar_goals_backup.png",
+      type: SCREENSHOT_TYPE,
+      sizes: SCREENSHOT_SIZE,
+      form_factor: "narrow",
+    },
+    {
+      src: "/screen/settings_theme_selection.png",
+      type: SCREENSHOT_TYPE,
+      sizes: SCREENSHOT_SIZE,
+      form_factor: "narrow",
+    },
+    {
+      src: "/screen/timer_idle_screen.png",
+      type: SCREENSHOT_TYPE,
+      sizes: SCREENSHOT_SIZE,
+      form_factor: "narrow",
+    },
+    {
+      src: "/screen/training_calendar_exercise_expanded.png",
+      type: SCREENSHOT_TYPE,
+      sizes: SCREENSHOT_SIZE,
+      form_factor: "narrow",
+    },
+    {
+      src: "/screen/training_calendar_exercise_list.png",
+      type: SCREENSHOT_TYPE,
+      sizes: SCREENSHOT_SIZE,
+      form_factor: "narrow",
+    },
+    {
+      src: "/screen/training_week_bench_expanded.png",
+      type: SCREENSHOT_TYPE,
+      sizes: SCREENSHOT_SIZE,
+      form_factor: "narrow",
+    },
+    {
+      src: "/screen/training_week_exercise_list.png",
+      type: SCREENSHOT_TYPE,
+      sizes: SCREENSHOT_SIZE,
+      form_factor: "narrow",
     },
   ],
 };

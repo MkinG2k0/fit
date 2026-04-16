@@ -30,15 +30,15 @@ export const ExerciseNameSelector = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <div className="flex w-full min-w-0 items-center justify-between gap-2 overflow-hidden px-0 text-md">
-        <span className="block min-w-0 truncate text-left">
+      <div className="flex w-full min-w-0 items-center gap-2 overflow-hidden px-0 text-md">
+        <span className="block flex-1 min-w-0 truncate text-left">
           {exerciseName || "Выберите упражнение"}
         </span>
         {isEditable && (
           <DialogTrigger asChild>
             <Button
               variant="ghost"
-              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+              className="h-8 w-8 shrink-0 p-0 text-muted-foreground hover:text-foreground"
               aria-label="Редактировать упражнение"
               onPointerDown={(event) => event.stopPropagation()}
               onClick={(event) => event.stopPropagation()}

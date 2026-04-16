@@ -1,6 +1,9 @@
 import { useMemo } from "react";
 import { buildDashboardAnalytics } from "@/entities/analytics";
-import { AnalyticsFilters, useAnalyticsFilters } from "@/features/analyticsFilters";
+import {
+  AnalyticsFilters,
+  useAnalyticsFilters,
+} from "@/features/analyticsFilters";
 import { readAllTrainingDaysFromStorage } from "@/shared/lib/analyticsStorage";
 import { Separator } from "@/shared/ui/shadCNComponents/ui/separator";
 import { AnalyticsDashboard } from "@/widgets/analyticsDashboard";
@@ -24,8 +27,8 @@ export const AnalyticsPage = () => {
   return (
     <div className="flex h-dvh flex-col overflow-hidden">
       <Header title="Аналитика" navigateBack />
-      <Separator />
-      <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-3 sm:px-4 sm:py-4">
+
+      <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
         <div className="mx-auto grid max-w-6xl gap-3 sm:gap-4">
           <p className="text-sm text-muted-foreground">
             Динамика упражнений, нагрузки и частоты тренировок
@@ -43,4 +46,3 @@ export const AnalyticsPage = () => {
     </div>
   );
 };
-
