@@ -4,6 +4,9 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 15px;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
 }
 
 .list {
@@ -11,11 +14,12 @@
   flex-direction: column;
   align-items: center;
   overflow-x: hidden;
+  overflow-y: auto;
   width: 100%;
-  max-height: calc(100dvh - 185px);
   border-radius: 10px;
   gap: 1rem;
-  flex: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .footer {
