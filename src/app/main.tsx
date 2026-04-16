@@ -10,7 +10,9 @@ registerServiceWorker();
 createRoot(document.getElementById("root")!).render(
   <ThemeProvider>
     <BrowserRouter>
-      <AppRoutes />
+      <div className={"p-2"}>
+        <AppRoutes />
+      </div>
     </BrowserRouter>
   </ThemeProvider>,
 );

@@ -1,3 +1,4 @@
+export * from "./createRandomUuid";
 export * from "./classMerge";
 export * from "./stringFormat";
 export * from "./storage";

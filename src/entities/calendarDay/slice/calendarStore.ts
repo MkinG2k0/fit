@@ -5,6 +5,7 @@ import { create } from "zustand";
 import type { ExerciseOption } from "@/features/exercise";
 import type { Exercise, ExerciseSet } from "@/entities/exercise";
 import type { CalendarDay } from "../model/types";
+import { createRandomUuid } from "@/shared/lib";
 import { getDaysFromLocalStorage } from "@/shared/lib/storage";
 import {
   generateExercise,
@@ -140,7 +141,7 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
           sets: [
             ...ex.sets,
             {
-              id: crypto.randomUUID(),
+              id: createRandomUuid(),
               weight: lastSet.weight,
               reps: lastSet.reps,
             },
