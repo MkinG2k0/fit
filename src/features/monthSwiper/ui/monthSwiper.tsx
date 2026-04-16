@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import { useCallback, useRef, useState } from "react";
+import { Virtual } from "swiper/modules";
 import { Swiper } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper/types";
 import type { daysArray } from "@/entities/calendarDay";
@@ -71,6 +72,11 @@ export const MonthSwiper = ({
     <Swiper
       key={"month"}
       ref={monthSwiperRef}
+      modules={[Virtual]}
+      virtual={{
+        addSlidesBefore: 1,
+        addSlidesAfter: 1,
+      }}
       slidesPerView={1}
       onSlideChange={handleMonthSlideChange}
       initialSlide={PRELOAD_MONTHS}

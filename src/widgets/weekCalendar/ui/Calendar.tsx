@@ -1,8 +1,8 @@
 import { GripHorizontal } from "lucide-react";
 import { type PanInfo } from "motion";
 import { useState } from "react";
-// @ts-ignore
 import "swiper/css";
+import "swiper/css/virtual";
 import { motion, AnimatePresence } from "motion/react";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";

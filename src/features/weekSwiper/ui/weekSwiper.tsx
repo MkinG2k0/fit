@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import { useCallback, useRef, useState } from "react";
+import { Virtual } from "swiper/modules";
 import { Swiper } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper/types";
 import type { daysArray } from "@/entities/calendarDay";
@@ -16,6 +17,7 @@ export const WeekSwiper = ({
   setObservableDate,
 }: WeekSwiperProps) => {
   const weekSwiperRef = useRef<{ swiper: SwiperType } | null>(null);
+
   const buildWeeksAroundTarget = useCallback((targetStart: dayjs.Dayjs) => {
     const initialWeeks: daysArray[] = [];
     for (let i = -PRELOAD_WEEKS; i <= PRELOAD_WEEKS; i++) {
@@ -23,6 +25,7 @@ export const WeekSwiper = ({
     }
     return initialWeeks;
   }, []);
+
   const getTargetWeekStart = useCallback(
     (date: dayjs.Dayjs) => date.startOf("isoWeek"),
     [],
@@ -73,6 +76,11 @@ export const WeekSwiper = ({
     <Swiper
       key={"week"}
       ref={weekSwiperRef}
+      modules={[Virtual]}
+      virtual={{
+        addSlidesBefore: 1,
+        addSlidesAfter: 1,
+      }}
       slidesPerView={1}
       onSlideChange={handleWeekSlideChange}
       initialSlide={PRELOAD_WEEKS}

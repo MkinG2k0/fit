@@ -76,7 +76,7 @@ export const useDaysSlides = (daysArray: daysArray[]) => {
   const fullSetCountGoal = getSafeGoal(ringGoals.fullSetCount);
   const fullVolumeGoal = getSafeGoal(ringGoals.fullVolume);
 
-  return daysArray.map((elem) => {
+  return daysArray.map((elem, slideIndex) => {
     const dayStatsByKey = new Map<string, DayStats>();
 
     elem.days.forEach((day) => {
@@ -86,7 +86,7 @@ export const useDaysSlides = (daysArray: daysArray[]) => {
     });
 
     return (
-      <SwiperSlide key={elem.start.toString()}>
+      <SwiperSlide key={elem.start.toString()} virtualIndex={slideIndex}>
         <div className={"mb-4 grid grid-cols-7 gap-y-3"}>
           {elem.days.map((day, index) => {
             const dayKey = day.format("DD-MM-YYYY");

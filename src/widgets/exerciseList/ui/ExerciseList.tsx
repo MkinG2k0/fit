@@ -23,7 +23,7 @@ export const ExerciseList = () => {
     <div className="relative flex min-h-0 flex-1 flex-col">
       <div
         className={
-          "min-h-0 flex flex-1 flex-col gap-2 overflow-x-hidden overflow-y-auto "
+          "min-h-0 flex flex-1 flex-col gap-2 overflow-x-hidden overflow-y-auto"
         }
       >
         <AnimatePresence>

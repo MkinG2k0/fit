@@ -1,1 +1,1 @@
-export const PRELOAD_WEEKS = 3;
+export const PRELOAD_WEEKS = 6;
