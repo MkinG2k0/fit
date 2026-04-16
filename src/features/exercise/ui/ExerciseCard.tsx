@@ -17,8 +17,8 @@ import {
 } from "lucide-react";
 import { useCalendarStore } from "@/entities/calendarDay";
 import { type Exercise, useExerciseStore } from "@/entities/exercise";
+import { cn } from "@shared/lib";
 import * as motion from "motion/react-client";
-import { cn } from "../../../shared/lib";
 import { ExerciseBody } from "./ExerciseBody";
 import { ExerciseDeleteDialog } from "./ExerciseDeleteDialog";
 import { ExerciseNameSelector } from "./ExerciseNameSelector";
