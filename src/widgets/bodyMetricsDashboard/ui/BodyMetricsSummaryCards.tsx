@@ -63,6 +63,8 @@ export const BodyMetricsSummaryCards = ({
   summary,
   className,
 }: BodyMetricsSummaryCardsProps) => {
+  const visibleSummary = summary.filter((item) => item.currentValue !== null);
+
   return (
     <Card className={cn("gap-3 py-4", className)}>
       <CardHeader className="px-4">
@@ -72,12 +74,12 @@ export const BodyMetricsSummaryCards = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="px-4">
-        {summary.length === 0 ? (
+        {visibleSummary.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             Нет данных для анализа. Добавьте первый замер через форму ниже.
           </p>
         ) : (
-          <div className={SUMMARY_GRID_CLASS}>{summary.map(renderSummaryCard)}</div>
+          <div className={SUMMARY_GRID_CLASS}>{visibleSummary.map(renderSummaryCard)}</div>
         )}
       </CardContent>
     </Card>

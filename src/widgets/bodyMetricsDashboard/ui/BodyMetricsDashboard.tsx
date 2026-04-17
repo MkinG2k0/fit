@@ -18,6 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/ui/shadCNComponents/ui/card";
+import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -56,6 +57,7 @@ export const BodyMetricsDashboard = ({ className }: BodyMetricsDashboardProps) =
   const clearError = useBodyMetricsStore((state) => state.clearError);
 
   const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const metricDefinitions = useMemo<BodyMetricDefinition[]>(() => {
     return [...BODY_METRIC_DEFINITIONS, ...customMetricDefinitions];
   }, [customMetricDefinitions]);
@@ -78,6 +80,7 @@ export const BodyMetricsDashboard = ({ className }: BodyMetricsDashboardProps) =
     }
 
     addEntry(draft);
+    setIsCreateDialogOpen(false);
     setActiveEntryId(null);
   };
 
@@ -130,17 +133,24 @@ export const BodyMetricsDashboard = ({ className }: BodyMetricsDashboardProps) =
         metricDefinitions={metricDefinitions}
       />
 
-      <BodyMetricsForm
-        initialEntry={null}
-        metricDefinitions={metricDefinitions}
-        onSubmit={handleFormSubmit}
-      />
-      <ManageBodyMetricsDialog
-        customMetricDefinitions={customMetricDefinitions}
-        onAdd={handleCreateCustomMetric}
-        onUpdate={handleUpdateCustomMetric}
-        onDelete={handleDeleteCustomMetric}
-      />
+      <div className="grid gap-2 sm:flex sm:flex-wrap">
+        <Button
+          type="button"
+          className="w-full sm:w-auto"
+          onClick={() => {
+            clearError();
+            setIsCreateDialogOpen(true);
+          }}
+        >
+          Новые замеры
+        </Button>
+        <ManageBodyMetricsDialog
+          customMetricDefinitions={customMetricDefinitions}
+          onAdd={handleCreateCustomMetric}
+          onUpdate={handleUpdateCustomMetric}
+          onDelete={handleDeleteCustomMetric}
+        />
+      </div>
 
       {status === "error" && errorMessage && (
         <p className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
@@ -179,6 +189,30 @@ export const BodyMetricsDashboard = ({ className }: BodyMetricsDashboardProps) =
               onCancelEdit={handleCancelEdit}
             />
           )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={isCreateDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            clearError();
+          }
+          setIsCreateDialogOpen(open);
+        }}
+      >
+        <DialogContent className="max-w-2xl p-0" showCloseButton>
+          <DialogHeader className="sr-only">
+            <DialogTitle>Новые замеры</DialogTitle>
+            <DialogDescription>
+              Добавьте новую запись замера параметра тела.
+            </DialogDescription>
+          </DialogHeader>
+          <BodyMetricsForm
+            initialEntry={null}
+            metricDefinitions={metricDefinitions}
+            onSubmit={handleFormSubmit}
+          />
         </DialogContent>
       </Dialog>
     </section>

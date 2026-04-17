@@ -1,10 +1,9 @@
-import { type MouseEvent, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 import {
   type BodyMetricDefinition,
   type BodyMetricsEntry,
 } from "@/entities/bodyMetrics";
-import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
   Card,
   CardContent,
@@ -18,6 +17,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/shared/ui/shadCNComponents/ui/chart";
+import { MultiSelect } from "@/shared/ui/shadCNComponents/ui/multi-select";
 import { cn } from "@/shared/ui/lib/utils";
 
 interface BodyMetricsTrendChartProps {
@@ -28,6 +28,7 @@ interface BodyMetricsTrendChartProps {
 
 type BodyMetricChartPoint = Record<string, number | string | undefined> & {
   date: string;
+  pointDateTime: string;
 };
 
 const CHART_COLORS = [
@@ -40,7 +41,8 @@ const CHART_COLORS = [
 const LINE_CHART_MARGIN = { left: 12, right: 12 };
 
 const formatDateLabel = (date: string) => {
-  const [year, month, day] = date.split("-");
+  const dateChunk = date.includes("T") ? date.split("T")[0] : date;
+  const [year, month, day] = dateChunk.split("-");
   if (!year || !month || !day) {
     return date;
   }
@@ -56,15 +58,24 @@ const buildChartPoints = (
   entries: BodyMetricsEntry[],
   metricDefinitions: BodyMetricDefinition[],
 ) => {
+  const lastKnownValues: Record<string, number | undefined> = {};
+
   return [...entries]
     .sort(
       (leftEntry, rightEntry) =>
-        parseDate(leftEntry.recordedAt) - parseDate(rightEntry.recordedAt),
+        parseDate(leftEntry.createdAt) - parseDate(rightEntry.createdAt),
     )
     .map((entry) => {
-      const point: BodyMetricChartPoint = { date: entry.recordedAt };
+      const point: BodyMetricChartPoint = {
+        date: entry.recordedAt,
+        pointDateTime: entry.createdAt,
+      };
       metricDefinitions.forEach((definition) => {
-        point[definition.key] = entry.measurements[definition.key];
+        const entryValue = entry.measurements[definition.key];
+        if (typeof entryValue === "number") {
+          lastKnownValues[definition.key] = entryValue;
+        }
+        point[definition.key] = lastKnownValues[definition.key];
       });
       return point;
     });
@@ -92,14 +103,18 @@ export const BodyMetricsTrendChart = ({
   metricDefinitions,
   className,
 }: BodyMetricsTrendChartProps) => {
-  const [enabledMetrics, setEnabledMetrics] = useState<Record<string, boolean>>({});
+  const [selectedMetricKeys, setSelectedMetricKeys] = useState<string[]>([]);
 
   useEffect(() => {
-    setEnabledMetrics((prevState) => {
-      return metricDefinitions.reduce<Record<string, boolean>>((accumulator, definition) => {
-        accumulator[definition.key] = prevState[definition.key] ?? true;
-        return accumulator;
-      }, {});
+    setSelectedMetricKeys((prevState) => {
+      const availableMetricKeys = metricDefinitions.map((definition) => definition.key);
+      const preservedSelection = prevState.filter((metricKey) =>
+        availableMetricKeys.includes(metricKey),
+      );
+      if (preservedSelection.length > 0) {
+        return preservedSelection;
+      }
+      return availableMetricKeys;
     });
   }, [metricDefinitions]);
 
@@ -115,49 +130,30 @@ export const BodyMetricsTrendChart = ({
     () => toMetricColorMap(metricDefinitions),
     [metricDefinitions],
   );
+  const metricOptions = useMemo(
+    () =>
+      metricDefinitions.map((definition) => ({
+        value: definition.key,
+        label: definition.label,
+      })),
+    [metricDefinitions],
+  );
   const activeDefinitions = useMemo(
-    () => metricDefinitions.filter((item) => enabledMetrics[item.key]),
-    [enabledMetrics, metricDefinitions],
+    () => metricDefinitions.filter((item) => selectedMetricKeys.includes(item.key)),
+    [selectedMetricKeys, metricDefinitions],
   );
 
-  const handleMetricToggle = (event: MouseEvent<HTMLButtonElement>) => {
-    const { metricKey } = event.currentTarget.dataset;
-    if (!metricKey) {
-      return;
-    }
-
-    setEnabledMetrics((prevState) => ({
-      ...prevState,
-      [metricKey]: !prevState[metricKey],
-    }));
-  };
-
-  const renderDefinitionToggle = (definition: BodyMetricDefinition) => {
-    const isEnabled = enabledMetrics[definition.key];
-    return (
-      <Button
-        key={definition.key}
-        type="button"
-        variant={isEnabled ? "default" : "outline"}
-        size="sm"
-        data-metric-key={definition.key}
-        onClick={handleMetricToggle}
-        className="min-w-0 truncate text-xs sm:text-sm"
-      >
-        {definition.label}
-      </Button>
-    );
-  };
-
   const renderActiveLine = (definition: BodyMetricDefinition) => {
+    const color = metricColorMap[definition.key];
     return (
       <Line
         key={definition.key}
         dataKey={definition.key}
         type="monotone"
-        stroke={metricColorMap[definition.key]}
+        stroke={color}
         strokeWidth={2}
-        dot={false}
+        dot={{ r: 3, fill: color, stroke: color }}
+        activeDot={{ r: 5, fill: color, stroke: color }}
         connectNulls
       />
     );
@@ -170,9 +166,14 @@ export const BodyMetricsTrendChart = ({
         <CardDescription>Все параметры на одном графике с возможностью скрытия</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-3 px-3 sm:px-4">
-        <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
-          {metricDefinitions.map(renderDefinitionToggle)}
-        </div>
+        <MultiSelect
+          options={metricOptions}
+          selectedValues={selectedMetricKeys}
+          placeholder="Выберите параметры"
+          searchPlaceholder="Найти параметр..."
+          emptyText="Параметры не найдены"
+          onSelectedValuesChange={setSelectedMetricKeys}
+        />
 
         {chartPoints.length === 0 ? (
           <p className="text-sm text-muted-foreground">
@@ -187,7 +188,7 @@ export const BodyMetricsTrendChart = ({
             <LineChart data={chartPoints} margin={LINE_CHART_MARGIN}>
               <CartesianGrid vertical={false} />
               <XAxis
-                dataKey="date"
+                dataKey="pointDateTime"
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
