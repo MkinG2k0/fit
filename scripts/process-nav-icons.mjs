@@ -26,7 +26,7 @@ const map = [
   ["Frame 5.svg", "icon-area-chart.svg"],
   ["Frame 7.svg", "icon-abs-core.svg"],
   ["Frame 4.svg", "icon-body-measurements.svg"],
-  ["Frame 6.svg", "icon-legs-power.svg"],
+  ["Frame 6.svg", "icon-leg.svg"],
   ["Frame 1.svg", "icon-biceps.svg"],
 ];
 
@@ -37,7 +37,7 @@ for (const [srcName, outName] of map) {
 
 const extraMap = [
   ["Frame 8.svg", "icon-mobility-arms-up.svg"],
-  ["Frame 9.svg", "icon-shoulders-stretch.svg"],
+  ["Frame 9.svg", "icon-shoulders.svg"],
 ];
 
 for (const [srcName, outName] of extraMap) {

@@ -12,15 +12,15 @@ export type AppNavIconVariant =
   | "body-metrics"
   | "menu";
 
-/** Меню: таймер — торс, список — гиря, аналитика — бицепс, настройки — пресс, тело — плечи/спина; chart — график для статистики. */
+/** Варианты нижней навигации → id графики (см. `EXERCISE_ICON_SVG_BY_ID`). */
 const VARIANT_TO_ICON_ID: Record<AppNavIconVariant, ExerciseIconGraphicId> = {
-  timer: "nav-body-metrics",
-  exercises: "nav-exercises",
-  analytics: "logo-mark",
-  chart: "nav-analytics",
-  settings: "nav-settings",
-  "body-metrics": "extra-shoulders-stretch",
-  menu: "nav-menu",
+  timer: "icon-muscles-front",
+  exercises: "icon-hand-power",
+  analytics: "icon-triceps",
+  chart: "icon-cardio",
+  settings: "icon-abs-core",
+  "body-metrics": "icon-shoulders",
+  menu: "icon-leg",
 };
 
 export interface AppNavIconProps
