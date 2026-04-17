@@ -187,18 +187,6 @@ export const CreateExercise = ({
                 <label htmlFor="category" className="text-sm font-medium">
                   Категория
                 </label>
-                {/* <CategorySelector
-              value={newExercise.category}
-              onValueChange={(value) =>
-                setNewExercise({ ...newExercise, category: value })
-              }
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              onSelect={handleSelect}
-              focused={focused}
-              commandRef={commandRef}
-              allExercises={allExercises}
-            /> */}
                 <div className="min-w-0 w-full max-w-full overflow-x-auto overflow-y-hidden overscroll-x-contain pb-1">
                   <div className="flex w-max min-w-full flex-nowrap gap-2">
                     {allExercises.map((category) => (
@@ -227,9 +215,18 @@ export const CreateExercise = ({
               </div>
 
               <div className="min-w-0 space-y-2">
-                <span className="text-sm font-medium">Иконка</span>
+                <span
+                  id="exercise-icon-picker-label"
+                  className="text-sm font-medium"
+                >
+                  Иконка
+                </span>
                 <div className="min-w-0 w-full max-w-full overflow-x-auto overflow-y-hidden overscroll-x-contain pb-1">
-                  <div className="flex w-max min-w-full flex-nowrap gap-2">
+                  <div
+                    className="flex w-max min-w-full flex-nowrap gap-2"
+                    role="listbox"
+                    aria-labelledby="exercise-icon-picker-label"
+                  >
                     {EXERCISE_ICON_PICKER_IDS.map((iconId) => (
                       <ExerciseIconOption
                         key={iconId}
