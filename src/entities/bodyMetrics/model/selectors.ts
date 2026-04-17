@@ -16,6 +16,12 @@ const getMetricValue = (measurements: BodyMeasurements, key: BodyMetricKey) => {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 };
 
+const getMetricHistoryValues = (entries: BodyMetricsEntry[], key: BodyMetricKey) => {
+  return entries
+    .map((entry) => getMetricValue(entry.measurements, key))
+    .filter((value): value is number => value !== null);
+};
+
 const resolveTrend = (delta: number | null): BodyMetricTrendSummary["trend"] => {
   if (delta === null) {
     return "none";
@@ -45,16 +51,11 @@ export const selectBodyMetricsTrendSummary = (
   metricDefinitions = BODY_METRIC_DEFINITIONS,
 ) => {
   const sortedEntries = selectSortedBodyMetricsEntries(entries);
-  const currentEntry = sortedEntries[0];
-  const previousEntry = sortedEntries[1];
 
   return metricDefinitions.map<BodyMetricTrendSummary>((definition) => {
-    const currentValue = currentEntry
-      ? getMetricValue(currentEntry.measurements, definition.key)
-      : null;
-    const previousValue = previousEntry
-      ? getMetricValue(previousEntry.measurements, definition.key)
-      : null;
+    const metricHistoryValues = getMetricHistoryValues(sortedEntries, definition.key);
+    const currentValue = metricHistoryValues[0] ?? null;
+    const previousValue = metricHistoryValues[1] ?? null;
     const delta =
       currentValue === null || previousValue === null
         ? null

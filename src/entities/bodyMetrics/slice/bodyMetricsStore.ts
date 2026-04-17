@@ -25,6 +25,11 @@ interface BodyMetricsActions {
   updateEntry: (entryId: string, draft: BodyMetricsDraft) => void;
   deleteEntry: (entryId: string) => void;
   addCustomMetricDefinition: (payload: CreateCustomBodyMetricPayload) => void;
+  updateCustomMetricDefinition: (
+    metricKey: string,
+    payload: CreateCustomBodyMetricPayload,
+  ) => void;
+  deleteCustomMetricDefinition: (metricKey: string) => void;
   clearError: () => void;
 }
 
@@ -49,6 +54,39 @@ const createCustomMetricKey = () => {
 
 const normalizeMetricLabel = (value: string) => value.trim();
 const normalizeMetricUnit = (value: string) => value.trim().toLowerCase();
+
+const resolveDefinitionValidationError = ({
+  label,
+  unit,
+  allDefinitions,
+  currentMetricKey,
+}: {
+  label: string;
+  unit: string;
+  allDefinitions: BodyMetricDefinition[];
+  currentMetricKey?: string;
+}) => {
+  if (label.length < 2) {
+    return "Название параметра должно содержать минимум 2 символа";
+  }
+
+  if (unit.length === 0) {
+    return "Укажите единицу измерения параметра";
+  }
+
+  const isDuplicateLabel = allDefinitions.some((definition) => {
+    if (currentMetricKey && definition.key === currentMetricKey) {
+      return false;
+    }
+    return definition.label.toLowerCase() === label.toLowerCase();
+  });
+
+  if (isDuplicateLabel) {
+    return "Параметр с таким названием уже существует";
+  }
+
+  return null;
+};
 
 const validateDraft = (draft: BodyMetricsDraft) => {
   if (draft.recordedAt.length === 0) {
@@ -145,35 +183,21 @@ export const useBodyMetricsStore = create<BodyMetricsState & BodyMetricsActions>
         set((state) => {
           const label = normalizeMetricLabel(payload.label);
           const unit = normalizeMetricUnit(payload.unit);
-
-          if (label.length < 2) {
-            return {
-              ...state,
-              status: "error",
-              errorMessage: "Название параметра должно содержать минимум 2 символа",
-            };
-          }
-
-          if (unit.length === 0) {
-            return {
-              ...state,
-              status: "error",
-              errorMessage: "Укажите единицу измерения параметра",
-            };
-          }
-
           const allDefinitions = [
             ...BODY_METRIC_DEFINITIONS,
             ...state.customMetricDefinitions,
           ];
-          const isDuplicateLabel = allDefinitions.some(
-            (definition) => definition.label.toLowerCase() === label.toLowerCase(),
-          );
-          if (isDuplicateLabel) {
+          const validationError = resolveDefinitionValidationError({
+            label,
+            unit,
+            allDefinitions,
+          });
+
+          if (validationError) {
             return {
               ...state,
               status: "error",
-              errorMessage: "Параметр с таким названием уже существует",
+              errorMessage: validationError,
             };
           }
 
@@ -189,6 +213,86 @@ export const useBodyMetricsStore = create<BodyMetricsState & BodyMetricsActions>
           return {
             ...state,
             customMetricDefinitions: [...state.customMetricDefinitions, customDefinition],
+            status: "idle",
+            errorMessage: null,
+          };
+        }),
+
+      updateCustomMetricDefinition: (metricKey, payload) =>
+        set((state) => {
+          const metricToUpdate = state.customMetricDefinitions.find(
+            (definition) => definition.key === metricKey,
+          );
+          if (!metricToUpdate) {
+            return {
+              ...state,
+              status: "error",
+              errorMessage: "Параметр для изменения не найден",
+            };
+          }
+
+          const label = normalizeMetricLabel(payload.label);
+          const unit = normalizeMetricUnit(payload.unit);
+          const allDefinitions = [
+            ...BODY_METRIC_DEFINITIONS,
+            ...state.customMetricDefinitions,
+          ];
+          const validationError = resolveDefinitionValidationError({
+            label,
+            unit,
+            allDefinitions,
+            currentMetricKey: metricKey,
+          });
+          if (validationError) {
+            return {
+              ...state,
+              status: "error",
+              errorMessage: validationError,
+            };
+          }
+
+          return {
+            ...state,
+            customMetricDefinitions: state.customMetricDefinitions.map((definition) =>
+              definition.key === metricKey
+                ? {
+                    ...definition,
+                    label,
+                    unit,
+                  }
+                : definition,
+            ),
+            status: "idle",
+            errorMessage: null,
+          };
+        }),
+
+      deleteCustomMetricDefinition: (metricKey) =>
+        set((state) => {
+          const isMetricExists = state.customMetricDefinitions.some(
+            (definition) => definition.key === metricKey,
+          );
+          if (!isMetricExists) {
+            return {
+              ...state,
+              status: "error",
+              errorMessage: "Параметр для удаления не найден",
+            };
+          }
+
+          return {
+            ...state,
+            customMetricDefinitions: state.customMetricDefinitions.filter(
+              (definition) => definition.key !== metricKey,
+            ),
+            entries: state.entries.map((entry) => {
+              const updatedMeasurements = { ...entry.measurements };
+              delete updatedMeasurements[metricKey];
+              return {
+                ...entry,
+                measurements: updatedMeasurements,
+              };
+            }),
             status: "idle",
             errorMessage: null,
           };

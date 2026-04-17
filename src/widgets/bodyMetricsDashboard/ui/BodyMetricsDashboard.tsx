@@ -9,7 +9,7 @@ import {
 } from "@/entities/bodyMetrics";
 import {
   BodyMetricsForm,
-  CreateCustomMetricCard,
+  ManageBodyMetricsDialog,
 } from "@/features/bodyMetricsEntry";
 import { BodyMetricsHistory } from "@/features/bodyMetricsHistory";
 import {
@@ -18,6 +18,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/ui/shadCNComponents/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/ui/shadCNComponents/ui/dialog";
 import { cn } from "@/shared/ui/lib/utils";
 import { BodyMetricsSummaryCards } from "./BodyMetricsSummaryCards";
 import { BodyMetricsTrendChart } from "./BodyMetricsTrendChart";
@@ -39,6 +46,12 @@ export const BodyMetricsDashboard = ({ className }: BodyMetricsDashboardProps) =
   const deleteEntry = useBodyMetricsStore((state) => state.deleteEntry);
   const addCustomMetricDefinition = useBodyMetricsStore(
     (state) => state.addCustomMetricDefinition,
+  );
+  const updateCustomMetricDefinition = useBodyMetricsStore(
+    (state) => state.updateCustomMetricDefinition,
+  );
+  const deleteCustomMetricDefinition = useBodyMetricsStore(
+    (state) => state.deleteCustomMetricDefinition,
   );
   const clearError = useBodyMetricsStore((state) => state.clearError);
 
@@ -88,6 +101,15 @@ export const BodyMetricsDashboard = ({ className }: BodyMetricsDashboardProps) =
   const handleCreateCustomMetric = (payload: { label: string; unit: string }) => {
     addCustomMetricDefinition(payload);
   };
+  const handleUpdateCustomMetric = (
+    metricKey: string,
+    payload: { label: string; unit: string },
+  ) => {
+    updateCustomMetricDefinition(metricKey, payload);
+  };
+  const handleDeleteCustomMetric = (metricKey: string) => {
+    deleteCustomMetricDefinition(metricKey);
+  };
 
   if (!isHydrated || status === "loading") {
     return (
@@ -109,13 +131,16 @@ export const BodyMetricsDashboard = ({ className }: BodyMetricsDashboardProps) =
       />
 
       <BodyMetricsForm
-        key={activeEntry?.id ?? "new-entry"}
-        initialEntry={activeEntry}
+        initialEntry={null}
         metricDefinitions={metricDefinitions}
         onSubmit={handleFormSubmit}
-        onCancelEdit={handleCancelEdit}
       />
-      <CreateCustomMetricCard onCreateCustomMetric={handleCreateCustomMetric} />
+      <ManageBodyMetricsDialog
+        customMetricDefinitions={customMetricDefinitions}
+        onAdd={handleCreateCustomMetric}
+        onUpdate={handleUpdateCustomMetric}
+        onDelete={handleDeleteCustomMetric}
+      />
 
       {status === "error" && errorMessage && (
         <p className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
@@ -130,6 +155,32 @@ export const BodyMetricsDashboard = ({ className }: BodyMetricsDashboardProps) =
         onEdit={handleEditEntry}
         onDelete={handleDeleteEntry}
       />
+
+      <Dialog
+        open={activeEntryId !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            handleCancelEdit();
+          }
+        }}
+      >
+        <DialogContent className="max-w-2xl p-0" showCloseButton>
+          <DialogHeader className="sr-only">
+            <DialogTitle>Редактирование замера</DialogTitle>
+            <DialogDescription>
+              Обновите дату и значения параметров выбранной записи.
+            </DialogDescription>
+          </DialogHeader>
+          {activeEntry && (
+            <BodyMetricsForm
+              initialEntry={activeEntry}
+              metricDefinitions={metricDefinitions}
+              onSubmit={handleFormSubmit}
+              onCancelEdit={handleCancelEdit}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };
