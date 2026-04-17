@@ -1,5 +1,7 @@
-import type { ImgHTMLAttributes } from "react";
-import { cn, publicAssetUrl } from "@/shared/lib";
+import type { HTMLAttributes } from "react";
+import { cn } from "@/shared/lib";
+import { ExerciseIconGraphic } from "../exerciseIcon/ExerciseIconGraphic";
+import type { ExerciseIconGraphicId } from "../exerciseIcon/svgHtml";
 
 export type AppNavIconVariant =
   | "timer"
@@ -11,32 +13,28 @@ export type AppNavIconVariant =
   | "menu";
 
 /** Меню: таймер — торс, список — гиря, аналитика — бицепс, настройки — пресс, тело — плечи/спина; chart — график для статистики. */
-const ICON_FILE: Record<AppNavIconVariant, string> = {
-  timer: "icons/nav-body-metrics.svg",
-  exercises: "icons/nav-exercises.svg",
-  analytics: "icons/logo-mark.svg",
-  chart: "icons/nav-analytics.svg",
-  settings: "icons/nav-settings.svg",
-  "body-metrics": "icons/extra-9.svg",
-  menu: "icons/nav-menu.svg",
+const VARIANT_TO_ICON_ID: Record<AppNavIconVariant, ExerciseIconGraphicId> = {
+  timer: "nav-body-metrics",
+  exercises: "nav-exercises",
+  analytics: "logo-mark",
+  chart: "nav-analytics",
+  settings: "nav-settings",
+  "body-metrics": "extra-9",
+  menu: "nav-menu",
 };
 
 export interface AppNavIconProps
-  extends Omit<ImgHTMLAttributes<HTMLImageElement>, "src"> {
+  extends Omit<HTMLAttributes<HTMLSpanElement>, "children"> {
   variant: AppNavIconVariant;
 }
 
 export const AppNavIcon = ({
   variant,
   className,
-  alt = "",
-  draggable = false,
   ...rest
 }: AppNavIconProps) => (
-  <img
-    alt={alt}
-    draggable={draggable}
-    src={publicAssetUrl(ICON_FILE[variant])}
+  <ExerciseIconGraphic
+    iconId={VARIANT_TO_ICON_ID[variant]}
     className={cn("size-5 shrink-0 object-contain", className)}
     {...rest}
   />

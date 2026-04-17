@@ -69,12 +69,14 @@ export const ExerciseBody = ({
               style={{ overflow: "hidden" }}
             >
               <div className={cn("flex gap-3 items-center font-numeric")}>
-                <div className={style.setIndex}>{idx + 1}</div>
+                <Button variant="ghost" className={style.setIndex}>
+                  {idx + 1}
+                </Button>
                 <div className={style.cell}>
                   <Input
                     className={cn(
                       INPUT_CLASSNAME,
-                      "text-primary bg-background w-32 border-primary h-12 rounded-md",
+                      "text-primary bg-background w-full border-primary h-12 rounded-md",
                     )}
                     type={"number"}
                     placeholder={"Кол-во"}
@@ -89,7 +91,7 @@ export const ExerciseBody = ({
                   <Input
                     className={cn(
                       INPUT_CLASSNAME,
-                      "text-primary bg-background w-32 border-primary h-12 rounded-md",
+                      "text-primary bg-background w-full border-primary h-12 rounded-md",
                     )}
                     type={"number"}
                     placeholder={"Кг"}
@@ -102,7 +104,7 @@ export const ExerciseBody = ({
                 </div>
                 <div className={style.deleteButtonCell}>
                   <Button
-                    className="bg-transparent text-muted-foreground hover:text-foreground"
+                    variant="ghost"
                     onClick={() => deleteSet(exercise, set)}
                   >
                     <X />

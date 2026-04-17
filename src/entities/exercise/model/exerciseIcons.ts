@@ -1,4 +1,6 @@
-/** Относительные пути к SVG в `public/` для иконок упражнений в каталоге и журнале. */
+import type { ExerciseIconGraphicId } from "@/shared/ui/exerciseIcon/svgHtml";
+
+/** Относительные пути к SVG в `public/` (кэш PWA, внешние ссылки). */
 export const EXERCISE_ICON_PATHS = {
   "nav-exercises": "icons/nav-exercises.svg",
   "nav-timer": "icons/nav-timer.svg",
@@ -9,9 +11,9 @@ export const EXERCISE_ICON_PATHS = {
   "extra-9": "icons/extra-9.svg",
   "nav-settings": "icons/nav-settings.svg",
   "extra-8": "icons/extra-8.svg",
-} as const;
+} as const satisfies Record<ExerciseIconGraphicId, string>;
 
-export type ExerciseIconId = keyof typeof EXERCISE_ICON_PATHS;
+export type ExerciseIconId = ExerciseIconGraphicId;
 
 export const DEFAULT_EXERCISE_ICON_ID: ExerciseIconId = "nav-exercises";
 
@@ -35,13 +37,16 @@ export const defaultIconIdForCategory = (category: string): ExerciseIconId => {
   return CATEGORY_DEFAULT_ICON[key] ?? DEFAULT_EXERCISE_ICON_ID;
 };
 
+const isExerciseIconId = (value: string): value is ExerciseIconId =>
+  Object.hasOwn(EXERCISE_ICON_PATHS, value);
+
 export const normalizeExerciseIconId = (value: unknown): ExerciseIconId => {
   if (typeof value !== "string") {
     return DEFAULT_EXERCISE_ICON_ID;
   }
 
-  if (Object.hasOwn(EXERCISE_ICON_PATHS, value)) {
-    return value as ExerciseIconId;
+  if (isExerciseIconId(value)) {
+    return value;
   }
 
   return DEFAULT_EXERCISE_ICON_ID;

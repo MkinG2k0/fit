@@ -16,6 +16,7 @@ import {
   DialogTitle,
 } from "@/shared/ui/shadCNComponents/ui/dialog";
 import { Input } from "@/shared/ui/shadCNComponents/ui/input";
+import { DeleteDialog } from "@/features/fullExerciseList/ui/DeleteDialog";
 import type { CatalogExerciseEditSource, NewExercise } from "../model/types";
 import { ExerciseIconOption } from "./ExerciseIconOption";
 
@@ -38,13 +39,16 @@ export const CreateExercise = ({
     iconId: DEFAULT_EXERCISE_ICON_ID,
   });
   const [error, setError] = useState<string>("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const createExercise = useExerciseStore((state) => state.createExercise);
   const updateExercise = useExerciseStore((state) => state.updateExercise);
+  const deleteExercise = useExerciseStore((state) => state.deleteExercise);
   const allExercises = useExerciseStore((state) => state.exercises);
   const isEditing = Boolean(editingExercise);
 
   useEffect(() => {
     if (!open) {
+      setDeleteDialogOpen(false);
       return;
     }
 
@@ -114,8 +118,7 @@ export const CreateExercise = ({
 
     const existingExercise = allExercises.some((category) =>
       category.exercises.some(
-        (exercise) =>
-          exercise.name.toLowerCase() === trimmedName.toLowerCase(),
+        (exercise) => exercise.name.toLowerCase() === trimmedName.toLowerCase(),
       ),
     );
 
@@ -131,26 +134,44 @@ export const CreateExercise = ({
     handleClose();
   };
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={"max-h-[90dvh]"}>
-        <DialogHeader>
-          <DialogTitle>
-            {isEditing ? "Редактировать упражнение" : "Создать упражнение"}
-          </DialogTitle>
-          <DialogDescription>
-            {isEditing
-              ? "Измените категорию, иконку или название упражнения"
-              : "Выберите категорию, иконку и название нового упражнения"}
-          </DialogDescription>
-        </DialogHeader>
+  const handleDeleteClick = () => {
+    setDeleteDialogOpen(true);
+  };
 
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <label htmlFor="category" className="text-sm font-medium">
-              Категория
-            </label>
-            {/* <CategorySelector
+  const handleDeleteConfirm = () => {
+    if (!editingExercise) {
+      return;
+    }
+    deleteExercise(editingExercise.name, editingExercise.category);
+    setDeleteDialogOpen(false);
+    handleClose();
+  };
+
+  const handleDeleteDialogOpenChange = (nextOpen: boolean) => {
+    setDeleteDialogOpen(nextOpen);
+  };
+
+  return (
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className={"max-h-[90dvh]"}>
+          <DialogHeader>
+            <DialogTitle>
+              {isEditing ? "Редактировать упражнение" : "Создать упражнение"}
+            </DialogTitle>
+            <DialogDescription>
+              {isEditing
+                ? "Измените категорию, иконку или название упражнения"
+                : "Выберите категорию, иконку и название нового упражнения"}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label htmlFor="category" className="text-sm font-medium">
+                Категория
+              </label>
+              {/* <CategorySelector
               value={newExercise.category}
               onValueChange={(value) =>
                 setNewExercise({ ...newExercise, category: value })
@@ -162,72 +183,94 @@ export const CreateExercise = ({
               commandRef={commandRef}
               allExercises={allExercises}
             /> */}
-            <div className="flex gap-2 flex-wrap">
-              {allExercises.map((category) => (
-                <Button
-                  key={category.category}
-                  variant={
-                    newExercise.category === category.category
-                      ? "default"
-                      : "outline"
-                  }
-                  onClick={() =>
-                    setNewExercise({
-                      ...newExercise,
-                      category: category.category,
-                      iconId: defaultIconIdForCategory(category.category),
-                    })
-                  }
-                >
-                  {category.category}
-                </Button>
-              ))}
+              <div className="flex gap-2 flex-wrap">
+                {allExercises.map((category) => (
+                  <Button
+                    key={category.category}
+                    variant={
+                      newExercise.category === category.category
+                        ? "default"
+                        : "outline"
+                    }
+                    onClick={() =>
+                      setNewExercise({
+                        ...newExercise,
+                        category: category.category,
+                        iconId: defaultIconIdForCategory(category.category),
+                      })
+                    }
+                  >
+                    {category.category}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="exercise-name" className="text-sm font-medium">
+                Название упражнения
+              </label>
+              <Input
+                id="exercise-name"
+                placeholder="Например: Жим лежа"
+                value={newExercise.name}
+                onChange={(e) => {
+                  setNewExercise({ ...newExercise, name: e.target.value });
+                  if (error) setError("");
+                }}
+              />
+              {error && <p className="text-sm text-red-500 mt-1">{error}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <span className="text-sm font-medium">Иконка</span>
+              <div className="flex flex-wrap gap-2">
+                {EXERCISE_ICON_PICKER_IDS.map((iconId) => (
+                  <ExerciseIconOption
+                    key={iconId}
+                    iconId={iconId}
+                    isSelected={newExercise.iconId === iconId}
+                    onSelect={handleIconSelect}
+                  />
+                ))}
+              </div>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label htmlFor="exercise-name" className="text-sm font-medium">
-              Название упражнения
-            </label>
-            <Input
-              id="exercise-name"
-              placeholder="Например: Жим лежа"
-              value={newExercise.name}
-              onChange={(e) => {
-                setNewExercise({ ...newExercise, name: e.target.value });
-                if (error) setError("");
-              }}
-            />
-            {error && <p className="text-sm text-red-500 mt-1">{error}</p>}
-          </div>
+          <DialogFooter>
+            <Button
+              onClick={handleSave}
+              disabled={!newExercise.category || !newExercise.name.trim()}
+            >
+              {isEditing ? "Сохранить" : "Создать"}
+            </Button>
 
-          <div className="space-y-2">
-            <span className="text-sm font-medium">Иконка</span>
-            <div className="flex flex-wrap gap-2">
-              {EXERCISE_ICON_PICKER_IDS.map((iconId) => (
-                <ExerciseIconOption
-                  key={iconId}
-                  iconId={iconId}
-                  isSelected={newExercise.iconId === iconId}
-                  onSelect={handleIconSelect}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
+            <Button variant="outline" onClick={handleClose}>
+              Отмена
+            </Button>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={handleClose}>
-            Отмена
-          </Button>
-          <Button
-            onClick={handleSave}
-            disabled={!newExercise.category || !newExercise.name.trim()}
-          >
-            {isEditing ? "Сохранить" : "Создать"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+            {isEditing && editingExercise && (
+              <Button
+                variant="destructive"
+                className="w-full"
+                onClick={handleDeleteClick}
+              >
+                Удалить упражнение
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {editingExercise && (
+        <DeleteDialog
+          open={deleteDialogOpen}
+          onOpenChange={handleDeleteDialogOpenChange}
+          type="exercise"
+          name={editingExercise.name}
+          onConfirm={handleDeleteConfirm}
+        />
+      )}
+    </>
   );
 };

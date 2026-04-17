@@ -1,7 +1,8 @@
 import type { MouseEvent } from "react";
 import { Pencil, Trash2 } from "lucide-react";
-import { EXERCISE_ICON_PATHS, type ExerciseIconId } from "@/entities/exercise";
-import { cn, publicAssetUrl } from "@/shared/lib";
+import type { ExerciseIconId } from "@/entities/exercise";
+import { cn } from "@/shared/lib";
+import { ExerciseIconGraphic } from "@/shared/ui";
 import { Checkbox } from "@/shared/ui/shadCNComponents/ui/checkbox";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { CommandItem } from "@/shared/ui/shadCNComponents/ui/command";
@@ -14,6 +15,8 @@ interface ExerciseItemProps {
   iconId: ExerciseIconId;
   checkable: "checkbox" | "radio" | false;
   deletable: boolean;
+  /** Показывать корзину в строке списка (удаление из экрана редактирования — отдельно). */
+  allowListDelete?: boolean;
   selected: boolean;
   onSelect?: (value: string) => void;
   onDelete: (name: string, category: string) => void;
@@ -30,6 +33,7 @@ export const ExerciseItem = ({
   iconId,
   checkable,
   deletable,
+  allowListDelete = true,
   selected,
   onSelect,
   onDelete,
@@ -53,10 +57,8 @@ export const ExerciseItem = ({
       onSelect={onSelect}
     >
       <div className={"flex gap-2 items-center overflow-hidden"}>
-        <img
-          alt=""
-          draggable={false}
-          src={publicAssetUrl(EXERCISE_ICON_PATHS[iconId])}
+        <ExerciseIconGraphic
+          iconId={iconId}
           className={cn(exerciseItemIconClassName)}
         />
         <span className="text-base overflow-hidden truncate font-medium">
@@ -82,14 +84,16 @@ export const ExerciseItem = ({
                 <Pencil className="h-4 w-4" />
               </Button>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
-              onClick={handleDeleteClick}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            {allowListDelete && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                onClick={handleDeleteClick}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
           </>
         )}
       </div>

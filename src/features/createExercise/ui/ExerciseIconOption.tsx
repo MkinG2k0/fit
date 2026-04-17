@@ -1,5 +1,6 @@
-import { EXERCISE_ICON_PATHS, type ExerciseIconId } from "@/entities/exercise";
-import { cn, publicAssetUrl } from "@/shared/lib";
+import type { ExerciseIconId } from "@/entities/exercise";
+import { cn } from "@/shared/lib";
+import { ExerciseIconGraphic } from "@/shared/ui";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 
 const optionIconClassName = "size-7 object-contain";
@@ -29,10 +30,8 @@ export const ExerciseIconOption = ({
       aria-label={`Иконка ${iconId}`}
       onClick={handleClick}
     >
-      <img
-        alt=""
-        draggable={false}
-        src={publicAssetUrl(EXERCISE_ICON_PATHS[iconId])}
+      <ExerciseIconGraphic
+        iconId={iconId}
         className={cn(optionIconClassName)}
       />
     </Button>

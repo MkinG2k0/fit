@@ -1,9 +1,9 @@
 import {
-  EXERCISE_ICON_PATHS,
   defaultIconIdForCategory,
   type ExerciseIconId,
 } from "@/entities/exercise";
-import { cn, publicAssetUrl } from "@/shared/lib";
+import { cn } from "@/shared/lib";
+import { ExerciseIconGraphic } from "@/shared/ui";
 
 interface ExerciseCategoryIconProps {
   category?: string;
@@ -16,18 +16,13 @@ export const ExerciseCategoryIcon = ({
   iconId,
   className,
 }: ExerciseCategoryIconProps) => {
-  const resolvedIconId =
-    iconId ?? (category ? defaultIconIdForCategory(category) : undefined);
-  const relativePath =
-    resolvedIconId !== undefined
-      ? EXERCISE_ICON_PATHS[resolvedIconId]
-      : EXERCISE_ICON_PATHS["nav-exercises"];
+  const resolvedIconId: ExerciseIconId =
+    iconId ?? (category ? defaultIconIdForCategory(category) : undefined) ??
+    "nav-exercises";
 
   return (
-    <img
-      alt=""
-      draggable={false}
-      src={publicAssetUrl(relativePath)}
+    <ExerciseIconGraphic
+      iconId={resolvedIconId}
       className={cn("object-contain", className)}
     />
   );

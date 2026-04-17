@@ -235,6 +235,7 @@ export const FullExerciseCommand = ({
                             category={group.category}
                             checkable={checkable}
                             deletable={deletable}
+                            allowListDelete={!onEditExercise}
                             selected={selectedExerciseCheckboxes.includes(
                               entry.name,
                             )}
