@@ -19,15 +19,15 @@ const normalizeSvg = (content) =>
       "$1",
     );
 
-/** Соответствие экспорта Figma → экран: таймер, упражнения, аналитика, настройки, тело, меню; логотип — бицепс. */
+/** Соответствие экспорта Figma → имена файлов по содержанию иконки. */
 const map = [
-  ["Frame 3.svg", "nav-timer.svg"],
-  ["Frame 2.svg", "nav-exercises.svg"],
-  ["Frame 5.svg", "nav-analytics.svg"],
-  ["Frame 7.svg", "nav-settings.svg"],
-  ["Frame 4.svg", "nav-body-metrics.svg"],
-  ["Frame 6.svg", "nav-menu.svg"],
-  ["Frame 1.svg", "logo-mark.svg"],
+  ["Frame 3.svg", "icon-muscles-front.svg"],
+  ["Frame 2.svg", "icon-kettlebell.svg"],
+  ["Frame 5.svg", "icon-area-chart.svg"],
+  ["Frame 7.svg", "icon-abs-core.svg"],
+  ["Frame 4.svg", "icon-body-measurements.svg"],
+  ["Frame 6.svg", "icon-legs-power.svg"],
+  ["Frame 1.svg", "icon-biceps.svg"],
 ];
 
 for (const [srcName, outName] of map) {
@@ -35,13 +35,18 @@ for (const [srcName, outName] of map) {
   fs.writeFileSync(path.join(dest, outName), normalizeSvg(raw));
 }
 
-for (const n of [8, 9]) {
-  const raw = fs.readFileSync(
-    path.join(root, `Frame ${n}.svg`),
-    "utf8",
-  );
-  fs.writeFileSync(path.join(dest, `extra-${n}.svg`), normalizeSvg(raw));
+const extraMap = [
+  ["Frame 8.svg", "icon-mobility-arms-up.svg"],
+  ["Frame 9.svg", "icon-shoulders-stretch.svg"],
+];
+
+for (const [srcName, outName] of extraMap) {
+  const raw = fs.readFileSync(path.join(root, srcName), "utf8");
+  fs.writeFileSync(path.join(dest, outName), normalizeSvg(raw));
 }
 
-fs.copyFileSync(path.join(dest, "logo-mark.svg"), path.join(publicDir, "logo.svg"));
+fs.copyFileSync(
+  path.join(dest, "icon-biceps.svg"),
+  path.join(publicDir, "logo.svg"),
+);
 console.log("Icons written to public/icons and public/logo.svg");

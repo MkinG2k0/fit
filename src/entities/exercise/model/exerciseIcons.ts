@@ -2,15 +2,15 @@ import type { ExerciseIconGraphicId } from "@/shared/ui/exerciseIcon/svgHtml";
 
 /** Относительные пути к SVG в `public/` (кэш PWA, внешние ссылки). */
 export const EXERCISE_ICON_PATHS = {
-  "nav-exercises": "icons/nav-exercises.svg",
-  "nav-timer": "icons/nav-timer.svg",
-  "nav-body-metrics": "icons/nav-body-metrics.svg",
-  "nav-menu": "icons/nav-menu.svg",
-  "nav-analytics": "icons/nav-analytics.svg",
-  "logo-mark": "icons/logo-mark.svg",
-  "extra-9": "icons/extra-9.svg",
-  "nav-settings": "icons/nav-settings.svg",
-  "extra-8": "icons/extra-8.svg",
+  "nav-exercises": "icons/icon-kettlebell.svg",
+  "nav-timer": "icons/icon-muscles-front.svg",
+  "nav-body-metrics": "icons/icon-body-measurements.svg",
+  "nav-menu": "icons/icon-legs-power.svg",
+  "nav-analytics": "icons/icon-area-chart.svg",
+  "logo-mark": "icons/icon-biceps.svg",
+  "extra-9": "icons/icon-shoulders-stretch.svg",
+  "nav-settings": "icons/icon-abs-core.svg",
+  "extra-8": "icons/icon-mobility-arms-up.svg",
 } as const satisfies Record<ExerciseIconGraphicId, string>;
 
 export type ExerciseIconId = ExerciseIconGraphicId;
