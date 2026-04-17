@@ -28,7 +28,6 @@ interface BodyMetricsTrendChartProps {
 
 type BodyMetricChartPoint = Record<string, number | string | undefined> & {
   date: string;
-  pointDateTime: string;
 };
 
 const CHART_COLORS = [
@@ -61,14 +60,17 @@ const buildChartPoints = (
   const lastKnownValues: Record<string, number | undefined> = {};
 
   return [...entries]
-    .sort(
-      (leftEntry, rightEntry) =>
-        parseDate(leftEntry.createdAt) - parseDate(rightEntry.createdAt),
-    )
+    .sort((leftEntry, rightEntry) => {
+      const recordedDiff =
+        parseDate(leftEntry.recordedAt) - parseDate(rightEntry.recordedAt);
+      if (recordedDiff !== 0) {
+        return recordedDiff;
+      }
+      return parseDate(leftEntry.createdAt) - parseDate(rightEntry.createdAt);
+    })
     .map((entry) => {
       const point: BodyMetricChartPoint = {
         date: entry.recordedAt,
-        pointDateTime: entry.createdAt,
       };
       metricDefinitions.forEach((definition) => {
         const entryValue = entry.measurements[definition.key];
@@ -188,7 +190,7 @@ export const BodyMetricsTrendChart = ({
             <LineChart data={chartPoints} margin={LINE_CHART_MARGIN}>
               <CartesianGrid vertical={false} />
               <XAxis
-                dataKey="pointDateTime"
+                dataKey="date"
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
