@@ -2,6 +2,8 @@ import absCore from "./svg/icon-abs-core.svg?raw";
 import areaChart from "./svg/icon-area-chart.svg?raw";
 import biceps from "./svg/icon-biceps.svg?raw";
 import bodyMeasurements from "./svg/icon-body-measurements.svg?raw";
+import calves from "./svg/icon-calves.svg?raw";
+import cardio from "./svg/icon-cardio.svg?raw";
 import kettlebell from "./svg/icon-kettlebell.svg?raw";
 import legsPower from "./svg/icon-legs-power.svg?raw";
 import mobilityArmsUp from "./svg/icon-mobility-arms-up.svg?raw";
@@ -18,6 +20,8 @@ export const EXERCISE_ICON_SVG_BY_ID = {
   "extra-9": shouldersStretch,
   "nav-settings": absCore,
   "extra-8": mobilityArmsUp,
+  "extra-cardio": cardio,
+  "extra-calves": calves,
 } as const;
 
 export type ExerciseIconGraphicId = keyof typeof EXERCISE_ICON_SVG_BY_ID;

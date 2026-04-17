@@ -1,0 +1,11 @@
+<svg width="125" height="125" viewBox="0 0 125 125" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path
+    d="M10 68h20l12-38 16 62 14-48 12 44 16-20h20"
+    stroke="currentColor"
+    stroke-width="8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  />
+  <circle cx="64" cy="34" r="9" fill="var(--primary)" />
+</svg>

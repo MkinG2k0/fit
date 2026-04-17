@@ -11,6 +11,8 @@ export const EXERCISE_ICON_PATHS = {
   "extra-9": "icons/icon-shoulders-stretch.svg",
   "nav-settings": "icons/icon-abs-core.svg",
   "extra-8": "icons/icon-mobility-arms-up.svg",
+  "extra-cardio": "icons/icon-cardio.svg",
+  "extra-calves": "icons/icon-calves.svg",
 } as const satisfies Record<ExerciseIconGraphicId, string>;
 
 export type ExerciseIconId = ExerciseIconGraphicId;
@@ -18,16 +20,16 @@ export type ExerciseIconId = ExerciseIconGraphicId;
 export const DEFAULT_EXERCISE_ICON_ID: ExerciseIconId = "nav-exercises";
 
 const CATEGORY_DEFAULT_ICON: Record<string, ExerciseIconId> = {
-  кардио: "nav-timer",
-  пресс: "nav-body-metrics",
+  кардио: "extra-cardio",
+  пресс: "nav-settings",
   ноги: "nav-menu",
-  икры: "nav-menu",
-  ягодицы: "nav-body-metrics",
-  спина: "nav-analytics",
-  грудь: "logo-mark",
+  икры: "extra-calves",
+  ягодицы: "nav-menu",
+  спина: "nav-timer",
+  грудь: "nav-exercises",
   плечи: "extra-9",
-  руки: "nav-settings",
-  предплечья: "nav-settings",
+  руки: "logo-mark",
+  предплечья: "nav-exercises",
   мобильность: "extra-8",
 };
 
@@ -62,4 +64,6 @@ export const EXERCISE_ICON_PICKER_IDS: ExerciseIconId[] = [
   "extra-9",
   "nav-settings",
   "extra-8",
+  "extra-cardio",
+  "extra-calves",
 ];

@@ -1,116 +1,115 @@
-import { defaultIconIdForCategory } from "@/entities/exercise/model/exerciseIcons";
+import type { ExerciseIconId } from "@/entities/exercise/model/exerciseIcons";
 import type { CatalogExercise } from "@/entities/exercise/model/types";
 
 const DEFAULT_PRESET_COLOR = { r: 255, g: 165, b: 0, a: 0.5 };
 
-const catalog = (category: string, names: readonly string[]): CatalogExercise[] => {
-  const iconId = defaultIconIdForCategory(category);
-
-  return names.map((name) => ({ name, iconId }));
-};
+const catalogExercise = (
+  name: string,
+  iconId: ExerciseIconId,
+): CatalogExercise => ({ name, iconId });
 
 export const allExercises = [
   {
     category: "Ноги",
-    exercises: catalog("Ноги", [
-      "Приседания",
-      "Жим ногами",
-      "Выпады",
-      "Болгарские выпады",
-      "Разгибания ног в тренажере",
-      "Сгибания ног в тренажере",
-    ]),
+    exercises: [
+      catalogExercise("Приседания", "nav-menu"),
+      catalogExercise("Жим ногами", "nav-menu"),
+      catalogExercise("Выпады", "nav-menu"),
+      catalogExercise("Болгарские выпады", "nav-menu"),
+      catalogExercise("Разгибания ног в тренажере", "nav-menu"),
+      catalogExercise("Сгибания ног в тренажере", "nav-menu"),
+    ],
   },
   {
     category: "Ягодицы",
-    exercises: catalog("Ягодицы", [
-      "Ягодичный мост",
-      "Румынская тяга",
-      "Отведение ноги в кроссовере",
-      "Гиперэкстензия",
-    ]),
+    exercises: [
+      catalogExercise("Ягодичный мост", "nav-menu"),
+      catalogExercise("Румынская тяга", "nav-menu"),
+      catalogExercise("Отведение ноги в кроссовере", "nav-menu"),
+      catalogExercise("Гиперэкстензия", "nav-menu"),
+    ],
   },
   {
     category: "Спина",
-    exercises: catalog("Спина", [
-      "Подтягивания",
-      "Тяга верхнего блока",
-      "Тяга штанги в наклоне",
-      "Тяга горизонтального блока",
-      "Тяга гантели одной рукой",
-    ]),
+    exercises: [
+      catalogExercise("Подтягивания", "nav-timer"),
+      catalogExercise("Тяга верхнего блока", "nav-timer"),
+      catalogExercise("Тяга штанги в наклоне", "nav-timer"),
+      catalogExercise("Тяга горизонтального блока", "nav-timer"),
+      catalogExercise("Тяга гантели одной рукой", "nav-timer"),
+    ],
   },
   {
     category: "Грудь",
-    exercises: catalog("Грудь", [
-      "Жим лежа",
-      "Жим гантелей на наклонной скамье",
-      "Разведение гантелей лежа",
-      "Отжимания на брусьях",
-      "Сведение рук в кроссовере",
-    ]),
+    exercises: [
+      catalogExercise("Жим лежа", "nav-exercises"),
+      catalogExercise("Жим гантелей на наклонной скамье", "nav-exercises"),
+      catalogExercise("Разведение гантелей лежа", "nav-exercises"),
+      catalogExercise("Отжимания на брусьях", "nav-exercises"),
+      catalogExercise("Сведение рук в кроссовере", "nav-exercises"),
+    ],
   },
   {
     category: "Плечи",
-    exercises: catalog("Плечи", [
-      "Армейский жим",
-      "Махи в сторону",
-      "Махи в наклоне",
-      "Тяга штанги к подбородку",
-    ]),
+    exercises: [
+      catalogExercise("Армейский жим", "extra-9"),
+      catalogExercise("Махи в сторону", "extra-9"),
+      catalogExercise("Махи в наклоне", "extra-9"),
+      catalogExercise("Тяга штанги к подбородку", "extra-9"),
+    ],
   },
   {
     category: "Руки",
-    exercises: catalog("Руки", [
-      "Подъём гантелей на бицепс",
-      "Молотки",
-      "Разгибания на блоке",
-      "Французский жим",
-      "Подъём штанги на бицепс",
-    ]),
+    exercises: [
+      catalogExercise("Подъём гантелей на бицепс", "logo-mark"),
+      catalogExercise("Молотки", "logo-mark"),
+      catalogExercise("Разгибания на блоке", "logo-mark"),
+      catalogExercise("Французский жим", "logo-mark"),
+      catalogExercise("Подъём штанги на бицепс", "logo-mark"),
+    ],
   },
   {
     category: "Пресс",
-    exercises: catalog("Пресс", [
-      "Скручивания",
-      "Планка",
-      "Подъем ног в висе",
-      "Русский твист",
-    ]),
+    exercises: [
+      catalogExercise("Скручивания", "nav-settings"),
+      catalogExercise("Планка", "nav-settings"),
+      catalogExercise("Подъем ног в висе", "nav-settings"),
+      catalogExercise("Русский твист", "nav-settings"),
+    ],
   },
   {
     category: "Кардио",
-    exercises: catalog("Кардио", [
-      "Бег",
-      "Велотренажер",
-      "Гребной тренажер",
-      "Эллиптический тренажер",
-      "Скакалка",
-    ]),
+    exercises: [
+      catalogExercise("Бег", "extra-cardio"),
+      catalogExercise("Велотренажер", "extra-cardio"),
+      catalogExercise("Гребной тренажер", "extra-cardio"),
+      catalogExercise("Эллиптический тренажер", "extra-cardio"),
+      catalogExercise("Скакалка", "extra-cardio"),
+    ],
   },
   {
     category: "Икры",
-    exercises: catalog("Икры", [
-      "Подъемы на носки стоя",
-      "Подъемы на носки сидя",
-      "Подъемы на носки в тренажере",
-    ]),
+    exercises: [
+      catalogExercise("Подъемы на носки стоя", "extra-calves"),
+      catalogExercise("Подъемы на носки сидя", "extra-calves"),
+      catalogExercise("Подъемы на носки в тренажере", "extra-calves"),
+    ],
   },
   {
     category: "Предплечья",
-    exercises: catalog("Предплечья", [
-      "Сгибания кистей с гантелями",
-      "Разгибания кистей с гантелями",
-      "Фермерская прогулка",
-    ]),
+    exercises: [
+      catalogExercise("Сгибания кистей с гантелями", "nav-exercises"),
+      catalogExercise("Разгибания кистей с гантелями", "nav-exercises"),
+      catalogExercise("Фермерская прогулка", "nav-exercises"),
+    ],
   },
   {
     category: "Мобильность",
-    exercises: catalog("Мобильность", [
-      "Растяжка задней поверхности бедра",
-      "Растяжка грудных мышц",
-      "Мобилизация грудного отдела",
-    ]),
+    exercises: [
+      catalogExercise("Растяжка задней поверхности бедра", "extra-8"),
+      catalogExercise("Растяжка грудных мышц", "extra-8"),
+      catalogExercise("Мобилизация грудного отдела", "extra-8"),
+    ],
   },
 ];
 
