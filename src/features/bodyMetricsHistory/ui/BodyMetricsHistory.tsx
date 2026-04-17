@@ -1,6 +1,7 @@
 import { PencilLine, Trash2 } from "lucide-react";
 import type { MouseEvent } from "react";
 import {
+  formatBodyMetricsRecordedAt,
   type BodyMetricDefinition,
   type BodyMetricsEntry,
 } from "@/entities/bodyMetrics";
@@ -31,19 +32,6 @@ const ENTRY_ACTIONS_CLASS = "flex items-center gap-1";
 
 const formatMetricValue = (definition: BodyMetricDefinition, value: number) => {
   return `${definition.label}: ${value.toFixed(1)} ${definition.unit}`;
-};
-
-const formatEntryDate = (date: string) => {
-  const parsedDate = new Date(date);
-  if (Number.isNaN(parsedDate.getTime())) {
-    return date;
-  }
-
-  return parsedDate.toLocaleDateString("ru-RU", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
 };
 
 export const BodyMetricsHistory = ({
@@ -94,7 +82,9 @@ export const BodyMetricsHistory = ({
                 )}
               >
                 <div className={ENTRY_HEAD_CLASS}>
-                  <p className="text-sm font-medium">{formatEntryDate(entry.recordedAt)}</p>
+                  <p className="text-sm font-medium">
+                    {formatBodyMetricsRecordedAt(entry.recordedAt)}
+                  </p>
                   <div className={ENTRY_ACTIONS_CLASS}>
                     <Button
                       type="button"

@@ -1,4 +1,4 @@
-import type { Exercise } from "@/entities/exercise";
+import type { Exercise, ExerciseIconId } from "@/entities/exercise";
 import type { RgbaColor } from "react-colorful";
 import type { CalendarDay } from "../model/types";
 import { createRandomUuid, saveDaysToLocalStorage } from "@/shared/lib";
@@ -9,6 +9,7 @@ export const generateExercise = (
   group: string,
   presetName?: string,
   presetColor?: RgbaColor,
+  iconId?: ExerciseIconId,
 ): Exercise => {
   return {
     sets: [
@@ -23,6 +24,7 @@ export const generateExercise = (
     name: name,
     presetColor: presetColor,
     presetName: presetName,
+    ...(iconId !== undefined ? { iconId } : {}),
   };
 };
 

@@ -14,3 +14,4 @@ export {
   selectSortedBodyMetricsEntries,
 } from "./model/selectors";
 export { useBodyMetricsStore } from "./slice/bodyMetricsStore";
+export { formatBodyMetricsRecordedAt } from "./lib/formatRecordedAt";

@@ -1,107 +1,116 @@
+import { defaultIconIdForCategory } from "@/entities/exercise/model/exerciseIcons";
+import type { CatalogExercise } from "@/entities/exercise/model/types";
+
 const DEFAULT_PRESET_COLOR = { r: 255, g: 165, b: 0, a: 0.5 };
+
+const catalog = (category: string, names: readonly string[]): CatalogExercise[] => {
+  const iconId = defaultIconIdForCategory(category);
+
+  return names.map((name) => ({ name, iconId }));
+};
 
 export const allExercises = [
   {
     category: "Ноги",
-    exercises: [
+    exercises: catalog("Ноги", [
       "Приседания",
       "Жим ногами",
       "Выпады",
       "Болгарские выпады",
       "Разгибания ног в тренажере",
       "Сгибания ног в тренажере",
-    ],
+    ]),
   },
   {
     category: "Ягодицы",
-    exercises: [
+    exercises: catalog("Ягодицы", [
       "Ягодичный мост",
       "Румынская тяга",
       "Отведение ноги в кроссовере",
       "Гиперэкстензия",
-    ],
+    ]),
   },
   {
     category: "Спина",
-    exercises: [
+    exercises: catalog("Спина", [
       "Подтягивания",
       "Тяга верхнего блока",
       "Тяга штанги в наклоне",
       "Тяга горизонтального блока",
       "Тяга гантели одной рукой",
-    ],
+    ]),
   },
   {
     category: "Грудь",
-    exercises: [
+    exercises: catalog("Грудь", [
       "Жим лежа",
       "Жим гантелей на наклонной скамье",
       "Разведение гантелей лежа",
       "Отжимания на брусьях",
       "Сведение рук в кроссовере",
-    ],
+    ]),
   },
   {
     category: "Плечи",
-    exercises: [
+    exercises: catalog("Плечи", [
       "Армейский жим",
       "Махи в сторону",
       "Махи в наклоне",
       "Тяга штанги к подбородку",
-    ],
+    ]),
   },
   {
     category: "Руки",
-    exercises: [
+    exercises: catalog("Руки", [
       "Подъём гантелей на бицепс",
       "Молотки",
       "Разгибания на блоке",
       "Французский жим",
       "Подъём штанги на бицепс",
-    ],
+    ]),
   },
   {
     category: "Пресс",
-    exercises: [
+    exercises: catalog("Пресс", [
       "Скручивания",
       "Планка",
       "Подъем ног в висе",
       "Русский твист",
-    ],
+    ]),
   },
   {
     category: "Кардио",
-    exercises: [
+    exercises: catalog("Кардио", [
       "Бег",
       "Велотренажер",
       "Гребной тренажер",
       "Эллиптический тренажер",
       "Скакалка",
-    ],
+    ]),
   },
   {
     category: "Икры",
-    exercises: [
+    exercises: catalog("Икры", [
       "Подъемы на носки стоя",
       "Подъемы на носки сидя",
       "Подъемы на носки в тренажере",
-    ],
+    ]),
   },
   {
     category: "Предплечья",
-    exercises: [
+    exercises: catalog("Предплечья", [
       "Сгибания кистей с гантелями",
       "Разгибания кистей с гантелями",
       "Фермерская прогулка",
-    ],
+    ]),
   },
   {
     category: "Мобильность",
-    exercises: [
+    exercises: catalog("Мобильность", [
       "Растяжка задней поверхности бедра",
       "Растяжка грудных мышц",
       "Мобилизация грудного отдела",
-    ],
+    ]),
   },
 ];
 

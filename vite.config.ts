@@ -22,6 +22,7 @@ export default defineConfig({
         "pwa-192x192.png",
         "pwa-512x512.png",
         "pwa-512x512-maskable.png",
+        "icons/*.svg",
       ],
       manifest: pwaManifest,
       srcDir: "src/app/providers/pwa",

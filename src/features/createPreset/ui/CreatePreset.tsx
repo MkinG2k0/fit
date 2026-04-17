@@ -161,7 +161,7 @@ export const CreatePreset = ({
       const filteredExercises = categoryMatches
         ? group.exercises
         : group.exercises.filter((exercise) =>
-            exercise.toLowerCase().includes(normalizedSearchQuery),
+            exercise.name.toLowerCase().includes(normalizedSearchQuery),
           );
 
       return {
@@ -267,17 +267,20 @@ export const CreatePreset = ({
                     <div className="mt-2 space-y-1">
                       {group.exercises.map((exercise) => (
                         <label
-                          key={exercise}
+                          key={exercise.name}
                           className="flex items-center space-x-2 cursor-pointer"
                         >
                           <input
                             type="checkbox"
-                            checked={newPreset.exercises.includes(exercise)}
+                            checked={newPreset.exercises.includes(exercise.name)}
                             onChange={(e) =>
-                              handleExerciseToggle(exercise, e.target.checked)
+                              handleExerciseToggle(
+                                exercise.name,
+                                e.target.checked,
+                              )
                             }
                           />
-                          <span className="text-sm truncate">{exercise}</span>
+                          <span className="text-sm truncate">{exercise.name}</span>
                         </label>
                       ))}
                     </div>

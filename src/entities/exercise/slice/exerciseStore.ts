@@ -3,6 +3,8 @@ import "dayjs/locale/ru";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { allExercises, trainingPreset } from "@/shared/config/constants";
+import { normalizeExerciseCategories } from "../lib/normalizeExerciseCategories";
+import type { ExerciseIconId } from "../model/exerciseIcons";
 import type { ExerciseCategory, TrainingPreset } from "../model/types";
 
 dayjs.locale("ru");
@@ -10,7 +12,11 @@ dayjs.locale("ru");
 interface ExerciseStore {
   exercises: ExerciseCategory[];
   trainingPreset: TrainingPreset[];
-  createExercise: (newExercise: { name: string; category: string }) => void;
+  createExercise: (newExercise: {
+    name: string;
+    category: string;
+    iconId: ExerciseIconId;
+  }) => void;
   createCategory: (categoryName: string) => void;
   renameCategory: (oldCategoryName: string, newCategoryName: string) => void;
   deleteCategory: (categoryName: string) => void;
@@ -34,7 +40,13 @@ export const useExerciseStore = create<ExerciseStore>()(
             exerciseGroup.category === newExercise.category
               ? {
                   ...exerciseGroup,
-                  exercises: [...exerciseGroup.exercises, newExercise.name],
+                  exercises: [
+                    ...exerciseGroup.exercises,
+                    {
+                      name: newExercise.name,
+                      iconId: newExercise.iconId,
+                    },
+                  ],
                 }
               : exerciseGroup,
           );
@@ -124,7 +136,7 @@ export const useExerciseStore = create<ExerciseStore>()(
               ? {
                   ...exerciseGroup,
                   exercises: exerciseGroup.exercises.filter(
-                    (exercise) => exercise !== exerciseName,
+                    (exercise) => exercise.name !== exerciseName,
                   ),
                 }
               : exerciseGroup,
@@ -142,6 +154,20 @@ export const useExerciseStore = create<ExerciseStore>()(
     }),
     {
       name: "exercise-store",
+      merge: (persistedState, currentState) => {
+        const persisted = (persistedState ?? {}) as Partial<ExerciseStore>;
+        const merged: ExerciseStore = {
+          ...currentState,
+          ...persisted,
+          trainingPreset:
+            persisted.trainingPreset ?? currentState.trainingPreset,
+        };
+
+        return {
+          ...merged,
+          exercises: normalizeExerciseCategories(merged.exercises),
+        };
+      },
     },
   ),
 );

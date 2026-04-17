@@ -209,14 +209,17 @@ export const FullExerciseCommand = ({
                         transition={{ duration: 0.25, ease: "easeInOut" }}
                         className="overflow-hidden"
                       >
-                        {group.exercises.map((name) => (
+                        {group.exercises.map((entry) => (
                           <ExerciseItem
-                            key={name}
-                            name={name}
+                            key={`${group.category}-${entry.name}`}
+                            name={entry.name}
+                            iconId={entry.iconId}
                             category={group.category}
                             checkable={checkable}
                             deletable={deletable}
-                            selected={selectedExerciseCheckboxes.includes(name)}
+                            selected={selectedExerciseCheckboxes.includes(
+                              entry.name,
+                            )}
                             onSelect={exerciseSelectHandler}
                             onDelete={handleExerciseDelete}
                           />

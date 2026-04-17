@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import {
   BODY_METRIC_DEFINITIONS,
+  formatBodyMetricsRecordedAt,
   selectBodyMetricsTrendSummary,
   selectSortedBodyMetricsEntries,
   useBodyMetricsStore,
@@ -23,6 +24,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/shared/ui/shadCNComponents/ui/dialog";
@@ -58,6 +60,7 @@ export const BodyMetricsDashboard = ({ className }: BodyMetricsDashboardProps) =
 
   const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [deleteConfirmEntryId, setDeleteConfirmEntryId] = useState<string | null>(null);
   const metricDefinitions = useMemo<BodyMetricDefinition[]>(() => {
     return [...BODY_METRIC_DEFINITIONS, ...customMetricDefinitions];
   }, [customMetricDefinitions]);
@@ -70,6 +73,10 @@ export const BodyMetricsDashboard = ({ className }: BodyMetricsDashboardProps) =
   const activeEntry = useMemo(
     () => sortedEntries.find((entry) => entry.id === activeEntryId) ?? null,
     [activeEntryId, sortedEntries],
+  );
+  const entryPendingDelete = useMemo(
+    () => sortedEntries.find((entry) => entry.id === deleteConfirmEntryId) ?? null,
+    [deleteConfirmEntryId, sortedEntries],
   );
 
   const handleFormSubmit = (draft: BodyMetricsDraft, entryId: string | null) => {
@@ -89,11 +96,29 @@ export const BodyMetricsDashboard = ({ className }: BodyMetricsDashboardProps) =
     clearError();
   };
 
-  const handleDeleteEntry = (entryId: string) => {
-    deleteEntry(entryId);
-    if (entryId === activeEntryId) {
+  const handleRequestDeleteEntry = (entryId: string) => {
+    setDeleteConfirmEntryId(entryId);
+  };
+
+  const handleDeleteConfirmDialogOpenChange = (open: boolean) => {
+    if (!open) {
+      setDeleteConfirmEntryId(null);
+    }
+  };
+
+  const handleCloseDeleteConfirmDialog = () => {
+    setDeleteConfirmEntryId(null);
+  };
+
+  const handleConfirmDeleteEntry = () => {
+    if (!deleteConfirmEntryId) {
+      return;
+    }
+    deleteEntry(deleteConfirmEntryId);
+    if (deleteConfirmEntryId === activeEntryId) {
       setActiveEntryId(null);
     }
+    setDeleteConfirmEntryId(null);
   };
 
   const handleCancelEdit = () => {
@@ -163,8 +188,32 @@ export const BodyMetricsDashboard = ({ className }: BodyMetricsDashboardProps) =
         metricDefinitions={metricDefinitions}
         activeEntryId={activeEntryId}
         onEdit={handleEditEntry}
-        onDelete={handleDeleteEntry}
+        onDelete={handleRequestDeleteEntry}
       />
+
+      <Dialog
+        open={deleteConfirmEntryId !== null}
+        onOpenChange={handleDeleteConfirmDialogOpenChange}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Удалить запись?</DialogTitle>
+            <DialogDescription>
+              {entryPendingDelete
+                ? `Запись от ${formatBodyMetricsRecordedAt(entryPendingDelete.recordedAt)} будет удалена без возможности восстановления.`
+                : "Выбранная запись будет удалена без возможности восстановления."}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={handleCloseDeleteConfirmDialog}>
+              Отмена
+            </Button>
+            <Button type="button" variant="destructive" onClick={handleConfirmDeleteEntry}>
+              Удалить
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog
         open={activeEntryId !== null}

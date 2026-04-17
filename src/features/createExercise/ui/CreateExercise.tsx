@@ -1,4 +1,11 @@
 import { useEffect, useState } from "react";
+import {
+  DEFAULT_EXERCISE_ICON_ID,
+  EXERCISE_ICON_PICKER_IDS,
+  defaultIconIdForCategory,
+  useExerciseStore,
+  type ExerciseIconId,
+} from "@/entities/exercise";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
   Dialog,
@@ -9,8 +16,8 @@ import {
   DialogTitle,
 } from "@/shared/ui/shadCNComponents/ui/dialog";
 import { Input } from "@/shared/ui/shadCNComponents/ui/input";
-import { useExerciseStore } from "@/entities/exercise";
 import type { NewExercise } from "../model/types";
+import { ExerciseIconOption } from "./ExerciseIconOption";
 
 interface CreateExerciseProps {
   open: boolean;
@@ -26,6 +33,7 @@ export const CreateExercise = ({
   const [newExercise, setNewExercise] = useState<NewExercise>({
     category: "",
     name: "",
+    iconId: DEFAULT_EXERCISE_ICON_ID,
   });
   const [error, setError] = useState<string>("");
   const createExercise = useExerciseStore((state) => state.createExercise);
@@ -39,14 +47,23 @@ export const CreateExercise = ({
     setNewExercise({
       category: defaultCategory ?? "",
       name: "",
+      iconId: defaultIconIdForCategory(defaultCategory ?? ""),
     });
     setError("");
   }, [defaultCategory, open]);
 
   const handleClose = () => {
     onOpenChange(false);
-    setNewExercise({ category: "", name: "" });
+    setNewExercise({
+      category: "",
+      name: "",
+      iconId: DEFAULT_EXERCISE_ICON_ID,
+    });
     setError("");
+  };
+
+  const handleIconSelect = (iconId: ExerciseIconId) => {
+    setNewExercise((prevState) => ({ ...prevState, iconId }));
   };
 
   const handleCreate = () => {
@@ -55,7 +72,7 @@ export const CreateExercise = ({
       const existingExercise = allExercises.some((category) =>
         category.exercises.some(
           (exercise) =>
-            exercise.toLowerCase() === newExercise.name.toLowerCase(),
+            exercise.name.toLowerCase() === newExercise.name.toLowerCase(),
         ),
       );
 
@@ -75,7 +92,7 @@ export const CreateExercise = ({
         <DialogHeader>
           <DialogTitle>Создать упражнение</DialogTitle>
           <DialogDescription>
-            Введите категорию и название нового упражнения
+            Выберите категорию, иконку и название нового упражнения
           </DialogDescription>
         </DialogHeader>
 
@@ -109,6 +126,7 @@ export const CreateExercise = ({
                     setNewExercise({
                       ...newExercise,
                       category: category.category,
+                      iconId: defaultIconIdForCategory(category.category),
                     })
                   }
                 >
@@ -132,6 +150,20 @@ export const CreateExercise = ({
               }}
             />
             {error && <p className="text-sm text-red-500 mt-1">{error}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <span className="text-sm font-medium">Иконка</span>
+            <div className="flex flex-wrap gap-2">
+              {EXERCISE_ICON_PICKER_IDS.map((iconId) => (
+                <ExerciseIconOption
+                  key={iconId}
+                  iconId={iconId}
+                  isSelected={newExercise.iconId === iconId}
+                  onSelect={handleIconSelect}
+                />
+              ))}
+            </div>
           </div>
         </div>
 

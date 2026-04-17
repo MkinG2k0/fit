@@ -72,15 +72,7 @@ export const ProfileDropDownMenu = () => {
             <ChartColumnBig />
             <div>Аналитика</div>
           </Button>
-          <Separator />
-          <Button
-            variant="ghost"
-            className="justify-start"
-            onClick={handleSettingsNavigate}
-          >
-            <Cog />
-            <div>Настройки</div>
-          </Button>
+
           <Separator />
           <Button
             variant="ghost"
@@ -89,6 +81,16 @@ export const ProfileDropDownMenu = () => {
           >
             <Ruler />
             <div>Параметры тела</div>
+          </Button>
+
+          <Separator />
+          <Button
+            variant="ghost"
+            className="justify-start"
+            onClick={handleSettingsNavigate}
+          >
+            <Cog />
+            <div>Настройки</div>
           </Button>
         </div>
       </PopoverContent>

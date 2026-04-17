@@ -3,7 +3,7 @@ import "dayjs/locale/ru";
 import type { RgbaColor } from "react-colorful";
 import { create } from "zustand";
 import type { ExerciseOption } from "@/features/exercise";
-import type { Exercise, ExerciseSet } from "@/entities/exercise";
+import type { Exercise, ExerciseIconId, ExerciseSet } from "@/entities/exercise";
 import type { CalendarDay } from "../model/types";
 import { createRandomUuid } from "@/shared/lib";
 import { getDaysFromLocalStorage } from "@/shared/lib/storage";
@@ -27,6 +27,7 @@ interface CalendarStore {
     group: string,
     presetName?: string,
     presetColor?: RgbaColor,
+    iconId?: ExerciseIconId,
   ) => void;
   setExerciseName: (
     exerciseParams: ExerciseOption | null,
@@ -57,7 +58,7 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
       return { days };
     }),
 
-  addExercise: (name, group, presetName?, presetColor?) =>
+  addExercise: (name, group, presetName?, presetColor?, iconId?) =>
     set((state) => {
       const { dateKey, oldExercises } = getDateKeyAndOldExercises(
         state.selectedDate,
@@ -65,7 +66,7 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
       );
       const newExercises = [
         ...oldExercises,
-        generateExercise(name, group, presetName, presetColor),
+        generateExercise(name, group, presetName, presetColor, iconId),
       ];
       const newDays = replaceExercises(
         state.selectedDate,
@@ -88,6 +89,9 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
           ...ex,
           name: exerciseParams!.name,
           category: exerciseParams!.group as string,
+          ...(exerciseParams?.iconId !== undefined
+            ? { iconId: exerciseParams.iconId }
+            : {}),
         };
       });
       const newDays = replaceExercises(

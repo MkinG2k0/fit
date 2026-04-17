@@ -1,25 +1,19 @@
 import type { PanInfo } from "motion";
 import { AnimatePresence } from "motion/react";
 import { useState, useEffect, useMemo, useRef, type MouseEvent } from "react";
-import {
-  Bike,
-  ChartColumnBig,
-  ChevronDown,
-  ChevronUp,
-  Dumbbell,
-  Footprints,
-  Hand,
-  HeartPulse,
-  Move,
-  Shield,
-  Trash2,
-  type LucideIcon,
-} from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { useCalendarStore } from "@/entities/calendarDay";
-import { type Exercise, useExerciseStore } from "@/entities/exercise";
+import {
+  categoryContainsExerciseName,
+  findCatalogExerciseByName,
+  type Exercise,
+  useExerciseStore,
+} from "@/entities/exercise";
+import { AppNavIcon } from "@/shared/ui";
 import { cn } from "@shared/lib";
 import * as motion from "motion/react-client";
 import { ExerciseBody } from "./ExerciseBody";
+import { ExerciseCategoryIcon } from "./ExerciseCategoryIcon";
 import { ExerciseDeleteDialog } from "./ExerciseDeleteDialog";
 import { ExerciseNameSelector } from "./ExerciseNameSelector";
 import { StatisticCard } from "@/widgets/statisticCard";
@@ -31,21 +25,6 @@ interface ExerciseCardProps {
 
 const SWIPE_DISTANCE_THRESHOLD = 100;
 const DRAG_CLICK_SUPPRESS_DELAY_MS = 120;
-const DEFAULT_EXERCISE_ICON: LucideIcon = Dumbbell;
-
-const EXERCISE_CATEGORY_ICONS: Record<string, LucideIcon> = {
-  ноги: Footprints,
-  ягодицы: Dumbbell,
-  спина: Dumbbell,
-  грудь: HeartPulse,
-  плечи: Dumbbell,
-  руки: Hand,
-  пресс: Shield,
-  кардио: Bike,
-  икры: Footprints,
-  предплечья: Hand,
-  мобильность: Move,
-};
 
 const formatTotalLiftedKg = (totalKg: number): string => {
   if (!Number.isFinite(totalKg) || totalKg <= 0) {
@@ -64,16 +43,6 @@ const formatTotalLiftedKg = (totalKg: number): string => {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
   });
-};
-
-const getExerciseIcon = (category: string | undefined): LucideIcon => {
-  const normalizedCategory = category?.trim().toLowerCase();
-
-  if (!normalizedCategory) {
-    return DEFAULT_EXERCISE_ICON;
-  }
-
-  return EXERCISE_CATEGORY_ICONS[normalizedCategory] ?? DEFAULT_EXERCISE_ICON;
 };
 
 export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
@@ -148,10 +117,14 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
   // ⚙️ 3. Обработка изменения названия упражнения
   const inputChangeHandler = (name: string) => {
     const category = allExercises.find((group) =>
-      group.exercises.includes(name),
+      categoryContainsExerciseName(group, name),
     )?.category;
-    if (category) {
-      setExerciseName({ name, group: category }, exercise);
+    const catalogEntry = findCatalogExerciseByName(allExercises, name);
+    if (category && catalogEntry) {
+      setExerciseName(
+        { name, group: category, iconId: catalogEntry.iconId },
+        exercise,
+      );
       setModalVisibility(false);
     }
   };
@@ -168,10 +141,6 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
   }, [exercise.sets]);
 
   const totalLiftedLabel = formatTotalLiftedKg(totalLiftedKg);
-  const ExerciseIcon = useMemo(
-    () => getExerciseIcon(exercise.category),
-    [exercise.category],
-  );
 
   return (
     <div className="relative overflow-hidden cursor-pointer">
@@ -191,7 +160,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
         transition={showHint ? { duration: 1.2, ease: "easeInOut" } : undefined}
       >
         <div className="pointer-events-none flex w-10 items-center h-full justify-center absolute -left-11.25 top-0 z-10">
-          <ChartColumnBig className="text-primary" />
+          <AppNavIcon variant="chart" />
         </div>
         <div
           className={cn(style.card, "rounded-xl")}
@@ -200,9 +169,10 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
           <div onClick={handleCardHeadClick} className={style.cardHead}>
             <div className={style.info}>
               <div className={style.icon}>
-                <ExerciseIcon
+                <ExerciseCategoryIcon
+                  category={exercise.category}
+                  iconId={exercise.iconId}
                   className={style.iconGraphic}
-                  aria-hidden="true"
                 />
               </div>
               <div className={style.exerciseName}>

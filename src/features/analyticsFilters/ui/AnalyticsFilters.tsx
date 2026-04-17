@@ -13,7 +13,10 @@ import {
 } from "@/shared/ui/shadCNComponents/ui/radio-group";
 import { cn } from "@/shared/ui/lib/utils";
 import { ANALYTICS_PERIOD_OPTIONS } from "../model/types";
-import { SearchableSelect, type SearchableSelectOption } from "./SearchableSelect";
+import {
+  SearchableSelect,
+  type SearchableSelectOption,
+} from "./SearchableSelect";
 
 interface AnalyticsFiltersProps {
   filters: AnalyticsFiltersState;
@@ -45,7 +48,9 @@ export const AnalyticsFilters = ({
 
   const exercisesByCategory = useMemo(() => {
     return allExercises.reduce<Record<string, string[]>>((acc, category) => {
-      acc[category.category] = category.exercises;
+      acc[category.category] = category.exercises.map(
+        (exercise) => exercise.name,
+      );
       return acc;
     }, {});
   }, []);
@@ -53,8 +58,10 @@ export const AnalyticsFilters = ({
   const exerciseOptions = useMemo<SearchableSelectOption[]>(() => {
     const exercises =
       filters.category.length > 0
-        ? exercisesByCategory[filters.category] ?? []
-        : allExercises.flatMap((category) => category.exercises);
+        ? (exercisesByCategory[filters.category] ?? [])
+        : allExercises.flatMap((category) =>
+            category.exercises.map((exercise) => exercise.name),
+          );
     const uniqueExercises = Array.from(new Set(exercises));
 
     return uniqueExercises.map((exercise) => ({
