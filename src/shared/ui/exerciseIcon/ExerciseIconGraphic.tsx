@@ -1,17 +1,16 @@
 import type { HTMLAttributes } from "react";
 import { cn } from "@/shared/lib";
-import {
-  EXERCISE_ICON_SVG_BY_ID,
-  type ExerciseIconGraphicId,
-} from "./svgHtml";
+import { EXERCISE_ICON_SVG_BY_ID, type ExerciseIconGraphicId } from "./svgHtml";
 
 const exerciseIconGraphicRootClassName =
   "inline-flex shrink-0 text-muted-foreground [&_svg]:block [&_svg]:h-full [&_svg]:w-full [&_svg]:max-h-full";
 
 export type { ExerciseIconGraphicId };
 
-export interface ExerciseIconGraphicProps
-  extends Omit<HTMLAttributes<HTMLSpanElement>, "children"> {
+export interface ExerciseIconGraphicProps extends Omit<
+  HTMLAttributes<HTMLSpanElement>,
+  "children"
+> {
   iconId: ExerciseIconGraphicId;
 }
 

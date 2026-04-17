@@ -154,59 +154,19 @@ export const CreateExercise = ({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className={"max-h-[90dvh]"}>
-          <DialogHeader>
-            <DialogTitle>
-              {isEditing ? "Редактировать упражнение" : "Создать упражнение"}
-            </DialogTitle>
-            <DialogDescription>
-              {isEditing
-                ? "Измените категорию, иконку или название упражнения"
-                : "Выберите категорию, иконку и название нового упражнения"}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="category" className="text-sm font-medium">
-                Категория
-              </label>
-              {/* <CategorySelector
-              value={newExercise.category}
-              onValueChange={(value) =>
-                setNewExercise({ ...newExercise, category: value })
-              }
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              onSelect={handleSelect}
-              focused={focused}
-              commandRef={commandRef}
-              allExercises={allExercises}
-            /> */}
-              <div className="flex gap-2 flex-wrap">
-                {allExercises.map((category) => (
-                  <Button
-                    key={category.category}
-                    variant={
-                      newExercise.category === category.category
-                        ? "default"
-                        : "outline"
-                    }
-                    onClick={() =>
-                      setNewExercise({
-                        ...newExercise,
-                        category: category.category,
-                        iconId: defaultIconIdForCategory(category.category),
-                      })
-                    }
-                  >
-                    {category.category}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-2">
+        <DialogContent className="max-h-[90dvh] min-w-0 overflow-x-hidden">
+          <div className="flex min-h-0 min-w-0 w-full flex-col gap-4">
+            <DialogHeader className="min-w-0">
+              <DialogTitle>
+                {isEditing ? "Редактировать упражнение" : "Создать упражнение"}
+              </DialogTitle>
+              <DialogDescription>
+                {isEditing
+                  ? "Измените категорию, иконку или название упражнения"
+                  : "Выберите категорию, иконку и название нового упражнения"}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="min-w-0 space-y-2">
               <label htmlFor="exercise-name" className="text-sm font-medium">
                 Название упражнения
               </label>
@@ -222,43 +182,90 @@ export const CreateExercise = ({
               {error && <p className="text-sm text-red-500 mt-1">{error}</p>}
             </div>
 
-            <div className="space-y-2">
-              <span className="text-sm font-medium">Иконка</span>
-              <div className="flex flex-wrap gap-2">
-                {EXERCISE_ICON_PICKER_IDS.map((iconId) => (
-                  <ExerciseIconOption
-                    key={iconId}
-                    iconId={iconId}
-                    isSelected={newExercise.iconId === iconId}
-                    onSelect={handleIconSelect}
-                  />
-                ))}
+            <div className="min-w-0 space-y-4">
+              <div className="min-w-0 space-y-2">
+                <label htmlFor="category" className="text-sm font-medium">
+                  Категория
+                </label>
+                {/* <CategorySelector
+              value={newExercise.category}
+              onValueChange={(value) =>
+                setNewExercise({ ...newExercise, category: value })
+              }
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              onSelect={handleSelect}
+              focused={focused}
+              commandRef={commandRef}
+              allExercises={allExercises}
+            /> */}
+                <div className="min-w-0 w-full max-w-full overflow-x-auto overflow-y-hidden overscroll-x-contain pb-1">
+                  <div className="flex w-max min-w-full flex-nowrap gap-2">
+                    {allExercises.map((category) => (
+                      <Button
+                        key={category.category}
+                        type="button"
+                        variant={
+                          newExercise.category === category.category
+                            ? "default"
+                            : "outline"
+                        }
+                        className="shrink-0 whitespace-nowrap"
+                        onClick={() =>
+                          setNewExercise({
+                            ...newExercise,
+                            category: category.category,
+                            iconId: defaultIconIdForCategory(category.category),
+                          })
+                        }
+                      >
+                        {category.category}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="min-w-0 space-y-2">
+                <span className="text-sm font-medium">Иконка</span>
+                <div className="min-w-0 w-full max-w-full overflow-x-auto overflow-y-hidden overscroll-x-contain pb-1">
+                  <div className="flex w-max min-w-full flex-nowrap gap-2">
+                    {EXERCISE_ICON_PICKER_IDS.map((iconId) => (
+                      <ExerciseIconOption
+                        key={iconId}
+                        iconId={iconId}
+                        isSelected={newExercise.iconId === iconId}
+                        onSelect={handleIconSelect}
+                      />
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
 
-          <DialogFooter>
-            <Button
-              onClick={handleSave}
-              disabled={!newExercise.category || !newExercise.name.trim()}
-            >
-              {isEditing ? "Сохранить" : "Создать"}
-            </Button>
-
-            <Button variant="outline" onClick={handleClose}>
-              Отмена
-            </Button>
-
-            {isEditing && editingExercise && (
-              <Button
-                variant="destructive"
-                className="w-full"
-                onClick={handleDeleteClick}
-              >
-                Удалить упражнение
+            <DialogFooter className="min-w-0">
+              <Button variant="outline" onClick={handleClose}>
+                Отмена
               </Button>
-            )}
-          </DialogFooter>
+
+              <Button
+                onClick={handleSave}
+                disabled={!newExercise.category || !newExercise.name.trim()}
+              >
+                {isEditing ? "Сохранить" : "Создать"}
+              </Button>
+
+              {isEditing && editingExercise && (
+                <Button
+                  variant="destructive"
+                  className="w-full"
+                  onClick={handleDeleteClick}
+                >
+                  Удалить упражнение
+                </Button>
+              )}
+            </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
 

@@ -1,5 +1,4 @@
-import { FolderPlus, Zap } from "lucide-react";
-import { AppNavIcon } from "@/shared/ui";
+import { Dumbbell, FolderPlus, Zap } from "lucide-react";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
   Popover,
@@ -51,7 +50,7 @@ export const CreateButtons = ({
             className={createButtonClasses}
             onClick={handleOpenExerciseModal}
           >
-            <AppNavIcon variant="exercises" className="mr-2 h-5 w-5" />
+            <Dumbbell className="mr-2 h-5 w-5" />
             Упражнение
           </Button>
           <Button

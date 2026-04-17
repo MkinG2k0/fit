@@ -3,8 +3,6 @@ import { cn } from "@/shared/lib";
 import { ExerciseIconGraphic } from "@/shared/ui";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 
-const optionIconClassName = "size-7 object-contain";
-
 interface ExerciseIconOptionProps {
   iconId: ExerciseIconId;
   isSelected: boolean;
@@ -30,10 +28,7 @@ export const ExerciseIconOption = ({
       aria-label={`Иконка ${iconId}`}
       onClick={handleClick}
     >
-      <ExerciseIconGraphic
-        iconId={iconId}
-        className={cn(optionIconClassName)}
-      />
+      <ExerciseIconGraphic iconId={iconId} className={cn("  ")} />
     </Button>
   );
 };
