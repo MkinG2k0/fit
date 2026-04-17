@@ -1,4 +1,5 @@
 import {
+  DEFAULT_EXERCISE_ICON_ID,
   defaultIconIdForCategory,
   type ExerciseIconId,
 } from "@/entities/exercise";
@@ -18,7 +19,7 @@ export const ExerciseCategoryIcon = ({
 }: ExerciseCategoryIconProps) => {
   const resolvedIconId: ExerciseIconId =
     iconId ?? (category ? defaultIconIdForCategory(category) : undefined) ??
-    "nav-exercises";
+    DEFAULT_EXERCISE_ICON_ID;
 
   return (
     <ExerciseIconGraphic

@@ -19,7 +19,7 @@ const VARIANT_TO_ICON_ID: Record<AppNavIconVariant, ExerciseIconGraphicId> = {
   analytics: "logo-mark",
   chart: "nav-analytics",
   settings: "nav-settings",
-  "body-metrics": "extra-9",
+  "body-metrics": "extra-shoulders-stretch",
   menu: "nav-menu",
 };
 

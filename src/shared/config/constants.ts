@@ -24,9 +24,9 @@ export const allExercises = [
     category: "Ягодицы",
     exercises: [
       catalogExercise("Ягодичный мост", "nav-menu"),
-      catalogExercise("Румынская тяга", "nav-menu"),
+      catalogExercise("Румынская тяга", "nav-timer"),
       catalogExercise("Отведение ноги в кроссовере", "nav-menu"),
-      catalogExercise("Гиперэкстензия", "nav-menu"),
+      catalogExercise("Гиперэкстензия", "nav-timer"),
     ],
   },
   {
@@ -45,17 +45,17 @@ export const allExercises = [
       catalogExercise("Жим лежа", "nav-exercises"),
       catalogExercise("Жим гантелей на наклонной скамье", "nav-exercises"),
       catalogExercise("Разведение гантелей лежа", "nav-exercises"),
-      catalogExercise("Отжимания на брусьях", "nav-exercises"),
-      catalogExercise("Сведение рук в кроссовере", "nav-exercises"),
+      catalogExercise("Отжимания на брусьях", "extra-shoulders-stretch"),
+      catalogExercise("Сведение рук в кроссовере", "extra-shoulders-stretch"),
     ],
   },
   {
     category: "Плечи",
     exercises: [
-      catalogExercise("Армейский жим", "extra-9"),
-      catalogExercise("Махи в сторону", "extra-9"),
-      catalogExercise("Махи в наклоне", "extra-9"),
-      catalogExercise("Тяга штанги к подбородку", "extra-9"),
+      catalogExercise("Армейский жим", "extra-shoulders-stretch"),
+      catalogExercise("Махи в сторону", "extra-shoulders-stretch"),
+      catalogExercise("Махи в наклоне", "extra-shoulders-stretch"),
+      catalogExercise("Тяга штанги к подбородку", "extra-shoulders-stretch"),
     ],
   },
   {
@@ -63,8 +63,8 @@ export const allExercises = [
     exercises: [
       catalogExercise("Подъём гантелей на бицепс", "logo-mark"),
       catalogExercise("Молотки", "logo-mark"),
-      catalogExercise("Разгибания на блоке", "logo-mark"),
-      catalogExercise("Французский жим", "logo-mark"),
+      catalogExercise("Разгибания на блоке", "extra-shoulders-stretch"),
+      catalogExercise("Французский жим", "extra-shoulders-stretch"),
       catalogExercise("Подъём штанги на бицепс", "logo-mark"),
     ],
   },
@@ -98,17 +98,17 @@ export const allExercises = [
   {
     category: "Предплечья",
     exercises: [
-      catalogExercise("Сгибания кистей с гантелями", "nav-exercises"),
-      catalogExercise("Разгибания кистей с гантелями", "nav-exercises"),
+      catalogExercise("Сгибания кистей с гантелями", "nav-body-metrics"),
+      catalogExercise("Разгибания кистей с гантелями", "nav-body-metrics"),
       catalogExercise("Фермерская прогулка", "nav-exercises"),
     ],
   },
   {
     category: "Мобильность",
     exercises: [
-      catalogExercise("Растяжка задней поверхности бедра", "extra-8"),
-      catalogExercise("Растяжка грудных мышц", "extra-8"),
-      catalogExercise("Мобилизация грудного отдела", "extra-8"),
+      catalogExercise("Растяжка задней поверхности бедра", "extra-mobility-arms-up"),
+      catalogExercise("Растяжка грудных мышц", "extra-mobility-arms-up"),
+      catalogExercise("Мобилизация грудного отдела", "extra-mobility-arms-up"),
     ],
   },
 ];

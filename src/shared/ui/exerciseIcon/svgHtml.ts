@@ -17,9 +17,9 @@ export const EXERCISE_ICON_SVG_BY_ID = {
   "nav-menu": legsPower,
   "nav-analytics": areaChart,
   "logo-mark": biceps,
-  "extra-9": shouldersStretch,
+  "extra-shoulders-stretch": shouldersStretch,
   "nav-settings": absCore,
-  "extra-8": mobilityArmsUp,
+  "extra-mobility-arms-up": mobilityArmsUp,
   "extra-cardio": cardio,
   "extra-calves": calves,
 } as const;
