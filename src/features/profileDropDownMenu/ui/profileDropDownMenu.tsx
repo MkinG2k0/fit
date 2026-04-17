@@ -2,6 +2,7 @@ import {
   ChartColumnBig,
   Cog,
   Menu,
+  Ruler,
   ScrollText,
   Timer as TimerIcon,
 } from "lucide-react";
@@ -30,6 +31,10 @@ export const ProfileDropDownMenu = () => {
 
   const handleSettingsNavigate = () => {
     navigate("/settings");
+  };
+
+  const handleBodyMetricsNavigate = () => {
+    navigate("/body-metrics");
   };
 
   return (
@@ -75,6 +80,15 @@ export const ProfileDropDownMenu = () => {
           >
             <Cog />
             <div>Настройки</div>
+          </Button>
+          <Separator />
+          <Button
+            variant="ghost"
+            className="justify-start"
+            onClick={handleBodyMetricsNavigate}
+          >
+            <Ruler />
+            <div>Параметры тела</div>
           </Button>
         </div>
       </PopoverContent>

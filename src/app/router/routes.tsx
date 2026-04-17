@@ -16,6 +16,11 @@ const AnalyticsPage = lazy(() =>
 const SettingsPage = lazy(() =>
   import("@/pages/SettingsPage").then((m) => ({ default: m.SettingsPage })),
 );
+const BodyMetricsPage = lazy(() =>
+  import("@/pages/BodyMetricsPage").then((m) => ({
+    default: m.BodyMetricsPage,
+  })),
+);
 
 export const AppRoutes = () => {
   return (
@@ -57,6 +62,14 @@ export const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <SettingsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/body-metrics"
+        element={
+          <ProtectedRoute>
+            <BodyMetricsPage />
           </ProtectedRoute>
         }
       />

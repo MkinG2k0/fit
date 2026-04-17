@@ -4,3 +4,4 @@ export { ExercisePage } from "./ExercisePage";
 export { LogInPage } from "./LogInPage";
 export { AnalyticsPage } from "./AnalyticsPage";
 export { SettingsPage } from "./SettingsPage";
+export { BodyMetricsPage } from "./BodyMetricsPage";
