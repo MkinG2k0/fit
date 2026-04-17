@@ -44,6 +44,8 @@
 }
 
 .exerciseName {
+		display: flex;
+		align-items: center;
 		padding-left: 10px;
 		font-size: 1em;
 		flex: 1;
@@ -76,12 +78,16 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		margin: 10px 0 10px 10px;
+		margin: 0 0 0 10px;
+		flex-shrink: 0;
 }
 
 .iconGraphic {
-		width: 28px;
-		height: 28px;
+		width: 56px;
+		height: 56px;
+		max-width: 56px;
+		max-height: 56px;
+		flex-shrink: 0;
 }
 
 .arrow {

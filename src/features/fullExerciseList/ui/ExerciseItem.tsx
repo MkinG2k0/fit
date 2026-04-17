@@ -8,7 +8,8 @@ import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { CommandItem } from "@/shared/ui/shadCNComponents/ui/command";
 import { RadioGroupItem } from "../../../shared/ui/shadCNComponents/ui/radio-group.tsx";
 
-const exerciseItemIconClassName = "size-4 shrink-0 object-contain opacity-80";
+const exerciseItemIconClassName =
+  "size-14 shrink-0 object-contain opacity-80 [&_svg]:!block [&_svg]:!size-14";
 
 interface ExerciseItemProps {
   name: string;
@@ -53,10 +54,10 @@ export const ExerciseItem = ({
   return (
     <CommandItem
       value={name}
-      className="text-base flex justify-between w-full"
+      className="text-base flex w-full justify-between"
       onSelect={onSelect}
     >
-      <div className={"flex gap-2 items-center overflow-hidden"}>
+      <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
         <ExerciseIconGraphic
           iconId={iconId}
           className={cn(exerciseItemIconClassName)}
@@ -65,7 +66,7 @@ export const ExerciseItem = ({
           {name}
         </span>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-2">
         {checkable === "radio" && (
           <RadioGroupItem checked={selected} value={name} id={name} />
         )}

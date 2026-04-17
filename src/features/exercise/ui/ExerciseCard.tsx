@@ -204,7 +204,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
               </span>
               <span className={style.liftedTotalUnit}>кг</span>
             </div>
-            <div className={"p-4"}>
+            <div className="p-4">
               {isEditable ? <ChevronUp /> : <ChevronDown />}
             </div>
           </div>
