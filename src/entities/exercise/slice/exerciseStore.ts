@@ -26,6 +26,13 @@ interface ExerciseStore {
     updatedTrainingPreset: TrainingPreset,
   ) => void;
   deleteExercise: (exerciseName: string, category: string) => void;
+  updateExercise: (params: {
+    previousName: string;
+    previousCategory: string;
+    name: string;
+    category: string;
+    iconId: ExerciseIconId;
+  }) => void;
   deleteTrainingPreset: (presetName: string) => void;
 }
 
@@ -142,6 +149,84 @@ export const useExerciseStore = create<ExerciseStore>()(
               : exerciseGroup,
           );
           return { exercises: updatedExercises };
+        }),
+      updateExercise: ({
+        previousName,
+        previousCategory,
+        name,
+        category,
+        iconId,
+      }) =>
+        set((state) => {
+          const normalizedName = name.trim();
+          const normalizedCategory = category.trim();
+          if (!normalizedName || !normalizedCategory) {
+            return state;
+          }
+
+          const sourceGroup = state.exercises.find(
+            (group) => group.category === previousCategory,
+          );
+          const sourceExists = sourceGroup?.exercises.some(
+            (exercise) => exercise.name === previousName,
+          );
+          if (!sourceExists) {
+            return state;
+          }
+
+          const isSelf = (groupCategory: string, exerciseName: string) =>
+            groupCategory === previousCategory && exerciseName === previousName;
+
+          const nameTakenElsewhere = state.exercises.some((group) =>
+            group.exercises.some(
+              (exercise) =>
+                exercise.name.trim().toLowerCase() ===
+                  normalizedName.toLowerCase() &&
+                !isSelf(group.category, exercise.name),
+            ),
+          );
+
+          if (nameTakenElsewhere) {
+            return state;
+          }
+
+          const exercisesWithoutPrevious = state.exercises.map((group) =>
+            group.category === previousCategory
+              ? {
+                  ...group,
+                  exercises: group.exercises.filter(
+                    (exercise) => exercise.name !== previousName,
+                  ),
+                }
+              : group,
+          );
+
+          const nextExercises = exercisesWithoutPrevious.map((group) =>
+            group.category === normalizedCategory
+              ? {
+                  ...group,
+                  exercises: [
+                    ...group.exercises,
+                    { name: normalizedName, iconId },
+                  ],
+                }
+              : group,
+          );
+
+          const nextPresets =
+            previousName === normalizedName
+              ? state.trainingPreset
+              : state.trainingPreset.map((preset) => ({
+                  ...preset,
+                  exercises: preset.exercises.map((exerciseName) =>
+                    exerciseName === previousName ? normalizedName : exerciseName,
+                  ),
+                }));
+
+          return {
+            exercises: nextExercises,
+            trainingPreset: nextPresets,
+          };
         }),
       deleteTrainingPreset: (presetName) =>
         set((state) => {

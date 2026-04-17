@@ -7,7 +7,10 @@ import {
   PopoverTrigger,
 } from "@/shared/ui/shadCNComponents/ui/popover";
 import type { TrainingPreset } from "@/entities/exercise";
-import { CreateExercise } from "@/features/createExercise";
+import {
+  CreateExercise,
+  type CatalogExerciseEditSource,
+} from "@/features/createExercise";
 import { CreateCategory } from "@/features/createCategory";
 import { CreatePreset } from "@/features/createPreset";
 import { FullExerciseCommand } from "@/features/fullExerciseList/ui/fullExerciseCommand";
@@ -20,6 +23,9 @@ export const AllExercises = () => {
   const [editingPreset, setEditingPreset] = useState<
     TrainingPreset | undefined
   >(undefined);
+  const [editingExercise, setEditingExercise] = useState<
+    CatalogExerciseEditSource | undefined
+  >(undefined);
   const [preselectedCategory, setPreselectedCategory] = useState<
     string | undefined
   >(undefined);
@@ -30,10 +36,17 @@ export const AllExercises = () => {
   const handleOpenExerciseModal = () => {
     setOpenAddPopover(false);
     setPreselectedCategory(undefined);
+    setEditingExercise(undefined);
+    setOpenExerciseModal(true);
+  };
+
+  const handleOpenExerciseEditModal = (payload: CatalogExerciseEditSource) => {
+    setEditingExercise(payload);
     setOpenExerciseModal(true);
   };
 
   const handleOpenExerciseModalByCategory = (categoryName: string) => {
+    setEditingExercise(undefined);
     setPreselectedCategory(categoryName);
     setOpenExerciseModal(true);
   };
@@ -62,6 +75,14 @@ export const AllExercises = () => {
     }
   };
 
+  const handleExerciseModalOpenChange = (open: boolean) => {
+    setOpenExerciseModal(open);
+    if (!open) {
+      setEditingExercise(undefined);
+      setPreselectedCategory(undefined);
+    }
+  };
+
   return (
     <div className="h-full min-h-0">
       <div className="flex h-full min-h-0 flex-col">
@@ -70,6 +91,7 @@ export const AllExercises = () => {
             checkable={false}
             deletable={true}
             onCreateExerciseInCategory={handleOpenExerciseModalByCategory}
+            onEditExercise={handleOpenExerciseEditModal}
             onEditPreset={handleOpenPresetEditModal}
           />
         </div>
@@ -115,9 +137,15 @@ export const AllExercises = () => {
 
       {/* Модальное окно добавления упражнения */}
       <CreateExercise
+        key={
+          editingExercise
+            ? `${editingExercise.category}-${editingExercise.name}`
+            : "create-exercise"
+        }
         open={openExerciseModal}
-        onOpenChange={setOpenExerciseModal}
+        onOpenChange={handleExerciseModalOpenChange}
         defaultCategory={preselectedCategory}
+        editingExercise={editingExercise}
       />
 
       <CreateCategory

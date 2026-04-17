@@ -7,7 +7,11 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/shared/ui/shadCNComponents/ui/command";
-import { type TrainingPreset, useExerciseStore } from "@/entities/exercise";
+import {
+  type ExerciseIconId,
+  type TrainingPreset,
+  useExerciseStore,
+} from "@/entities/exercise";
 import { DeleteDialog } from "./DeleteDialog";
 import { ExerciseItem } from "./ExerciseItem";
 import { PresetItem } from "./PresetItem";
@@ -20,6 +24,11 @@ interface BaseProps {
   deletable?: boolean;
   variant?: "exercises" | "presets" | "all";
   onCreateExerciseInCategory?: (categoryName: string) => void;
+  onEditExercise?: (payload: {
+    name: string;
+    category: string;
+    iconId: ExerciseIconId;
+  }) => void;
   onEditPreset?: (preset: TrainingPreset) => void;
 }
 
@@ -61,6 +70,7 @@ export const FullExerciseCommand = ({
   deletable = false,
   variant = "all",
   onCreateExerciseInCategory,
+  onEditExercise,
   onEditPreset,
 }: FullExerciseCommandProps) => {
   const allExercises = useExerciseStore((state) => state.exercises);
@@ -127,6 +137,14 @@ export const FullExerciseCommand = ({
 
   const handleExerciseDelete = (name: string, category: string) => {
     openDeleteDialog("exercise", name, category);
+  };
+
+  const handleExerciseEdit = (payload: {
+    name: string;
+    category: string;
+    iconId: ExerciseIconId;
+  }) => {
+    onEditExercise?.(payload);
   };
 
   const handlePresetDelete = (name: string) => {
@@ -222,6 +240,11 @@ export const FullExerciseCommand = ({
                             )}
                             onSelect={exerciseSelectHandler}
                             onDelete={handleExerciseDelete}
+                            onEdit={
+                              deletable && onEditExercise
+                                ? handleExerciseEdit
+                                : undefined
+                            }
                           />
                         ))}
                       </motion.div>

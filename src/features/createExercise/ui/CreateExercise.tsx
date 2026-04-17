@@ -16,19 +16,21 @@ import {
   DialogTitle,
 } from "@/shared/ui/shadCNComponents/ui/dialog";
 import { Input } from "@/shared/ui/shadCNComponents/ui/input";
-import type { NewExercise } from "../model/types";
+import type { CatalogExerciseEditSource, NewExercise } from "../model/types";
 import { ExerciseIconOption } from "./ExerciseIconOption";
 
 interface CreateExerciseProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   defaultCategory?: string;
+  editingExercise?: CatalogExerciseEditSource;
 }
 
 export const CreateExercise = ({
   open,
   onOpenChange,
   defaultCategory,
+  editingExercise,
 }: CreateExerciseProps) => {
   const [newExercise, setNewExercise] = useState<NewExercise>({
     category: "",
@@ -37,20 +39,30 @@ export const CreateExercise = ({
   });
   const [error, setError] = useState<string>("");
   const createExercise = useExerciseStore((state) => state.createExercise);
+  const updateExercise = useExerciseStore((state) => state.updateExercise);
   const allExercises = useExerciseStore((state) => state.exercises);
+  const isEditing = Boolean(editingExercise);
 
   useEffect(() => {
     if (!open) {
       return;
     }
 
-    setNewExercise({
-      category: defaultCategory ?? "",
-      name: "",
-      iconId: defaultIconIdForCategory(defaultCategory ?? ""),
-    });
+    if (editingExercise) {
+      setNewExercise({
+        category: editingExercise.category,
+        name: editingExercise.name,
+        iconId: editingExercise.iconId,
+      });
+    } else {
+      setNewExercise({
+        category: defaultCategory ?? "",
+        name: "",
+        iconId: defaultIconIdForCategory(defaultCategory ?? ""),
+      });
+    }
     setError("");
-  }, [defaultCategory, open]);
+  }, [defaultCategory, editingExercise, open]);
 
   const handleClose = () => {
     onOpenChange(false);
@@ -66,33 +78,70 @@ export const CreateExercise = ({
     setNewExercise((prevState) => ({ ...prevState, iconId }));
   };
 
-  const handleCreate = () => {
-    if (newExercise.category && newExercise.name) {
-      // Check if exercise with this name already exists in any category
-      const existingExercise = allExercises.some((category) =>
-        category.exercises.some(
+  const handleSave = () => {
+    const trimmedName = newExercise.name.trim();
+    if (!newExercise.category || !trimmedName) {
+      return;
+    }
+
+    if (editingExercise) {
+      const duplicateElsewhere = allExercises.some((group) =>
+        group.exercises.some(
           (exercise) =>
-            exercise.name.toLowerCase() === newExercise.name.toLowerCase(),
+            exercise.name.toLowerCase() === trimmedName.toLowerCase() &&
+            !(
+              group.category === editingExercise.category &&
+              exercise.name === editingExercise.name
+            ),
         ),
       );
 
-      if (existingExercise) {
+      if (duplicateElsewhere) {
         setError("Упражнение с таким названием уже существует");
         return;
       }
 
-      createExercise(newExercise);
+      updateExercise({
+        previousName: editingExercise.name,
+        previousCategory: editingExercise.category,
+        name: trimmedName,
+        category: newExercise.category,
+        iconId: newExercise.iconId,
+      });
       handleClose();
+      return;
     }
+
+    const existingExercise = allExercises.some((category) =>
+      category.exercises.some(
+        (exercise) =>
+          exercise.name.toLowerCase() === trimmedName.toLowerCase(),
+      ),
+    );
+
+    if (existingExercise) {
+      setError("Упражнение с таким названием уже существует");
+      return;
+    }
+
+    createExercise({
+      ...newExercise,
+      name: trimmedName,
+    });
+    handleClose();
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={"max-h-[90dvh]"}>
         <DialogHeader>
-          <DialogTitle>Создать упражнение</DialogTitle>
+          <DialogTitle>
+            {isEditing ? "Редактировать упражнение" : "Создать упражнение"}
+          </DialogTitle>
           <DialogDescription>
-            Выберите категорию, иконку и название нового упражнения
+            {isEditing
+              ? "Измените категорию, иконку или название упражнения"
+              : "Выберите категорию, иконку и название нового упражнения"}
           </DialogDescription>
         </DialogHeader>
 
@@ -172,10 +221,10 @@ export const CreateExercise = ({
             Отмена
           </Button>
           <Button
-            onClick={handleCreate}
-            disabled={!newExercise.category || !newExercise.name}
+            onClick={handleSave}
+            disabled={!newExercise.category || !newExercise.name.trim()}
           >
-            Создать
+            {isEditing ? "Сохранить" : "Создать"}
           </Button>
         </DialogFooter>
       </DialogContent>

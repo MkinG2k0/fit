@@ -1,4 +1,5 @@
-import { Trash2 } from "lucide-react";
+import type { MouseEvent } from "react";
+import { Pencil, Trash2 } from "lucide-react";
 import { EXERCISE_ICON_PATHS, type ExerciseIconId } from "@/entities/exercise";
 import { cn, publicAssetUrl } from "@/shared/lib";
 import { Checkbox } from "@/shared/ui/shadCNComponents/ui/checkbox";
@@ -16,6 +17,11 @@ interface ExerciseItemProps {
   selected: boolean;
   onSelect?: (value: string) => void;
   onDelete: (name: string, category: string) => void;
+  onEdit?: (payload: {
+    name: string;
+    category: string;
+    iconId: ExerciseIconId;
+  }) => void;
   category: string;
 }
 
@@ -27,8 +33,19 @@ export const ExerciseItem = ({
   selected,
   onSelect,
   onDelete,
+  onEdit,
   category,
 }: ExerciseItemProps) => {
+  const handleDeleteClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    onDelete(name, category);
+  };
+
+  const handleEditClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    onEdit?.({ name, category, iconId });
+  };
+
   return (
     <CommandItem
       value={name}
@@ -54,17 +71,26 @@ export const ExerciseItem = ({
           <Checkbox value={name} checked={selected} />
         )}
         {deletable && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(name, category);
-            }}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          <>
+            {onEdit && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={handleEditClick}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+              onClick={handleDeleteClick}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </>
         )}
       </div>
     </CommandItem>
