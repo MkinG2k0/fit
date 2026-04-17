@@ -60,7 +60,7 @@ export const ManageBodyMetricsDialog = ({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button type="button" variant="outline">
+        <Button type="button" variant="outline" className="w-full sm:w-auto">
           <Settings2 />
           Управление параметрами
         </Button>

@@ -124,45 +124,47 @@ export const useBodyMetricsForm = ({
     }
   };
 
+  const clearSelectedMetricValue = () => {
+    setFields((prevState) => ({
+      ...prevState,
+      [selectedMetricKey]: "",
+    }));
+  };
+
   const validateAndBuildDraft = (): BodyMetricsDraft | null => {
     if (recordedAt.length === 0) {
       setErrorMessage("Дата замеров обязательна");
       return null;
     }
 
-    const measurements: BodyMetricsDraft["measurements"] = {};
-
-    for (const [key, value] of Object.entries(fields)) {
-      const rawValue = value.trim();
-      if (rawValue.length === 0) {
-        continue;
-      }
-
-      const definition = getDefinitionByKey(metricDefinitions, key);
-      if (!definition) {
-        continue;
-      }
-
-      const parsedValue = toNumber(rawValue);
-      if (parsedValue === null || parsedValue <= 0) {
-        setErrorMessage(`${definition.label}: введите корректное число больше 0`);
-        return null;
-      }
-
-      if (parsedValue < definition.min || parsedValue > definition.max) {
-        setErrorMessage(
-          `${definition.label}: значение должно быть от ${definition.min} до ${definition.max} ${definition.unit}`,
-        );
-        return null;
-      }
-
-      measurements[key] = Number(parsedValue.toFixed(1));
-    }
-
-    if (Object.keys(measurements).length === 0) {
-      setErrorMessage("Заполните хотя бы один параметр тела");
+    const definition = getDefinitionByKey(metricDefinitions, selectedMetricKey);
+    if (!definition) {
+      setErrorMessage("Выберите параметр для сохранения");
       return null;
     }
+
+    const rawValue = (fields[selectedMetricKey] ?? "").trim();
+    if (rawValue.length === 0) {
+      setErrorMessage(`Введите значение для параметра "${definition.label}"`);
+      return null;
+    }
+
+    const parsedValue = toNumber(rawValue);
+    if (parsedValue === null || parsedValue <= 0) {
+      setErrorMessage(`${definition.label}: введите корректное число больше 0`);
+      return null;
+    }
+
+    if (parsedValue < definition.min || parsedValue > definition.max) {
+      setErrorMessage(
+        `${definition.label}: значение должно быть от ${definition.min} до ${definition.max} ${definition.unit}`,
+      );
+      return null;
+    }
+
+    const measurements: BodyMetricsDraft["measurements"] = {
+      [selectedMetricKey]: Number(parsedValue.toFixed(1)),
+    };
 
     return {
       recordedAt,
@@ -181,6 +183,7 @@ export const useBodyMetricsForm = ({
     handleRecordedAtChange,
     handleFieldChange,
     handleSelectedMetricChange,
+    clearSelectedMetricValue,
     validateAndBuildDraft,
   };
 };

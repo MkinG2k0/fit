@@ -39,7 +39,13 @@ const CHART_COLORS = [
 ];
 const LINE_CHART_MARGIN = { left: 12, right: 12 };
 
-const formatDateLabel = (date: string) => date.slice(0, 5);
+const formatDateLabel = (date: string) => {
+  const [year, month, day] = date.split("-");
+  if (!year || !month || !day) {
+    return date;
+  }
+  return `${day}.${month}`;
+};
 
 const parseDate = (date: string) => {
   const parsed = Date.parse(date);
@@ -136,6 +142,7 @@ export const BodyMetricsTrendChart = ({
         size="sm"
         data-metric-key={definition.key}
         onClick={handleMetricToggle}
+        className="min-w-0 truncate text-xs sm:text-sm"
       >
         {definition.label}
       </Button>
@@ -158,12 +165,12 @@ export const BodyMetricsTrendChart = ({
 
   return (
     <Card className={cn("gap-3 py-4", className)}>
-      <CardHeader className="px-4">
+      <CardHeader className="px-3 sm:px-4">
         <CardTitle>График изменения параметров</CardTitle>
         <CardDescription>Все параметры на одном графике с возможностью скрытия</CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-3 px-4">
-        <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+      <CardContent className="grid gap-3 px-3 sm:px-4">
+        <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
           {metricDefinitions.map(renderDefinitionToggle)}
         </div>
 
@@ -176,7 +183,7 @@ export const BodyMetricsTrendChart = ({
             Включите хотя бы один параметр, чтобы увидеть линии на графике.
           </p>
         ) : (
-          <ChartContainer config={chartConfig} className="h-56 w-full sm:h-72">
+          <ChartContainer config={chartConfig} className="h-44 w-full sm:h-72">
             <LineChart data={chartPoints} margin={LINE_CHART_MARGIN}>
               <CartesianGrid vertical={false} />
               <XAxis

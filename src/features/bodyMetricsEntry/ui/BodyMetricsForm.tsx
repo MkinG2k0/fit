@@ -67,6 +67,7 @@ export const BodyMetricsForm = ({
     handleRecordedAtChange,
     handleFieldChange,
     handleSelectedMetricChange,
+    clearSelectedMetricValue,
     validateAndBuildDraft,
   } = useBodyMetricsForm({
     metricDefinitions,
@@ -103,6 +104,9 @@ export const BodyMetricsForm = ({
     }
 
     onSubmit(draft, initialEntry?.id ?? null);
+    if (!isEditing) {
+      clearSelectedMetricValue();
+    }
   };
 
   const selectedDefinition = fieldDefinitions.find(
@@ -202,8 +206,8 @@ export const BodyMetricsForm = ({
             </div>
           </div>
           <p className={HINT_CLASS}>
-            Можно заполнить несколько параметров: выберите другой пункт в списке и
-            введите значение перед сохранением.
+            Один параметр сохраняется как отдельная запись. Для следующего параметра
+            выберите его в списке и сохраните снова.
           </p>
 
           {(errorMessage ?? "").length > 0 && (

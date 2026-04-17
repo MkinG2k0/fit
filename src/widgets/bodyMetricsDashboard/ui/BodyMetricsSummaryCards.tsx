@@ -47,12 +47,14 @@ const getTrendLabel = (trendSummary: BodyMetricTrendSummary) => {
 
 const renderSummaryCard = (item: BodyMetricTrendSummary) => {
   return (
-    <article key={item.key} className={SUMMARY_CARD_CLASS}>
-      <p className="text-sm text-muted-foreground">{item.label}</p>
-      <p className="text-xl font-semibold">
+    <article key={item.key} className={cn(SUMMARY_CARD_CLASS, "min-w-0")}>
+      <p className="truncate text-sm text-muted-foreground">{item.label}</p>
+      <p className="truncate text-lg font-semibold sm:text-xl">
         {item.currentValue === null ? "—" : `${item.currentValue.toFixed(1)} ${item.unit}`}
       </p>
-      <p className={cn("text-xs", getTrendTextClass(item.trend))}>{getTrendLabel(item)}</p>
+      <p className={cn("break-words text-xs", getTrendTextClass(item.trend))}>
+        {getTrendLabel(item)}
+      </p>
     </article>
   );
 };
