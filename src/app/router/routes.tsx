@@ -21,6 +21,9 @@ const BodyMetricsPage = lazy(() =>
     default: m.BodyMetricsPage,
   })),
 );
+const ActivityPage = lazy(() =>
+  import("@/pages/ActivityPage").then((m) => ({ default: m.ActivityPage })),
+);
 
 export const AppRoutes = () => {
   return (
@@ -73,6 +76,15 @@ export const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/activity"
+        element={
+          <ProtectedRoute>
+            <ActivityPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/health" element={<Navigate to="/activity" replace />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

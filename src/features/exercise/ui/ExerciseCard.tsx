@@ -168,7 +168,12 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
         >
           <div onClick={handleCardHeadClick} className={style.cardHead}>
             <div className={style.info}>
-              <div className={style.icon}>
+              <div
+                className={cn(
+                  style.icon,
+                  "flex items-center justify-center p-2",
+                )}
+              >
                 <ExerciseCategoryIcon
                   category={exercise.category}
                   iconId={exercise.iconId}

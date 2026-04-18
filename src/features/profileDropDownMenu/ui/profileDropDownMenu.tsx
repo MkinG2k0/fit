@@ -1,4 +1,5 @@
 import {
+  Activity,
   ChartColumnBig,
   Cog,
   Menu,
@@ -35,6 +36,10 @@ export const ProfileDropDownMenu = () => {
 
   const handleBodyMetricsNavigate = () => {
     navigate("/body-metrics");
+  };
+
+  const handleActivityNavigate = () => {
+    navigate("/activity");
   };
 
   return (
@@ -81,6 +86,16 @@ export const ProfileDropDownMenu = () => {
           >
             <Ruler />
             <div>Параметры тела</div>
+          </Button>
+
+          <Separator />
+          <Button
+            variant="ghost"
+            className="justify-start"
+            onClick={handleActivityNavigate}
+          >
+            <Activity />
+            <div>Активность</div>
           </Button>
 
           <Separator />

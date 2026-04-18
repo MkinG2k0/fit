@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Локальный URL Vite для Capacitor live reload (копия из capacitor-dev-server.example)
+.capacitor-dev-server
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

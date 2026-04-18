@@ -30,7 +30,8 @@ export default defineConfig({
     }),
   ],
   server: {
-    host: "127.0.0.1",
+    // Listen on LAN so a physical device can load the dev server (Capacitor live reload).
+    host: true,
   },
   resolve: {
     alias: {
