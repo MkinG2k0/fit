@@ -21,8 +21,6 @@ interface ExerciseSetRowProps {
     event: ChangeEvent<HTMLInputElement>,
     setItem: ExerciseSet,
   ) => void;
-  onSetStart: (setId: string) => void;
-  onSetComplete: (setId: string) => void;
 }
 
 export const ExerciseSetRow = ({
@@ -33,22 +31,12 @@ export const ExerciseSetRow = ({
   calorieDisplay,
   inputClassName,
   onInputChange,
-  onSetStart,
-  onSetComplete,
 }: ExerciseSetRowProps) => {
   const deleteSet = useCalendarStore((s) => s.deleteSet);
 
   const handleDelete = useCallback(() => {
     deleteSet(exercise, set);
   }, [deleteSet, exercise, set]);
-
-  const handleStart = useCallback(() => {
-    onSetStart(set.id);
-  }, [onSetStart, set.id]);
-
-  const handleComplete = useCallback(() => {
-    onSetComplete(set.id);
-  }, [onSetComplete, set.id]);
 
   return (
     <div
@@ -96,11 +84,7 @@ export const ExerciseSetRow = ({
         />
       </div>
       {showKcalColumn ? (
-        <ExerciseSetKcalCell
-          calorieDisplay={calorieDisplay}
-          onStart={handleStart}
-          onComplete={handleComplete}
-        />
+        <ExerciseSetKcalCell calorieDisplay={calorieDisplay} />
       ) : null}
       <Button
         type="button"

@@ -1,4 +1,4 @@
-export type SetCalorieUiPhase = "idle" | "active" | "calculating";
+export type SetCalorieUiPhase = "calculating";
 
 export interface SetCalorieProfileInput {
   userWeightKg: number;

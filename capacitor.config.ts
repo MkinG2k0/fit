@@ -4,10 +4,10 @@ const config: CapacitorConfig = {
   appId: "com.fit.myapp",
   appName: "fit",
   webDir: "dist",
-  server: {
-    url: "http://192.168.0.199:5173",
-    cleartext: true,
-  },
+  // server: {
+  //   url: "http://192.168.0.199:5173",
+  //   cleartext: true,
+  // },
 };
 
 export default config;

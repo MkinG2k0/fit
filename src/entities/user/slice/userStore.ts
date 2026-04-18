@@ -6,6 +6,16 @@ import {
   type RingGoalsSettings,
 } from "../model/ringGoals";
 
+const DEFAULT_SET_DURATION_FALLBACK_SEC = 60;
+const MIN_DEFAULT_SET_DURATION_SEC = 30;
+const MAX_DEFAULT_SET_DURATION_SEC = 180;
+
+const clampDefaultSetDurationSec = (sec: number): number =>
+  Math.min(
+    MAX_DEFAULT_SET_DURATION_SEC,
+    Math.max(MIN_DEFAULT_SET_DURATION_SEC, Math.round(sec)),
+  );
+
 interface UserState {
   user: IUser;
   accessToken: string;
@@ -13,6 +23,8 @@ interface UserState {
   ringGoals: RingGoalsSettings;
   /** Фича: ккал на подход (Health / пульс). По умолчанию выкл. */
   workoutCaloriesEnabled: boolean;
+  /** Средняя длительность подхода (сек) для первого окна без предыдущего endTime. */
+  defaultSetDurationSec: number;
 }
 
 interface ActionsState {
@@ -20,6 +32,7 @@ interface ActionsState {
   setPersonalData: (param: IUserPersonalData) => void;
   setRingGoals: (ringGoals: RingGoalsSettings) => void;
   setWorkoutCaloriesEnabled: (enabled: boolean) => void;
+  setDefaultSetDurationSec: (sec: number) => void;
   setAccessToken: (token: string) => void;
   deleteUserData: () => void;
   reset: () => void;
@@ -34,6 +47,9 @@ export const useUserStore = create<UserState & ActionsState>()(
       personalData: {},
       ringGoals: DEFAULT_RING_GOALS,
       workoutCaloriesEnabled: false,
+      defaultSetDurationSec: clampDefaultSetDurationSec(
+        DEFAULT_SET_DURATION_FALLBACK_SEC,
+      ),
       accessToken: "",
 
       setAccessToken: (token) => set({ accessToken: token }),
@@ -61,6 +77,11 @@ export const useUserStore = create<UserState & ActionsState>()(
           workoutCaloriesEnabled: enabled,
         })),
 
+      setDefaultSetDurationSec: (sec) =>
+        set(() => ({
+          defaultSetDurationSec: clampDefaultSetDurationSec(sec),
+        })),
+
       deleteUserData: () =>
         set(() => ({
           user: {
@@ -75,7 +96,25 @@ export const useUserStore = create<UserState & ActionsState>()(
     }),
     {
       name: "user",
+      merge: (persisted, current) => {
+        const p = persisted as Partial<UserState & ActionsState>;
+        return {
+          ...current,
+          ...p,
+          defaultSetDurationSec:
+            typeof p.defaultSetDurationSec === "number" &&
+            Number.isFinite(p.defaultSetDurationSec)
+              ? clampDefaultSetDurationSec(p.defaultSetDurationSec)
+              : current.defaultSetDurationSec,
+        };
+      },
     },
   ),
 );
+
+export {
+  MIN_DEFAULT_SET_DURATION_SEC,
+  MAX_DEFAULT_SET_DURATION_SEC,
+  DEFAULT_SET_DURATION_FALLBACK_SEC,
+};
 

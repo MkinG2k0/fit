@@ -49,7 +49,10 @@ interface CalendarStore {
     setId: string,
     calories: SetCalories,
   ) => void;
-  addSetToExercise: (exercise: Exercise) => void;
+  addSetToExercise: (
+    exercise: Exercise,
+    payload: { weight: number; reps: number; endTime: string },
+  ) => string;
   deleteExercise: (exercise: Exercise) => void;
   deleteSet: (exercise: Exercise, exerciseSet: ExerciseSet) => void;
 }
@@ -167,17 +170,13 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
       return { days: newDays };
     }),
 
-  addSetToExercise: (exercise) =>
+  addSetToExercise: (exercise, payload) => {
+    const newSetId = createRandomUuid();
     set((state) => {
       const { dateKey, oldExercises } = getDateKeyAndOldExercises(
         state.selectedDate,
         state.days,
       );
-      const lastSet = exercise.sets[exercise.sets.length - 1] ?? {
-        id: 0,
-        weight: 0,
-        reps: 0,
-      };
       const newExercises = oldExercises.map((ex) => {
         if (ex.id !== exercise.id) return ex;
         return {
@@ -185,9 +184,10 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
           sets: [
             ...ex.sets,
             {
-              id: createRandomUuid(),
-              weight: lastSet.weight,
-              reps: lastSet.reps,
+              id: newSetId,
+              weight: payload.weight,
+              reps: payload.reps,
+              endTime: payload.endTime,
             },
           ],
         };
@@ -199,7 +199,9 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
         newExercises,
       );
       return { days: newDays };
-    }),
+    });
+    return newSetId;
+  },
 
   deleteExercise: (exercise) =>
     set((state) => {

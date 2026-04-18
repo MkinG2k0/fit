@@ -1,4 +1,4 @@
-import { Check, Circle, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { Badge } from "@/shared/ui/shadCNComponents/ui/badge";
 import { formatKcalOneDecimal, type SetRowCalorieDisplay } from "../calories";
@@ -12,14 +12,10 @@ const kcalBadgeClass =
 
 interface ExerciseSetKcalCellProps {
   calorieDisplay: SetRowCalorieDisplay;
-  onStart: () => void;
-  onComplete: () => void;
 }
 
 export const ExerciseSetKcalCell = ({
   calorieDisplay,
-  onStart,
-  onComplete,
 }: ExerciseSetKcalCellProps) => {
   if (calorieDisplay.kind === "done") {
     const { calories } = calorieDisplay;
@@ -49,23 +45,6 @@ export const ExerciseSetKcalCell = ({
     );
   }
 
-  if (calorieDisplay.kind === "active") {
-    return (
-      <div className={kcalCellWrap}>
-        <span className="size-1.5 shrink-0 rounded-full bg-primary animate-pulse" />
-        <Button
-          type="button"
-          variant="secondary"
-          className="flex-auto"
-          onClick={onComplete}
-          aria-label="Завершить подход"
-        >
-          <Check className="size-4" />
-        </Button>
-      </div>
-    );
-  }
-
   if (calorieDisplay.kind === "calculating") {
     return (
       <div className={kcalCellWrap}>
@@ -78,20 +57,14 @@ export const ExerciseSetKcalCell = ({
   }
 
   return (
-    <Button
-      type="button"
-      size="icon"
-      variant="outline"
-      onClick={onStart}
-      aria-label="Начать подход"
-      className="flex-auto w-full h-full"
+    <div
+      className={cn(
+        kcalCellWrap,
+        "rounded-md border border-border text-sm tabular-nums text-muted-foreground",
+      )}
+      aria-hidden
     >
-      <Circle
-        className="size-4 shrink-0 text-destructive"
-        fill="currentColor"
-        strokeWidth={0}
-        aria-hidden
-      />
-    </Button>
+      —
+    </div>
   );
 };

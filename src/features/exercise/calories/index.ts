@@ -1,4 +1,13 @@
-export type { SetCalorieUiPhase, SetCalorieProfileInput } from "./model/types";
+export type {
+  SetCalorieUiPhase,
+  SetCalorieProfileInput,
+  SetCalorieWindowInput,
+} from "./model/types";
+export {
+  getSetTimeRange,
+  MAX_SET_DURATION_SEC,
+  DEFAULT_SET_DURATION_SEC,
+} from "./lib/setTimeRange";
 export { useSetCalorieSession } from "./lib/useSetCalorieSession";
 export {
   getSetRowCalorieDisplay,

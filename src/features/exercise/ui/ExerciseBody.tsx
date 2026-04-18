@@ -1,10 +1,11 @@
 import { Trash2 } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
-import { type ChangeEvent, useCallback, useState } from "react";
+import { type ChangeEvent, useCallback, useRef, useState } from "react";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { useCalendarStore } from "@/entities/calendarDay";
 import type { Exercise, ExerciseSet } from "@/entities/exercise";
+import { useUserStore } from "@/entities/user";
 import { StatisticCard } from "@/widgets/statisticCard";
 import { cn } from "@/shared/lib/classMerge";
 import style from "./ExerciseCard.module.css";
@@ -12,7 +13,9 @@ import { CustomButton } from "@/shared/ui";
 import { useLastExerciseSession } from "../lib/useLastExerciseSession";
 import { useWorkoutCaloriesUiEnabled } from "../lib/useWorkoutCaloriesUiEnabled";
 import {
+  DEFAULT_SET_DURATION_SEC,
   getSetRowCalorieDisplay,
+  getSetTimeRange,
   useSetCalorieSession,
   WorkoutCalorieProfileDialog,
 } from "../calories";
@@ -33,6 +36,7 @@ export const ExerciseBody = ({
 
   const onChangeHandler = useCalendarStore((store) => store.setExerciseValues);
   const addSetToExercise = useCalendarStore((store) => store.addSetToExercise);
+  const addSetGuardRef = useRef(false);
 
   const setCalorieSession = useSetCalorieSession({
     exercise,
@@ -59,16 +63,40 @@ export const ExerciseBody = ({
     [exercise, onChangeHandler],
   );
 
-  const handleSetComplete = useCallback(
-    (setId: string) => {
-      void setCalorieSession.onSetComplete(setId);
-    },
-    [setCalorieSession],
-  );
-
   const handleAddSet = useCallback(() => {
-    addSetToExercise(exercise);
-  }, [addSetToExercise, exercise]);
+    if (addSetGuardRef.current) {
+      return;
+    }
+    addSetGuardRef.current = true;
+
+    const lastSet = exercise.sets.at(-1);
+    const previousEnd =
+      lastSet?.endTime !== undefined && lastSet.endTime !== ""
+        ? new Date(lastSet.endTime)
+        : null;
+
+    const endNow = new Date();
+    const defaultSec =
+      useUserStore.getState().defaultSetDurationSec ??
+      DEFAULT_SET_DURATION_SEC;
+    const { startTime, endTime } = getSetTimeRange(
+      previousEnd,
+      defaultSec,
+      endNow,
+    );
+
+    const newSetId = addSetToExercise(exercise, {
+      weight: lastSet?.weight ?? 0,
+      reps: lastSet?.reps ?? 0,
+      endTime: endTime.toISOString(),
+    });
+
+    void setCalorieSession
+      .runSetCaloriesAfterAdd(newSetId, { startTime, endTime })
+      .finally(() => {
+        addSetGuardRef.current = false;
+      });
+  }, [addSetToExercise, exercise, setCalorieSession]);
 
   return (
     <div className="flex flex-col gap-2 p-4 pt-0">
@@ -124,8 +152,6 @@ export const ExerciseBody = ({
                 calorieDisplay={calorieDisplay}
                 inputClassName={INPUT_CLASSNAME}
                 onInputChange={inputHandler}
-                onSetStart={setCalorieSession.onSetStart}
-                onSetComplete={handleSetComplete}
               />
             </motion.div>
           );

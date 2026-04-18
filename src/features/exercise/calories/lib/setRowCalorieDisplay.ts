@@ -3,7 +3,6 @@ import type { SetCalorieUiPhase } from "../model/types";
 
 export type SetRowCalorieDisplay =
   | { kind: "idle" }
-  | { kind: "active" }
   | { kind: "calculating" }
   | { kind: "done"; calories: SetCalories };
 
@@ -13,9 +12,6 @@ export const getSetRowCalorieDisplay = (
 ): SetRowCalorieDisplay => {
   if (set.calories) {
     return { kind: "done", calories: set.calories };
-  }
-  if (phase === "active") {
-    return { kind: "active" };
   }
   if (phase === "calculating") {
     return { kind: "calculating" };

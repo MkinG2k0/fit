@@ -17,6 +17,7 @@ export const generateExercise = (
         weight: 0,
         reps: 0,
         id: createRandomUuid(),
+        endTime: new Date().toISOString(),
       },
     ],
     id: createRandomUuid(),

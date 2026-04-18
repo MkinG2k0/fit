@@ -4,6 +4,11 @@ export {
   MIN_RING_GOAL_VALUE,
   type RingGoalsSettings,
 } from "./model/ringGoals";
-export { useUserStore } from "./slice/userStore";
+export {
+  useUserStore,
+  MIN_DEFAULT_SET_DURATION_SEC,
+  MAX_DEFAULT_SET_DURATION_SEC,
+  DEFAULT_SET_DURATION_FALLBACK_SEC,
+} from "./slice/userStore";
 export * from "./api/userApi";
 

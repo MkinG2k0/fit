@@ -15,6 +15,13 @@ const THEME_STORAGE_KEY = "theme-preferences";
 const EXERCISE_STORAGE_KEY = "exercise-store";
 const USER_STORAGE_KEY = "user";
 
+const clampExportedDefaultSetDurationSec = (value: unknown): number => {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return 60;
+  }
+  return Math.min(180, Math.max(30, Math.round(value)));
+};
+
 export const APP_SETTINGS_SECTION_IDS = {
   theme: "theme",
   exercises: "exercises",
@@ -72,6 +79,7 @@ const isUserProfileExport = (
   personalData: IUserPersonalData;
   ringGoals: RingGoalsSettings;
   workoutCaloriesEnabled?: boolean;
+  defaultSetDurationSec?: number;
 } => {
   if (!isPlainObject(value)) {
     return false;
@@ -88,6 +96,14 @@ const isUserProfileExport = (
   if (
     "workoutCaloriesEnabled" in value &&
     typeof value.workoutCaloriesEnabled !== "boolean"
+  ) {
+    return false;
+  }
+  if (
+    "defaultSetDurationSec" in value &&
+    value.defaultSetDurationSec !== undefined &&
+    (typeof value.defaultSetDurationSec !== "number" ||
+      !Number.isFinite(value.defaultSetDurationSec))
   ) {
     return false;
   }
@@ -141,12 +157,16 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         personalData?: IUserPersonalData;
         ringGoals?: RingGoalsSettings;
         workoutCaloriesEnabled?: boolean;
+        defaultSetDurationSec?: number;
       };
       return {
         user: state.user ?? { userName: "" },
         personalData: state.personalData ?? {},
         ringGoals: state.ringGoals ?? DEFAULT_RING_GOALS,
         workoutCaloriesEnabled: state.workoutCaloriesEnabled ?? false,
+        defaultSetDurationSec: clampExportedDefaultSetDurationSec(
+          state.defaultSetDurationSec,
+        ),
       };
     },
     importSnapshot: (payload: unknown) => {
@@ -164,6 +184,9 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
           );
         }
         if (isZustandPersistBlob(existing) && isPlainObject(existing.state)) {
+          const prevState = existing.state as {
+            defaultSetDurationSec?: number;
+          };
           const next = {
             ...existing,
             state: {
@@ -172,6 +195,9 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
               personalData: payload.personalData,
               ringGoals: payload.ringGoals,
               workoutCaloriesEnabled: payload.workoutCaloriesEnabled ?? false,
+              defaultSetDurationSec: clampExportedDefaultSetDurationSec(
+                payload.defaultSetDurationSec ?? prevState.defaultSetDurationSec,
+              ),
             },
           };
           writeJsonToLocalStorage(USER_STORAGE_KEY, next);
@@ -187,6 +213,9 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
             personalData: payload.personalData,
             ringGoals: payload.ringGoals,
             workoutCaloriesEnabled: payload.workoutCaloriesEnabled ?? false,
+            defaultSetDurationSec: clampExportedDefaultSetDurationSec(
+              payload.defaultSetDurationSec,
+            ),
             accessToken: "",
           },
         });
