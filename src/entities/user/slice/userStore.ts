@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import type { IUser, IUserPersonalData } from "../model/types";
+import type { WorkoutCalorieProfileOnboardingStatus } from "../model/workoutCalorieOnboarding";
+import { isWorkoutCalorieProfileComplete } from "../lib/isWorkoutCalorieProfileComplete";
 import { persist } from "zustand/middleware";
 import {
   DEFAULT_RING_GOALS,
@@ -25,6 +27,8 @@ interface UserState {
   workoutCaloriesEnabled: boolean;
   /** Средняя длительность подхода (сек) для первого окна без предыдущего endTime. */
   defaultSetDurationSec: number;
+  /** Онбординг: вес/возраст/пол (persist в user). */
+  workoutCalorieProfileOnboarding: WorkoutCalorieProfileOnboardingStatus;
 }
 
 interface ActionsState {
@@ -33,6 +37,9 @@ interface ActionsState {
   setRingGoals: (ringGoals: RingGoalsSettings) => void;
   setWorkoutCaloriesEnabled: (enabled: boolean) => void;
   setDefaultSetDurationSec: (sec: number) => void;
+  setWorkoutCalorieProfileOnboarding: (
+    status: WorkoutCalorieProfileOnboardingStatus,
+  ) => void;
   setAccessToken: (token: string) => void;
   deleteUserData: () => void;
   reset: () => void;
@@ -50,6 +57,7 @@ export const useUserStore = create<UserState & ActionsState>()(
       defaultSetDurationSec: clampDefaultSetDurationSec(
         DEFAULT_SET_DURATION_FALLBACK_SEC,
       ),
+      workoutCalorieProfileOnboarding: "pending",
       accessToken: "",
 
       setAccessToken: (token) => set({ accessToken: token }),
@@ -60,12 +68,19 @@ export const useUserStore = create<UserState & ActionsState>()(
         })),
 
       setPersonalData: (param) =>
-        set((state) => ({
-          personalData: {
+        set((state) => {
+          const personalData: IUserPersonalData = {
             ...state.personalData,
             ...param,
-          },
-        })),
+          };
+          return {
+            personalData,
+            workoutCalorieProfileOnboarding:
+              isWorkoutCalorieProfileComplete(personalData)
+                ? "done"
+                : state.workoutCalorieProfileOnboarding,
+          };
+        }),
 
       setRingGoals: (ringGoals) =>
         set(() => ({
@@ -80,6 +95,11 @@ export const useUserStore = create<UserState & ActionsState>()(
       setDefaultSetDurationSec: (sec) =>
         set(() => ({
           defaultSetDurationSec: clampDefaultSetDurationSec(sec),
+        })),
+
+      setWorkoutCalorieProfileOnboarding: (status) =>
+        set(() => ({
+          workoutCalorieProfileOnboarding: status,
         })),
 
       deleteUserData: () =>
@@ -98,9 +118,23 @@ export const useUserStore = create<UserState & ActionsState>()(
       name: "user",
       merge: (persisted, current) => {
         const p = persisted as Partial<UserState & ActionsState>;
+        const personalData: IUserPersonalData = {
+          ...current.personalData,
+          ...(p.personalData ?? {}),
+        };
+        let workoutCalorieProfileOnboarding = p.workoutCalorieProfileOnboarding;
+        if (workoutCalorieProfileOnboarding === undefined) {
+          workoutCalorieProfileOnboarding = isWorkoutCalorieProfileComplete(
+            personalData,
+          )
+            ? "done"
+            : "pending";
+        }
         return {
           ...current,
           ...p,
+          personalData,
+          workoutCalorieProfileOnboarding,
           defaultSetDurationSec:
             typeof p.defaultSetDurationSec === "number" &&
             Number.isFinite(p.defaultSetDurationSec)

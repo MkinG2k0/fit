@@ -15,4 +15,4 @@ export {
 } from "./lib/setRowCalorieDisplay";
 export { formatKcalOneDecimal } from "./lib/formatKcal";
 export { WorkoutCalorieProfileDialog } from "./ui/WorkoutCalorieProfileDialog";
-export { isWorkoutCalorieProfileComplete } from "./lib/isWorkoutCalorieProfileComplete";
+export { isWorkoutCalorieProfileComplete } from "@/entities/user";

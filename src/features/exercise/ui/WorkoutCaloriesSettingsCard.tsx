@@ -1,11 +1,13 @@
 import { type ChangeEvent, useCallback } from "react";
 import { FlaskConical } from "lucide-react";
 import {
+  isWorkoutCalorieProfileComplete,
   MAX_DEFAULT_SET_DURATION_SEC,
   MIN_DEFAULT_SET_DURATION_SEC,
   useUserStore,
 } from "@/entities/user";
 import { cn } from "@/shared/lib/classMerge";
+import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { Checkbox } from "@/shared/ui/shadCNComponents/ui/checkbox";
 import {
   Card,
@@ -15,6 +17,8 @@ import {
   CardTitle,
 } from "@/shared/ui/shadCNComponents/ui/card";
 import { Label } from "@/shared/ui/shadCNComponents/ui/label";
+import { WorkoutCalorieProfileDialog } from "../calories";
+import { useCalorieProfileSettingsDialog } from "../lib/useCalorieProfileSettingsDialog";
 
 interface WorkoutCaloriesSettingsCardProps {
   className?: string;
@@ -29,6 +33,7 @@ export const WorkoutCaloriesSettingsCard = ({
   className,
 }: WorkoutCaloriesSettingsCardProps) => {
   const workoutCaloriesEnabled = useUserStore((s) => s.workoutCaloriesEnabled);
+  const personalData = useUserStore((s) => s.personalData);
   const setWorkoutCaloriesEnabled = useUserStore(
     (s) => s.setWorkoutCaloriesEnabled,
   );
@@ -37,6 +42,9 @@ export const WorkoutCaloriesSettingsCard = ({
     (s) => s.setDefaultSetDurationSec,
   );
   const checked = workoutCaloriesEnabled ?? false;
+  const profileComplete = isWorkoutCalorieProfileComplete(personalData);
+  const { open: profileDialogOpen, setOpen: setProfileDialogOpen } =
+    useCalorieProfileSettingsDialog();
 
   const handleCheckedChange = useCallback(
     (value: boolean | "indeterminate") => {
@@ -54,6 +62,10 @@ export const WorkoutCaloriesSettingsCard = ({
 
   return (
     <Card className={cn(CARD_CLASS, className)}>
+      <WorkoutCalorieProfileDialog
+        open={profileDialogOpen}
+        onOpenChange={setProfileDialogOpen}
+      />
       <CardHeader className={CARD_HEADER_CLASS}>
         <CardTitle className="flex items-center gap-2">
           <FlaskConical className="size-5 text-muted-foreground" aria-hidden />
@@ -88,6 +100,27 @@ export const WorkoutCaloriesSettingsCard = ({
             </p>
           </div>
         </div>
+        {checked && !profileComplete ? (
+          <div className={ROW_CLASS}>
+            <div className="grid min-w-0 flex-1 gap-2">
+              <p className="text-sm text-muted-foreground">
+                Для расчёта ккал укажите вес, возраст и пол (сохраняются в этом
+                устройстве) — в приложении на Android иначе колонка «Ккал» не
+                заполнится после подходов.
+              </p>
+              <Button
+                type="button"
+                variant="secondary"
+                className="w-full sm:w-auto"
+                onClick={() => {
+                  setProfileDialogOpen(true);
+                }}
+              >
+                Указать данные
+              </Button>
+            </div>
+          </div>
+        ) : null}
         {checked ? (
           <div className={ROW_CLASS}>
             <div className="grid min-w-0 flex-1 gap-2">

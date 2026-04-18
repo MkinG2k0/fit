@@ -1,4 +1,6 @@
 export type { IUser, IUserPersonalData } from "./model/types";
+export type { WorkoutCalorieProfileOnboardingStatus } from "./model/workoutCalorieOnboarding";
+export { isWorkoutCalorieProfileComplete } from "./lib/isWorkoutCalorieProfileComplete";
 export {
   DEFAULT_RING_GOALS,
   MIN_RING_GOAL_VALUE,

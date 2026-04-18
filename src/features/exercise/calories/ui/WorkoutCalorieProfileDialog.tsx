@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
   Dialog,
@@ -8,22 +8,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/ui/shadCNComponents/ui/dialog";
-import { Input } from "@/shared/ui/shadCNComponents/ui/input";
-import { Label } from "@/shared/ui/shadCNComponents/ui/label";
-import {
-  RadioGroup,
-  RadioGroupItem,
-} from "@/shared/ui/shadCNComponents/ui/radio-group";
+import { WorkoutCalorieProfileFields } from "@/shared/ui";
 import { useUserStore } from "@/entities/user";
-import { cn } from "@/shared/lib/classMerge";
 
 interface WorkoutCalorieProfileDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-const radioRowClass =
-  "flex items-center gap-2 rounded-md border border-border px-3 py-2";
+const isFemaleStored = (g: string | undefined): boolean =>
+  g === "female" ||
+  g === "женский" ||
+  g === "жен";
 
 export const WorkoutCalorieProfileDialog = ({
   open,
@@ -39,12 +35,18 @@ export const WorkoutCalorieProfileDialog = ({
     existing.age !== undefined ? String(existing.age) : "",
   );
   const [gender, setGender] = useState<"male" | "female">(() =>
-    existing.gender === "female" ||
-    existing.gender === "женский" ||
-    existing.gender === "жен"
-      ? "female"
-      : "male",
+    isFemaleStored(existing.gender) ? "female" : "male",
   );
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const pd = useUserStore.getState().personalData;
+    setWeight(pd.weight !== undefined ? String(pd.weight) : "");
+    setAge(pd.age !== undefined ? String(pd.age) : "");
+    setGender(isFemaleStored(pd.gender) ? "female" : "male");
+  }, [open]);
 
   const handleSubmit = () => {
     const w = Number.parseFloat(weight.replace(",", "."));
@@ -70,51 +72,18 @@ export const WorkoutCalorieProfileDialog = ({
             MET).
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-2">
-          <div className="grid gap-2">
-            <Label htmlFor="wc-weight">Вес, кг</Label>
-            <Input
-              id="wc-weight"
-              inputMode="decimal"
-              value={weight}
-              onChange={(e) => {
-                setWeight(e.target.value);
-              }}
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="wc-age">Возраст</Label>
-            <Input
-              id="wc-age"
-              inputMode="numeric"
-              value={age}
-              onChange={(e) => {
-                setAge(e.target.value);
-              }}
-            />
-          </div>
-          <div className="grid gap-2">
-            <span className="text-sm font-medium text-foreground">Пол</span>
-            <RadioGroup
-              value={gender}
-              onValueChange={(v) => {
-                if (v === "male" || v === "female") {
-                  setGender(v);
-                }
-              }}
-              className="grid gap-2"
-            >
-              <label className={cn(radioRowClass, "cursor-pointer")}>
-                <RadioGroupItem value="male" id="wc-male" />
-                <span className="text-sm">Мужской</span>
-              </label>
-              <label className={cn(radioRowClass, "cursor-pointer")}>
-                <RadioGroupItem value="female" id="wc-female" />
-                <span className="text-sm">Женский</span>
-              </label>
-            </RadioGroup>
-          </div>
-        </div>
+        <WorkoutCalorieProfileFields
+          weight={weight}
+          age={age}
+          gender={gender}
+          onWeightChange={setWeight}
+          onAgeChange={setAge}
+          onGenderChange={setGender}
+          weightInputId="wc-weight"
+          ageInputId="wc-age"
+          maleRadioId="wc-male"
+          femaleRadioId="wc-female"
+        />
         <DialogFooter>
           <Button
             type="button"

@@ -1,7 +1,8 @@
 import { Trash2 } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
-import { type ChangeEvent, useCallback, useRef, useState } from "react";
+import { type ChangeEvent, useCallback, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { useCalendarStore } from "@/entities/calendarDay";
 import type { Exercise, ExerciseSet } from "@/entities/exercise";
@@ -17,7 +18,6 @@ import {
   getSetRowCalorieDisplay,
   getSetTimeRange,
   useSetCalorieSession,
-  WorkoutCalorieProfileDialog,
 } from "../calories";
 import { ExerciseSetRow } from "./ExerciseSetRow";
 
@@ -30,8 +30,8 @@ export const ExerciseBody = ({
   exercise,
   onDeleteRequested,
 }: ExerciseBodyProps) => {
+  const navigate = useNavigate();
   const lastSession = useLastExerciseSession(exercise.name);
-  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   const showCaloriesUi = useWorkoutCaloriesUiEnabled();
 
   const onChangeHandler = useCalendarStore((store) => store.setExerciseValues);
@@ -42,7 +42,7 @@ export const ExerciseBody = ({
     exercise,
     enabled: showCaloriesUi,
     onProfileRequired: () => {
-      setProfileDialogOpen(true);
+      void navigate("/settings?calorieProfile=1");
     },
   });
 
@@ -100,12 +100,6 @@ export const ExerciseBody = ({
 
   return (
     <div className="flex flex-col gap-2 p-4 pt-0">
-      {showCaloriesUi ? (
-        <WorkoutCalorieProfileDialog
-          open={profileDialogOpen}
-          onOpenChange={setProfileDialogOpen}
-        />
-      ) : null}
       {lastSession !== null ? (
         <p
           className="w-full px-4 text-center text-xs leading-snug text-muted-foreground"

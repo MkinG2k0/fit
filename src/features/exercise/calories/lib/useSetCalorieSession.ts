@@ -2,12 +2,11 @@ import { useCallback, useState } from "react";
 import type { Exercise } from "@/entities/exercise";
 import { readHeartRateBpmSamples } from "@/entities/health";
 import { useCalendarStore } from "@/entities/calendarDay";
-import { useUserStore } from "@/entities/user";
+import { isWorkoutCalorieProfileComplete, useUserStore } from "@/entities/user";
 import type { IUserPersonalData } from "@/entities/user/model/types";
 import type { SetCalorieUiPhase, SetCalorieWindowInput } from "../model/types";
 import { calcSetCaloriesWithRetries } from "./calcSetCaloriesWithRetries";
 import { isMaleFromGender } from "./genderFromProfile";
-import { isWorkoutCalorieProfileComplete } from "./isWorkoutCalorieProfileComplete";
 
 interface UseSetCalorieSessionParams {
   exercise: Exercise;

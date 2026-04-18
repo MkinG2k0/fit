@@ -1,4 +1,4 @@
-import type { IUserPersonalData } from "@/entities/user/model/types";
+import type { IUserPersonalData } from "../model/types";
 
 export const isWorkoutCalorieProfileComplete = (
   personal: IUserPersonalData,

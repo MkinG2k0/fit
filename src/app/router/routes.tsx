@@ -24,10 +24,14 @@ const BodyMetricsPage = lazy(() =>
 const ActivityPage = lazy(() =>
   import("@/pages/ActivityPage").then((m) => ({ default: m.ActivityPage })),
 );
+const OnboardingPage = lazy(() =>
+  import("@/pages/OnboardingPage").then((m) => ({ default: m.OnboardingPage })),
+);
 
 export const AppRoutes = () => {
   return (
     <Routes>
+      <Route path="/onboarding" element={<OnboardingPage />} />
       <Route
         path="/"
         element={
