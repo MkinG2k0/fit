@@ -71,6 +71,7 @@ const isUserProfileExport = (
   user: IUser;
   personalData: IUserPersonalData;
   ringGoals: RingGoalsSettings;
+  workoutCaloriesEnabled?: boolean;
 } => {
   if (!isPlainObject(value)) {
     return false;
@@ -82,6 +83,12 @@ const isUserProfileExport = (
     return false;
   }
   if (!isRingGoalsSettings(value.ringGoals)) {
+    return false;
+  }
+  if (
+    "workoutCaloriesEnabled" in value &&
+    typeof value.workoutCaloriesEnabled !== "boolean"
+  ) {
     return false;
   }
   return true;
@@ -133,11 +140,13 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         user?: IUser;
         personalData?: IUserPersonalData;
         ringGoals?: RingGoalsSettings;
+        workoutCaloriesEnabled?: boolean;
       };
       return {
         user: state.user ?? { userName: "" },
         personalData: state.personalData ?? {},
         ringGoals: state.ringGoals ?? DEFAULT_RING_GOALS,
+        workoutCaloriesEnabled: state.workoutCaloriesEnabled ?? false,
       };
     },
     importSnapshot: (payload: unknown) => {
@@ -162,6 +171,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
               user: payload.user,
               personalData: payload.personalData,
               ringGoals: payload.ringGoals,
+              workoutCaloriesEnabled: payload.workoutCaloriesEnabled ?? false,
             },
           };
           writeJsonToLocalStorage(USER_STORAGE_KEY, next);
@@ -176,6 +186,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
             user: payload.user,
             personalData: payload.personalData,
             ringGoals: payload.ringGoals,
+            workoutCaloriesEnabled: payload.workoutCaloriesEnabled ?? false,
             accessToken: "",
           },
         });

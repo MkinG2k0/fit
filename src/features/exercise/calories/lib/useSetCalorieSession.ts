@@ -12,11 +12,14 @@ import { isWorkoutCalorieProfileComplete } from "./isWorkoutCalorieProfileComple
 interface UseSetCalorieSessionParams {
   exercise: Exercise;
   onProfileRequired: () => void;
+  /** На web не показываем UI ккал — хук не меняет состояние. */
+  enabled?: boolean;
 }
 
 export const useSetCalorieSession = ({
   exercise,
   onProfileRequired,
+  enabled = true,
 }: UseSetCalorieSessionParams) => {
   const applySetCalories = useCalendarStore((s) => s.applySetCalories);
 
@@ -27,6 +30,9 @@ export const useSetCalorieSession = ({
 
   const onSetStart = useCallback(
     (setId: string) => {
+      if (!enabled) {
+        return;
+      }
       const personal = useUserStore.getState().personalData;
       if (!isWorkoutCalorieProfileComplete(personal)) {
         onProfileRequired();
@@ -44,11 +50,14 @@ export const useSetCalorieSession = ({
       });
       startTimeBySetIdRef.current.set(setId, new Date());
     },
-    [onProfileRequired],
+    [enabled, onProfileRequired],
   );
 
   const onSetComplete = useCallback(
     async (setId: string) => {
+      if (!enabled) {
+        return;
+      }
       const start = startTimeBySetIdRef.current.get(setId);
       if (!start) {
         return;
@@ -80,7 +89,7 @@ export const useSetCalorieSession = ({
         });
       }
     },
-    [applySetCalories, exercise],
+    [applySetCalories, enabled, exercise],
   );
 
   return {

@@ -26,7 +26,7 @@ const CARD_HEADER_CLASS = "px-4";
 const CARD_CONTENT_CLASS = "px-4";
 const INPUT_GROUP_CLASS = "grid gap-3 sm:grid-cols-2";
 const INPUT_WRAPPER_CLASS = "flex flex-col gap-2";
-const HINT_CLASS = "text-xs text-muted-foreground";
+const HINT_CLASS = "text-xs text-muted-foreground mt-2";
 const ACTIONS_CLASS = "mt-1 flex flex-wrap gap-2";
 const VALID_INTEGER_PATTERN = /^\d+$/;
 
@@ -50,7 +50,9 @@ export const ProfileRingGoalsSettingsCard = ({
   const [setCountGoalInput, setSetCountGoalInput] = useState(
     String(ringGoals.fullSetCount),
   );
-  const [volumeGoalInput, setVolumeGoalInput] = useState(String(ringGoals.fullVolume));
+  const [volumeGoalInput, setVolumeGoalInput] = useState(
+    String(ringGoals.fullVolume),
+  );
   const [validationMessage, setValidationMessage] = useState("");
 
   useEffect(() => {
@@ -74,7 +76,9 @@ export const ProfileRingGoalsSettingsCard = ({
     setSetCountGoalInput(event.target.value);
   };
 
-  const handleVolumeGoalInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleVolumeGoalInputChange = (
+    event: ChangeEvent<HTMLInputElement>,
+  ) => {
     setVolumeGoalInput(event.target.value);
   };
 
@@ -140,10 +144,18 @@ export const ProfileRingGoalsSettingsCard = ({
         </p>
 
         <div className={ACTIONS_CLASS}>
-          <Button type="button" onClick={handleSaveRingGoals} disabled={!isDirty}>
+          <Button
+            type="button"
+            onClick={handleSaveRingGoals}
+            disabled={!isDirty}
+          >
             Сохранить
           </Button>
-          <Button type="button" variant="outline" onClick={handleResetRingGoals}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleResetRingGoals}
+          >
             Сбросить по умолчанию
           </Button>
         </div>

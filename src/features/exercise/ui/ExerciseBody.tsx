@@ -6,9 +6,11 @@ import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { useCalendarStore } from "@/entities/calendarDay";
 import type { Exercise, ExerciseSet } from "@/entities/exercise";
 import { StatisticCard } from "@/widgets/statisticCard";
+import { cn } from "@/shared/lib/classMerge";
 import style from "./ExerciseCard.module.css";
 import { CustomButton } from "@/shared/ui";
 import { useLastExerciseSession } from "../lib/useLastExerciseSession";
+import { useWorkoutCaloriesUiEnabled } from "../lib/useWorkoutCaloriesUiEnabled";
 import {
   getSetRowCalorieDisplay,
   useSetCalorieSession,
@@ -27,12 +29,14 @@ export const ExerciseBody = ({
 }: ExerciseBodyProps) => {
   const lastSession = useLastExerciseSession(exercise.name);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  const showCaloriesUi = useWorkoutCaloriesUiEnabled();
 
   const onChangeHandler = useCalendarStore((store) => store.setExerciseValues);
   const addSetToExercise = useCalendarStore((store) => store.addSetToExercise);
 
   const setCalorieSession = useSetCalorieSession({
     exercise,
+    enabled: showCaloriesUi,
     onProfileRequired: () => {
       setProfileDialogOpen(true);
     },
@@ -68,10 +72,12 @@ export const ExerciseBody = ({
 
   return (
     <div className="flex flex-col gap-2 p-4 pt-0">
-      <WorkoutCalorieProfileDialog
-        open={profileDialogOpen}
-        onOpenChange={setProfileDialogOpen}
-      />
+      {showCaloriesUi ? (
+        <WorkoutCalorieProfileDialog
+          open={profileDialogOpen}
+          onOpenChange={setProfileDialogOpen}
+        />
+      ) : null}
       {lastSession !== null ? (
         <p
           className="w-full px-4 text-center text-xs leading-snug text-muted-foreground"
@@ -80,11 +86,18 @@ export const ExerciseBody = ({
           Прошлый раз, {lastSession.dateLabel}: {lastSession.setsSummary}
         </p>
       ) : null}
-      <div className={style.inputsHeader}>
+      <div
+        className={cn(
+          style.inputsHeader,
+          !showCaloriesUi && style.inputsHeaderWeb,
+        )}
+      >
         <span className={style.inputsHeaderSpacer} />
         <span className={style.inputLabel}>Кол-во</span>
         <span className={style.inputLabel}>Кг</span>
-        <span className={style.inputLabelKcal}>Ккал</span>
+        {showCaloriesUi ? (
+          <span className={style.inputLabelKcal}>Ккал</span>
+        ) : null}
         <span className={style.inputsHeaderSpacer} />
       </div>
 
@@ -107,6 +120,7 @@ export const ExerciseBody = ({
                 exercise={exercise}
                 set={set}
                 index={idx}
+                showKcalColumn={showCaloriesUi}
                 calorieDisplay={calorieDisplay}
                 inputClassName={INPUT_CLASSNAME}
                 onInputChange={inputHandler}

@@ -13,6 +13,8 @@ interface ExerciseSetRowProps {
   exercise: Exercise;
   set: ExerciseSet;
   index: number;
+  /** На web колонка ккал скрыта — Health недоступен. */
+  showKcalColumn: boolean;
   calorieDisplay: SetRowCalorieDisplay;
   inputClassName: string;
   onInputChange: (
@@ -27,6 +29,7 @@ export const ExerciseSetRow = ({
   exercise,
   set,
   index,
+  showKcalColumn,
   calorieDisplay,
   inputClassName,
   onInputChange,
@@ -48,7 +51,13 @@ export const ExerciseSetRow = ({
   }, [onSetComplete, set.id]);
 
   return (
-    <div className={cn(style.setGridRow, "gap-3")}>
+    <div
+      className={cn(
+        style.setGridRow,
+        !showKcalColumn && style.setGridRowWeb,
+        "gap-3",
+      )}
+    >
       <Button
         variant="outline"
         size="icon"
@@ -86,11 +95,13 @@ export const ExerciseSetRow = ({
           }}
         />
       </div>
-      <ExerciseSetKcalCell
-        calorieDisplay={calorieDisplay}
-        onStart={handleStart}
-        onComplete={handleComplete}
-      />
+      {showKcalColumn ? (
+        <ExerciseSetKcalCell
+          calorieDisplay={calorieDisplay}
+          onStart={handleStart}
+          onComplete={handleComplete}
+        />
+      ) : null}
       <Button
         type="button"
         variant="outline"

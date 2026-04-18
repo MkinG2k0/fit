@@ -11,12 +11,15 @@ interface UserState {
   accessToken: string;
   personalData: IUserPersonalData;
   ringGoals: RingGoalsSettings;
+  /** Фича: ккал на подход (Health / пульс). По умолчанию выкл. */
+  workoutCaloriesEnabled: boolean;
 }
 
 interface ActionsState {
   addUserData: (user: IUser) => void;
   setPersonalData: (param: IUserPersonalData) => void;
   setRingGoals: (ringGoals: RingGoalsSettings) => void;
+  setWorkoutCaloriesEnabled: (enabled: boolean) => void;
   setAccessToken: (token: string) => void;
   deleteUserData: () => void;
   reset: () => void;
@@ -30,6 +33,7 @@ export const useUserStore = create<UserState & ActionsState>()(
       },
       personalData: {},
       ringGoals: DEFAULT_RING_GOALS,
+      workoutCaloriesEnabled: false,
       accessToken: "",
 
       setAccessToken: (token) => set({ accessToken: token }),
@@ -50,6 +54,11 @@ export const useUserStore = create<UserState & ActionsState>()(
       setRingGoals: (ringGoals) =>
         set(() => ({
           ringGoals,
+        })),
+
+      setWorkoutCaloriesEnabled: (enabled) =>
+        set(() => ({
+          workoutCaloriesEnabled: enabled,
         })),
 
       deleteUserData: () =>

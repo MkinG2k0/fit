@@ -2,6 +2,7 @@ import { Header } from "@/widgets";
 import { ThemeSettingsCard } from "@/features/themeSwitcher";
 import { SettingsTransferCard } from "@/features/appSettingsTransfer";
 import { ProfileRingGoalsSettingsCard } from "@/features/profileRingGoalsSettings";
+import { WorkoutCaloriesSettingsCard } from "@/features/exercise";
 import {
   Card,
   CardContent,
@@ -32,6 +33,8 @@ export const SettingsPage = () => {
           <ThemeSettingsCard />
 
           <ProfileRingGoalsSettingsCard />
+
+          <WorkoutCaloriesSettingsCard />
 
           <Card className={CARD_CLASS}>
             <CardHeader className={CARD_HEADER_CLASS}>

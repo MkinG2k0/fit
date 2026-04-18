@@ -100,7 +100,7 @@
   display: grid;
   width: 100%;
   grid-template-columns:
-    36px minmax(0, 1fr) minmax(0, 1fr) minmax(52px, 64px)
+    36px minmax(0, 1fr) minmax(0, 1fr) 50px
     36px;
   align-items: center;
   gap: 8px;
@@ -111,6 +111,15 @@
   width: 100%;
   grid-template-columns: 36px minmax(0, 1fr) minmax(0, 1fr) 50px 36px;
   align-items: center;
+}
+
+/* Web: без колонки Ккал */
+.inputsHeaderWeb {
+  grid-template-columns: 36px minmax(0, 1fr) minmax(0, 1fr) 36px;
+}
+
+.setGridRowWeb {
+  grid-template-columns: 36px minmax(0, 1fr) minmax(0, 1fr) 36px;
 }
 
 .inputsHeaderSpacer {
@@ -132,7 +141,7 @@
   font-weight: 600;
   line-height: 1.1;
   color: var(--muted-foreground);
-  text-align: right;
+  text-align: center;
 }
 
 .cell {

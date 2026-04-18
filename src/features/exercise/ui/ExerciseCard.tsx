@@ -18,6 +18,7 @@ import { ExerciseDeleteDialog } from "./ExerciseDeleteDialog";
 import { ExerciseNameSelector } from "./ExerciseNameSelector";
 import { StatisticCard } from "@/widgets/statisticCard";
 import { formatKcalOneDecimal } from "../calories";
+import { useWorkoutCaloriesUiEnabled } from "../lib/useWorkoutCaloriesUiEnabled";
 import style from "./ExerciseCard.module.css";
 
 interface ExerciseCardProps {
@@ -47,6 +48,7 @@ const formatTotalLiftedKg = (totalKg: number): string => {
 };
 
 export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
+  const showCaloriesUi = useWorkoutCaloriesUiEnabled();
   const [isEditable, setIsEditable] = useState(false);
   const [modalVisibility, setModalVisibility] = useState(false);
   const [showHint, setShowHint] = useState(false);
@@ -213,13 +215,17 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
             </div>
             <div
               className={style.liftedTotal}
-              title="Суммарный объём и оценка ккал по завершённым подходам"
+              title={
+                showCaloriesUi
+                  ? "Суммарный объём и оценка ккал по завершённым подходам"
+                  : "Суммарный объём: повторения × вес по подходам"
+              }
             >
               <span className={cn(style.liftedTotalValue, "font-numeric")}>
                 {totalLiftedLabel}
               </span>
               <span className={style.liftedTotalUnit}>кг</span>
-              {totalKcal > 0 ? (
+              {showCaloriesUi && totalKcal > 0 ? (
                 <>
                   <span
                     className="text-muted-foreground shrink-0 px-0.5"
