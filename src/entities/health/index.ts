@@ -7,3 +7,7 @@ export {
   loadTodayHealthMetrics,
   openHealthSettingsIfAndroid,
 } from "./api/healthApi";
+export {
+  ensureWorkoutHeartRateReadAccess,
+  readHeartRateBpmSamples,
+} from "./api/heartRateRead";

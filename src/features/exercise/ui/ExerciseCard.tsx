@@ -17,6 +17,7 @@ import { ExerciseCategoryIcon } from "./ExerciseCategoryIcon";
 import { ExerciseDeleteDialog } from "./ExerciseDeleteDialog";
 import { ExerciseNameSelector } from "./ExerciseNameSelector";
 import { StatisticCard } from "@/widgets/statisticCard";
+import { formatKcalOneDecimal } from "../calories";
 import style from "./ExerciseCard.module.css";
 
 interface ExerciseCardProps {
@@ -142,6 +143,16 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
 
   const totalLiftedLabel = formatTotalLiftedKg(totalLiftedKg);
 
+  const totalKcal = useMemo(() => {
+    return exercise.sets.reduce((sum, set) => {
+      const k = set.calories?.kcal;
+      if (typeof k !== "number" || !Number.isFinite(k)) {
+        return sum;
+      }
+      return sum + k;
+    }, 0);
+  }, [exercise.sets]);
+
   return (
     <div className="relative overflow-hidden cursor-pointer">
       <motion.div
@@ -202,12 +213,26 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
             </div>
             <div
               className={style.liftedTotal}
-              title="Суммарный объём: по каждому подходу умножаем повторения на вес (кг) и складываем"
+              title="Суммарный объём и оценка ккал по завершённым подходам"
             >
               <span className={cn(style.liftedTotalValue, "font-numeric")}>
                 {totalLiftedLabel}
               </span>
               <span className={style.liftedTotalUnit}>кг</span>
+              {totalKcal > 0 ? (
+                <>
+                  <span
+                    className="text-muted-foreground shrink-0 px-0.5"
+                    aria-hidden
+                  >
+                    •
+                  </span>
+                  <span className={cn(style.liftedTotalValue, "font-numeric")}>
+                    {formatKcalOneDecimal(totalKcal)}
+                  </span>
+                  <span className={style.liftedTotalUnit}>ккал</span>
+                </>
+              ) : null}
             </div>
             <div className="p-4">
               {isEditable ? <ChevronUp /> : <ChevronDown />}

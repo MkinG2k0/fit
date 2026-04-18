@@ -3,7 +3,12 @@ import "dayjs/locale/ru";
 import type { RgbaColor } from "react-colorful";
 import { create } from "zustand";
 import type { ExerciseOption } from "@/features/exercise";
-import type { Exercise, ExerciseIconId, ExerciseSet } from "@/entities/exercise";
+import type {
+  Exercise,
+  ExerciseIconId,
+  ExerciseSet,
+  SetCalories,
+} from "@/entities/exercise";
 import type { CalendarDay } from "../model/types";
 import { createRandomUuid } from "@/shared/lib";
 import { getDaysFromLocalStorage } from "@/shared/lib/storage";
@@ -35,9 +40,14 @@ interface CalendarStore {
   ) => void;
   setExerciseValues: (
     value: string,
-    type: keyof ExerciseSet,
+    type: "reps" | "weight",
     id: string,
     exercise: Exercise,
+  ) => void;
+  applySetCalories: (
+    exercise: Exercise,
+    setId: string,
+    calories: SetCalories,
   ) => void;
   addSetToExercise: (exercise: Exercise) => void;
   deleteExercise: (exercise: Exercise) => void;
@@ -114,7 +124,37 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
         return {
           ...ex,
           sets: ex.sets.map((set) =>
-            set.id === id ? { ...set, [type]: Number(value) } : set,
+            set.id === id
+              ? {
+                  ...set,
+                  [type]: Number(value),
+                  calories: undefined,
+                }
+              : set,
+          ),
+        };
+      });
+      const newDays = replaceExercises(
+        state.selectedDate,
+        state.days,
+        dateKey,
+        newExercises,
+      );
+      return { days: newDays };
+    }),
+
+  applySetCalories: (exercise, setId, calories) =>
+    set((state) => {
+      const { dateKey, oldExercises } = getDateKeyAndOldExercises(
+        state.selectedDate,
+        state.days,
+      );
+      const newExercises = oldExercises.map((ex) => {
+        if (ex.id !== exercise.id) return ex;
+        return {
+          ...ex,
+          sets: ex.sets.map((set) =>
+            set.id === setId ? { ...set, calories } : set,
           ),
         };
       });

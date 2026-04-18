@@ -7,7 +7,7 @@
 **Files:**
 
 - UI-компоненты смешивают `PascalCase` и `camel/lowercase`: `src/widgets/loginForm/ui/LoginForm.tsx`, `src/features/timer/ui/timer.tsx`, `src/widgets/allExercises/ui/allExercises.tsx`.
-- CSS Modules используют суффикс `.module.css`: `src/widgets/loginForm/ui/LoginForm.module.css`, `src/entities/calendarDay/ui/Day.module.css`.
+- **Стили:** CSS Modules (`*.module.css`) **не использовать** — ни в новом коде, ни при рефакторинге; только Tailwind в TSX (`className`), `cn` / `class-variance-authority` для вариантов, глобальные базовые стили в `src/app/styles/index.css` при необходимости. Легаси-файлы `*.module.css` допускаются до миграции, но новые такие файлы не добавлять. **Классы Tailwind никогда не выносить в переменные, константы или отдельные хелперы**, возвращающие одну строку классов ради «чистоты» файла — литералы и аргументы `cn(...)` задаются **на месте** в JSX внутри `className`. Допустимо только **`cva`** как контракт вариантов переиспользуемого UI-примитива (паттерн shadcn), не произвольная `const styles = '...'`.
 - Баррели слоев оформлены через `index.ts`: `src/widgets/index.ts`, `src/pages/index.ts`, `src/entities/user/index.ts`.
 
 **Functions:**
@@ -38,6 +38,10 @@
 - Инструмент: `ESLint` c flat config в `eslint.config.js`.
 - База правил: `@eslint/js`, `typescript-eslint`, `eslint-plugin-react-hooks`, `eslint-plugin-react-refresh`, `eslint-plugin-react-x`, `eslint-plugin-react-dom`.
 - В конфиге нет кастомных локальных правил (`rules: {}`), опора на preset-ы.
+
+**Tailwind / className:**
+
+- Политика: см. пункт **Стили** в разделе Naming Patterns выше (inline, без промежуточных const со строками классов; исключение — `cva` для variants).
 
 ## Import Organization
 
@@ -119,7 +123,7 @@
 
 - Отсутствуют автоматизированные тесты и test-command, поэтому регрессии ловятся только линтом/сборкой.
 - Непоследовательность нейминга файлов (`Timer.tsx` vs `timer.tsx`, `allExercises.tsx`) повышает когнитивную нагрузку.
-- Смешение Tailwind и CSS Modules усложняет поддержку единого UI-стандарта (`src/widgets/loginForm/ui/LoginForm.module.css`, `src/features/timer/ui/timer.tsx`).
+- В кодовой базе ещё встречается легаси-смесь Tailwind и CSS Modules; целевой стандарт — Tailwind-only (см. выше → стили).
 - Частые инлайн-обработчики в JSX увеличивают риск лишних рендеров и усложняют рефакторинг.
 - Логирование через `console.*` без abstraction слоя ограничивает наблюдаемость в production.
 

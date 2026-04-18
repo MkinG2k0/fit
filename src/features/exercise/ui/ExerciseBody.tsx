@@ -1,8 +1,7 @@
-import { Trash2, X } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
-import { type ChangeEvent } from "react";
-import { Input } from "@/shared/ui/shadCNComponents/ui/input";
+import { type ChangeEvent, useCallback, useState } from "react";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { useCalendarStore } from "@/entities/calendarDay";
 import type { Exercise, ExerciseSet } from "@/entities/exercise";
@@ -10,7 +9,12 @@ import { StatisticCard } from "@/widgets/statisticCard";
 import style from "./ExerciseCard.module.css";
 import { CustomButton } from "@/shared/ui";
 import { useLastExerciseSession } from "../lib/useLastExerciseSession";
-import { cn } from "@/shared/lib/classMerge";
+import {
+  getSetRowCalorieDisplay,
+  useSetCalorieSession,
+  WorkoutCalorieProfileDialog,
+} from "../calories";
+import { ExerciseSetRow } from "./ExerciseSetRow";
 
 interface ExerciseBodyProps {
   exercise: Exercise;
@@ -22,26 +26,52 @@ export const ExerciseBody = ({
   onDeleteRequested,
 }: ExerciseBodyProps) => {
   const lastSession = useLastExerciseSession(exercise.name);
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+
   const onChangeHandler = useCalendarStore((store) => store.setExerciseValues);
   const addSetToExercise = useCalendarStore((store) => store.addSetToExercise);
-  const deleteSet = useCalendarStore((store) => store.deleteSet);
+
+  const setCalorieSession = useSetCalorieSession({
+    exercise,
+    onProfileRequired: () => {
+      setProfileDialogOpen(true);
+    },
+  });
+
   const INPUT_CLASSNAME =
     "font-numeric shadow-none ring-0 outline-none focus-visible:ring-0 focus-visible:ring-offset-0 text-center text-2xl text-foreground placeholder:text-muted-foreground";
 
-  const inputHandler = (
-    event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
-    set: ExerciseSet,
-  ) => {
-    onChangeHandler(
-      event.target.value,
-      event.target.name as keyof ExerciseSet,
-      set.id,
-      exercise,
-    );
-  };
+  const inputHandler = useCallback(
+    (
+      event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+      set: ExerciseSet,
+    ) => {
+      const name = event.target.name;
+      if (name !== "reps" && name !== "weight") {
+        return;
+      }
+      onChangeHandler(event.target.value, name, set.id, exercise);
+    },
+    [exercise, onChangeHandler],
+  );
+
+  const handleSetComplete = useCallback(
+    (setId: string) => {
+      void setCalorieSession.onSetComplete(setId);
+    },
+    [setCalorieSession],
+  );
+
+  const handleAddSet = useCallback(() => {
+    addSetToExercise(exercise);
+  }, [addSetToExercise, exercise]);
 
   return (
     <div className="flex flex-col gap-2 p-4 pt-0">
+      <WorkoutCalorieProfileDialog
+        open={profileDialogOpen}
+        onOpenChange={setProfileDialogOpen}
+      />
       {lastSession !== null ? (
         <p
           className="w-full px-4 text-center text-xs leading-snug text-muted-foreground"
@@ -54,11 +84,16 @@ export const ExerciseBody = ({
         <span className={style.inputsHeaderSpacer} />
         <span className={style.inputLabel}>Кол-во</span>
         <span className={style.inputLabel}>Кг</span>
+        <span className={style.inputLabelKcal}>Ккал</span>
         <span className={style.inputsHeaderSpacer} />
       </div>
 
       <AnimatePresence>
         {exercise.sets.map((set, idx) => {
+          const calorieDisplay = getSetRowCalorieDisplay(
+            set,
+            setCalorieSession.phaseBySetId[set.id],
+          );
           return (
             <motion.div
               key={set.id}
@@ -68,64 +103,29 @@ export const ExerciseBody = ({
               transition={{ duration: 0.3, ease: "easeInOut" }}
               style={{ overflow: "hidden" }}
             >
-              <div className={cn("flex gap-3 items-center font-numeric")}>
-                <Button variant="ghost" className={style.setIndex}>
-                  {idx + 1}
-                </Button>
-                <div className={style.cell}>
-                  <Input
-                    className={cn(
-                      INPUT_CLASSNAME,
-                      "text-primary bg-background w-full border-primary h-12 rounded-md",
-                    )}
-                    type={"number"}
-                    placeholder={"Кол-во"}
-                    name={"reps"}
-                    value={set.reps === 0 ? "" : set.reps}
-                    onChange={(e) => {
-                      inputHandler(e, set);
-                    }}
-                  />
-                </div>
-                <div className={style.cell}>
-                  <Input
-                    className={cn(
-                      INPUT_CLASSNAME,
-                      "text-primary bg-background w-full border-primary h-12 rounded-md",
-                    )}
-                    type={"number"}
-                    placeholder={"Кг"}
-                    name={"weight"}
-                    value={set.weight === 0 ? "" : set.weight}
-                    onChange={(e) => {
-                      inputHandler(e, set);
-                    }}
-                  />
-                </div>
-                <div className={style.deleteButtonCell}>
-                  <Button
-                    variant="ghost"
-                    onClick={() => deleteSet(exercise, set)}
-                  >
-                    <X />
-                  </Button>
-                </div>
-              </div>
+              <ExerciseSetRow
+                exercise={exercise}
+                set={set}
+                index={idx}
+                calorieDisplay={calorieDisplay}
+                inputClassName={INPUT_CLASSNAME}
+                onInputChange={inputHandler}
+                onSetStart={setCalorieSession.onSetStart}
+                onSetComplete={handleSetComplete}
+              />
             </motion.div>
           );
         })}
       </AnimatePresence>
       <div className={"flex gap-3 items-center justify-between"}>
         <StatisticCard exerciseName={exercise.name} />
-        <CustomButton
-          classes={"flex-1"}
-          buttonHandler={() => addSetToExercise(exercise)}
-        >
+        <CustomButton classes={"flex-1"} buttonHandler={handleAddSet}>
           Добавить подход
         </CustomButton>
         <Button
           variant="outline"
           className="text-destructive"
+          size="icon"
           onClick={onDeleteRequested}
         >
           <Trash2 />

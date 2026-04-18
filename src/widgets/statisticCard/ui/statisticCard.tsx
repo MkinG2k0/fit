@@ -51,7 +51,7 @@ export const StatisticCard = ({
       <form>
         {showTrigger && (
           <DialogTrigger asChild>
-            <Button variant="outline">
+            <Button variant="outline" size="icon">
               <ChartColumnBig />
             </Button>
           </DialogTrigger>

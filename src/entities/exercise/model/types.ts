@@ -2,10 +2,19 @@ import type { RgbaColor } from "react-colorful";
 
 import type { ExerciseIconId } from "./exerciseIcons";
 
+export type SetCalorieSource = "heart_rate" | "met_fallback";
+
+export interface SetCalories {
+  kcal: number;
+  source: SetCalorieSource;
+  avgHr?: number;
+}
+
 export interface ExerciseSet {
   id: string;
   weight: number;
   reps: number;
+  calories?: SetCalories;
 }
 
 export interface Exercise {

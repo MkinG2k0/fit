@@ -3,6 +3,8 @@ export type {
   Exercise,
   ExerciseSet,
   ExerciseCategory,
+  SetCalories,
+  SetCalorieSource,
   TrainingPreset,
 } from "./model/types";
 export type { ExerciseIconId } from "./model/exerciseIcons";
