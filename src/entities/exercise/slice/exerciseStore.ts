@@ -1,7 +1,8 @@
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { zustandAppStorage } from "@/shared/lib/storageAdapter";
 import { allExercises, trainingPreset } from "@/shared/config/constants";
 import { normalizeExerciseCategories } from "../lib/normalizeExerciseCategories";
 import type { ExerciseIconId } from "../model/exerciseIcons";
@@ -239,6 +240,7 @@ export const useExerciseStore = create<ExerciseStore>()(
     }),
     {
       name: "exercise-store",
+      storage: createJSONStorage(() => zustandAppStorage),
       merge: (persistedState, currentState) => {
         const persisted = (persistedState ?? {}) as Partial<ExerciseStore>;
         const merged: ExerciseStore = {

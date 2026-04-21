@@ -2,7 +2,8 @@ import { create } from "zustand";
 import type { IUser, IUserPersonalData } from "../model/types";
 import type { WorkoutCalorieProfileOnboardingStatus } from "../model/workoutCalorieOnboarding";
 import { isWorkoutCalorieProfileComplete } from "../lib/isWorkoutCalorieProfileComplete";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { zustandAppStorage } from "@/shared/lib/storageAdapter";
 import {
   DEFAULT_RING_GOALS,
   type RingGoalsSettings,
@@ -153,6 +154,7 @@ export const useUserStore = create<UserState & ActionsState>()(
     }),
     {
       name: "user",
+      storage: createJSONStorage(() => zustandAppStorage),
       merge: (persisted, current) => {
         const p = persisted as Partial<UserState & ActionsState>;
         const personalData: IUserPersonalData = {
@@ -195,6 +197,7 @@ export const useUserStore = create<UserState & ActionsState>()(
               : current.workoutListShowDaySummary,
         };
       },
+      
     },
   ),
 );

@@ -2,7 +2,7 @@ import { localStorageDriver } from "./localStorageDriver";
 import { preferencesDriver } from "./preferencesDriver";
 import type { StorageBackendMode } from "./types";
 
-const DEFAULT_STORAGE_MODE: StorageBackendMode = "dual";
+const DEFAULT_STORAGE_MODE: StorageBackendMode = "preferences";
 
 const resolveStorageMode = (): StorageBackendMode => {
   const rawMode = import.meta.env.VITE_STORAGE_BACKEND_MODE;

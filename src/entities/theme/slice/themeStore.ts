@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { zustandAppStorage } from "@/shared/lib/storageAdapter";
 import type { ThemeMode } from "../model/types";
 
 interface ThemeState {
@@ -18,6 +19,7 @@ export const useThemeStore = create<ThemeState & ThemeActions>()(
     }),
     {
       name: "theme-preferences",
+      storage: createJSONStorage(() => zustandAppStorage),
     },
   ),
 );

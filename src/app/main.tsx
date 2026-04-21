@@ -12,15 +12,19 @@ import { AppContent } from "./AppContent.tsx";
 
 initCapacitorEdgeToEdgeChrome();
 registerServiceWorker();
-void runStorageMigration();
 
-createRoot(document.getElementById("root")!).render(
-  <ThemeProvider>
-    <BrowserRouter>
-      <WorkoutHealthPermissionInit />
-      <WorkoutCaloriesRecalculationInit />
-      <OnboardingNavigation />
-      <AppContent />
-    </BrowserRouter>
-  </ThemeProvider>,
-);
+const rootElement = document.getElementById("root")!;
+
+void (async () => {
+  await runStorageMigration();
+  createRoot(rootElement).render(
+    <ThemeProvider>
+      <BrowserRouter>
+        <WorkoutHealthPermissionInit />
+        <WorkoutCaloriesRecalculationInit />
+        <OnboardingNavigation />
+        <AppContent />
+      </BrowserRouter>
+    </ThemeProvider>,
+  );
+})();
