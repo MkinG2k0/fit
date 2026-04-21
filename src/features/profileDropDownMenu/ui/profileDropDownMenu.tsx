@@ -7,6 +7,7 @@ import {
   ScrollText,
   Timer as TimerIcon,
 } from "lucide-react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button.tsx";
 import {
@@ -18,32 +19,15 @@ import { Separator } from "@/shared/ui/shadCNComponents/ui/separator.tsx";
 
 export const ProfileDropDownMenu = () => {
   const navigate = useNavigate();
-  const handleTimerNavigate = () => {
-    navigate("/timer");
-  };
+  const [open, setOpen] = useState(false);
 
-  const handleExercisesNavigate = () => {
-    navigate("/exercises");
-  };
-
-  const handleAnalyticsNavigate = () => {
-    navigate("/analytics");
-  };
-
-  const handleSettingsNavigate = () => {
-    navigate("/settings");
-  };
-
-  const handleBodyMetricsNavigate = () => {
-    navigate("/body-metrics");
-  };
-
-  const handleActivityNavigate = () => {
-    navigate("/activity");
+  const handleNavigate = (path: string) => {
+    setOpen(false);
+    navigate(path);
   };
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button variant="outline">
           <Menu />
@@ -54,35 +38,17 @@ export const ProfileDropDownMenu = () => {
           <Button
             variant="ghost"
             className="justify-start"
-            onClick={handleTimerNavigate}
+            onClick={() => handleNavigate("/timer")}
           >
             <TimerIcon />
             <div>Таймер</div>
-          </Button>
-          <Separator />
-          <Button
-            variant="ghost"
-            className="justify-start"
-            onClick={handleExercisesNavigate}
-          >
-            <ScrollText />
-            <div>Список упражнений</div>
-          </Button>
-          <Separator />
-          <Button
-            variant="ghost"
-            className="justify-start"
-            onClick={handleAnalyticsNavigate}
-          >
-            <ChartColumnBig />
-            <div>Аналитика</div>
           </Button>
 
           <Separator />
           <Button
             variant="ghost"
             className="justify-start"
-            onClick={handleBodyMetricsNavigate}
+            onClick={() => handleNavigate("/body-metrics")}
           >
             <Ruler />
             <div>Параметры тела</div>
@@ -92,17 +58,35 @@ export const ProfileDropDownMenu = () => {
           <Button
             variant="ghost"
             className="justify-start"
-            onClick={handleActivityNavigate}
+            onClick={() => handleNavigate("/activity")}
           >
             <Activity />
             <div>Активность</div>
+          </Button>
+          <Separator />
+          <Button
+            variant="ghost"
+            className="justify-start"
+            onClick={() => handleNavigate("/exercises")}
+          >
+            <ScrollText />
+            <div>Список упражнений</div>
+          </Button>
+          <Separator />
+          <Button
+            variant="ghost"
+            className="justify-start"
+            onClick={() => handleNavigate("/analytics")}
+          >
+            <ChartColumnBig />
+            <div>Аналитика</div>
           </Button>
 
           <Separator />
           <Button
             variant="ghost"
             className="justify-start"
-            onClick={handleSettingsNavigate}
+            onClick={() => handleNavigate("/settings")}
           >
             <Cog />
             <div>Настройки</div>

@@ -1,7 +1,11 @@
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts";
 import type { MuscleBalance } from "@/entities/analytics";
 import { AnalyticsCard, AnalyticsSectionTitle } from "@/shared/ui/analytics";
-import { ChartContainer, type ChartConfig } from "@/shared/ui/shadCNComponents/ui/chart";
+import {
+  ChartContainer,
+  type ChartConfig,
+} from "@/shared/ui/shadCNComponents/ui/chart";
+import { Divide } from "lucide-react";
 
 interface AnalyticsMuscleBalanceCardProps {
   muscleBalance: MuscleBalance;
@@ -27,10 +31,13 @@ export const AnalyticsMuscleBalanceCard = ({
       <AnalyticsSectionTitle subtitle="Доля нагрузки по группам">
         Мышечный баланс
       </AnalyticsSectionTitle>
-      <div className="grid gap-4 sm:grid-cols-[200px_1fr] sm:items-center">
-        <ChartContainer config={chartConfig} className="mx-auto h-40 w-full max-w-[220px]">
+      <div className="grid gap-4 grid-cols-[1fr_1fr] sm:items-center">
+        <ChartContainer
+          config={chartConfig}
+          className="mx-auto h-40 w-full max-w-[220px]"
+        >
           <RadarChart data={radarData}>
-            <PolarGrid stroke="rgba(255,255,255,0.2)" />
+            <PolarGrid stroke="var(--border)" />
             <PolarAngleAxis
               dataKey="muscle"
               tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
@@ -43,16 +50,20 @@ export const AnalyticsMuscleBalanceCard = ({
             />
           </RadarChart>
         </ChartContainer>
+
         <div className="grid gap-2">
           {muscleBalance.items.map((item) => (
-            <div key={item.muscle} className="grid grid-cols-[minmax(84px,1fr)_1fr_auto] items-center gap-2">
-              <span className="text-xs text-muted-foreground">{item.muscle}</span>
-              <div className="h-2 rounded-full bg-[rgba(255,255,255,0.08)]">
-                <div
-                  className="h-2 rounded-full bg-primary"
-                  style={{ width: `${Math.max(4, item.percent)}%` }}
-                />
-              </div>
+            <div
+              key={item.muscle}
+              className="grid grid-cols-[80px_1fr_auto] items-center gap-2"
+            >
+              <span className="text-xs text-muted-foreground">
+                {item.muscle}
+              </span>
+              <div
+                className="h-2 rounded-full bg-primary"
+                style={{ width: `${Math.max(4, item.percent)}%` }}
+              />
               <span className="text-xs font-semibold text-primary">
                 {item.percent.toFixed(0)}%
               </span>

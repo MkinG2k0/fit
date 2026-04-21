@@ -41,7 +41,7 @@ export const AnalyticsHeroCard = ({
       <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <AnalyticsSectionTitle
           className="mb-0 min-w-0"
-          // subtitle="Общий тоннаж за период"
+          subtitle="Общий тоннаж за период"
         >
           Объём
         </AnalyticsSectionTitle>

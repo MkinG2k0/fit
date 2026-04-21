@@ -17,17 +17,20 @@ const DAY_ENTRIES = [
 ];
 
 const intensityClassNames = [
-  "bg-[rgba(255,255,255,0.06)]",
-  "bg-[rgba(245,130,32,0.24)]",
-  "bg-[rgba(245,130,32,0.4)]",
-  "bg-[rgba(245,130,32,0.58)]",
-  "bg-[rgba(245,130,32,0.78)]",
+  "bg-primary/8",
+  "bg-primary/24",
+  "bg-primary/40",
+  "bg-primary/58",
+  "bg-primary/78",
 ];
 
 export const AnalyticsActivityHeatmapCard = ({
   heatmap,
 }: AnalyticsActivityHeatmapCardProps) => {
-  const weekIndexes = Array.from({ length: heatmap.weeks }, (_, weekIndex) => weekIndex);
+  const weekIndexes = Array.from(
+    { length: heatmap.weeks },
+    (_, weekIndex) => weekIndex,
+  );
   const cellsByPosition = new Map(
     heatmap.cells.map((cell) => [`${cell.weekIndex}-${cell.dayIndex}`, cell]),
   );
@@ -50,18 +53,25 @@ export const AnalyticsActivityHeatmapCard = ({
         </div>
         <div
           className="grid gap-1.5"
-          style={{ gridTemplateColumns: `repeat(${heatmap.weeks}, minmax(0, 1fr))` }}
+          style={{
+            gridTemplateColumns: `repeat(${heatmap.weeks}, minmax(0, 1fr))`,
+          }}
         >
           {weekIndexes.map((weekIndex) => (
             <div key={`week-${weekIndex}`} className="grid gap-1.5">
               {DAY_ENTRIES.map((day) => {
-                const cell = cellsByPosition.get(`${weekIndex}-${day.dayIndex}`);
+                const cell = cellsByPosition.get(
+                  `${weekIndex}-${day.dayIndex}`,
+                );
                 const intensity = cell?.intensity ?? 0;
                 return (
                   <div
                     key={`${weekIndex}-${day.id}`}
                     title={`${cell?.dateKey ?? "-"} • ${cell?.sessions ?? 0} сессий`}
-                    className={cn("h-4 rounded-[4px]", intensityClassNames[intensity])}
+                    className={cn(
+                      "h-4 rounded-sm",
+                      intensityClassNames[intensity],
+                    )}
                   />
                 );
               })}
