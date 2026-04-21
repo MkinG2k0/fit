@@ -96,12 +96,11 @@ export const AllExercises = () => {
         <div className={"flex justify-center items-center"}>
           <Popover open={openAddPopover} onOpenChange={setOpenAddPopover}>
             <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="fixed right-0 bottom-0 left-1/2 mb-8 -translate-x-1/2 justify-center border border-black bg-white p-6 text-xl text-black"
-              >
-                Создать
-              </Button>
+              <div className="fixed right-0 bottom-0 p-2 text-xl w-full max-w-[800px] mx-auto">
+                <Button variant="outline" className="w-full p-6">
+                  Создать
+                </Button>
+              </div>
             </PopoverTrigger>
             <PopoverContent className="w-64 p-2" align="center">
               <div className="flex flex-col gap-2">

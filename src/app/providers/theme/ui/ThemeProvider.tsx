@@ -1,5 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 import { useThemeStore, type ThemeMode } from "@/entities/theme";
+import { syncCapacitorStatusBarStyle } from "@/shared/lib/capacitorSystemBars";
 
 interface ThemeProviderProps {
   children: ReactNode;
@@ -47,10 +48,19 @@ const applyThemeMode = (themeMode: ThemeMode) => {
   if (customThemeClassName) {
     rootElement.classList.add(customThemeClassName);
   }
+
+  syncCapacitorStatusBarStyle(shouldUseDarkTheme);
 };
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const themeMode = useThemeStore((state) => state.themeMode);
+
+  useEffect(() => {
+    const unsub = useThemeStore.persist.onFinishHydration(() => {
+      applyThemeMode(useThemeStore.getState().themeMode);
+    });
+    return unsub;
+  }, []);
 
   useEffect(() => {
     applyThemeMode(themeMode);

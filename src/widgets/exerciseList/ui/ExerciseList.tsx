@@ -62,7 +62,7 @@ export const ExerciseList = () => {
     <div className="relative flex min-h-0 flex-1 flex-col">
       <div
         className={
-          "min-h-0 flex flex-1 flex-col gap-2 overflow-x-hidden overflow-y-auto"
+          "min-h-0 flex flex-1 flex-col gap-2 overflow-x-hidden overflow-y-auto pb-[calc(5.75rem+env(safe-area-inset-bottom,0px))]"
         }
       >
         {exerciseArray.length > 0 ? (
@@ -178,9 +178,8 @@ export const ExerciseList = () => {
             </motion.div>
           ))}
         </AnimatePresence>
-        <div className={"mb-26"}></div>
       </div>
-      <div className={"fixed bottom-0 left-0 right-0 p-2"}>
+      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-border/60 bg-background px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))]">
         <AddExercise />
       </div>
     </div>

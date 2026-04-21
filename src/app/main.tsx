@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { runStorageMigration } from "@/shared/lib";
+import { initCapacitorEdgeToEdgeChrome } from "@/shared/lib/capacitorSystemBars";
 import "./styles/index.css";
 import { registerServiceWorker } from "./providers/pwa/register.ts";
 import { ThemeProvider } from "./providers/theme";
@@ -9,6 +10,7 @@ import { WorkoutCaloriesRecalculationInit } from "./providers/WorkoutCaloriesRec
 import { OnboardingNavigation } from "./providers/OnboardingNavigation";
 import { AppContent } from "./AppContent.tsx";
 
+initCapacitorEdgeToEdgeChrome();
 registerServiceWorker();
 void runStorageMigration();
 

@@ -4,6 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 #root {
+  min-height: 100dvh;
+  height: 100%;
   font-family: "Roboto Condensed", sans-serif !important;
 }
 
@@ -29,6 +31,12 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  min-height: 100dvh;
+  height: 100%;
+}
+
+html {
+  background-color: var(--background);
 }
 
 .disable-dbl-tap-zoom {

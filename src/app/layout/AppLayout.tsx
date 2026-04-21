@@ -24,7 +24,13 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   const pageTitle = PAGE_TITLES[pathname] ?? "Тренировки";
 
   return (
-    <div className="flex h-dvh flex-col overflow-x-hidden overflow-y-auto gap-2 p-2 bg-background text-foreground pb-4">
+    <div
+      className="flex h-dvh min-h-dvh flex-col overflow-x-hidden overflow-y-auto gap-2 bg-background text-foreground
+    pt-[max(0.75rem,env(safe-area-inset-top,0px))]
+    pr-[max(0.5rem,env(safe-area-inset-right,0px))]
+    pb-[max(1rem,env(safe-area-inset-bottom,0px))]
+    pl-[max(0.5rem,env(safe-area-inset-left,0px))]"
+    >
       <Header date={!isHomePage} title={pageTitle} navigateBack={isHomePage} />
       {children}
     </div>
