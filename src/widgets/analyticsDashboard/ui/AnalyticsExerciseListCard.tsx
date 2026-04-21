@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import type { ExerciseTrendRow } from "@/entities/analytics";
+import { formatTonnageParts } from "@/shared/lib";
 import { AnalyticsCard, AnalyticsSectionTitle } from "@/shared/ui/analytics";
 import { Input } from "@/shared/ui/shadCNComponents/ui/input";
 import { AnalyticsExerciseDetailsDialog } from "./AnalyticsExerciseDetailsDialog";
@@ -82,33 +83,37 @@ export const AnalyticsExerciseListCard = ({
             Упражнения не найдены
           </div>
         ) : (
-          visibleRows.map((row) => (
-            <button
-              key={row.id}
-              type="button"
-              onClick={() => handleRowClick(row)}
-              className="grid grid-cols-[1fr_auto] items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2"
-            >
-              <div className="flex flex-col min-w-0">
-                <div className="truncate text-left text-sm font-semibold text-foreground">
-                  {row.name}
+          visibleRows.map((row) => {
+            const tonnage = formatTonnageParts(row.tonnage);
+
+            return (
+              <button
+                key={row.id}
+                type="button"
+                onClick={() => handleRowClick(row)}
+                className="grid grid-cols-[1fr_auto] items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2"
+              >
+                <div className="flex flex-col min-w-0">
+                  <div className="truncate text-left text-sm font-semibold text-foreground">
+                    {row.name}
+                  </div>
+                  <div className="text-xs text-left not-only:text-muted-foreground">
+                    {row.sessions} тренировок
+                  </div>
                 </div>
-                <div className="text-xs text-left not-only:text-muted-foreground">
-                  {row.sessions} тренировок
+                <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+                  <AnalyticsExerciseSparkline
+                    trendPoints={row.trend}
+                    className="h-8 w-12 shrink-0 sm:w-16"
+                  />
+                  <p className="text-lg font-bold text-primary">
+                    {tonnage.value}
+                    <span className="text-sm">{tonnage.unit}</span>
+                  </p>
                 </div>
-              </div>
-              <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-                <AnalyticsExerciseSparkline
-                  trendPoints={row.trend}
-                  className="h-8 w-12 shrink-0 sm:w-16"
-                />
-                <p className="text-lg font-bold text-primary">
-                  {(row.tonnage / 1000).toFixed(1)}
-                  <span className="text-sm">т</span>
-                </p>
-              </div>
-            </button>
-          ))
+              </button>
+            );
+          })
         )}
       </div>
       {shouldShowToggleButton && (

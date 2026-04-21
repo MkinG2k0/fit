@@ -1,5 +1,5 @@
 import type { AnalyticsPeriod, DashboardAnalytics } from "@/entities/analytics";
-import { formatTonnageInTons } from "@/features/analyticsPeriodCompare/model/formatPeriodComparison";
+import { formatTonnageParts } from "@/shared/lib";
 import { AnalyticsCard, AnalyticsSectionTitle } from "@/shared/ui/analytics";
 import { cn } from "@/shared/ui/lib/utils";
 import { AnalyticsPeriodSegmentedControl } from "./AnalyticsPeriodSegmentedControl";
@@ -28,6 +28,7 @@ export const AnalyticsHeroCard = ({
   onPeriodChange,
   analytics,
 }: AnalyticsHeroCardProps) => {
+  const totalTonnage = formatTonnageParts(summary.volume.totalTonnage);
   const deltaLabel = formatDelta(comparison.deltaPercent);
   const deltaClassName =
     comparison.delta > 0
@@ -48,9 +49,9 @@ export const AnalyticsHeroCard = ({
         <div className="flex gap-2 justify-between">
           <div>
             <p className="text-3xl font-extrabold tabular-nums sm:text-5xl">
-              {formatTonnageInTons(summary.volume.totalTonnage)}
+              {totalTonnage.value}
               <span className="ml-2 text-lg font-semibold text-muted-foreground">
-                т
+                {totalTonnage.unit}
               </span>
             </p>
             <p className={cn("mt-2 text-sm font-medium", deltaClassName)}>

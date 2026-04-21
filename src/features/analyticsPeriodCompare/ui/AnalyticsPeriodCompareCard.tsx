@@ -1,9 +1,9 @@
 import type { AnalyticsPeriod, PeriodComparison } from "@/entities/analytics";
 import { AnalyticsCard, AnalyticsSectionTitle } from "@/shared/ui/analytics";
+import { formatTonnage } from "@/shared/lib";
 import { cn } from "@/shared/ui/lib/utils";
 import {
   formatPeriodDelta,
-  formatTonnageInTons,
   getPeriodLabel,
 } from "../model/formatPeriodComparison";
 
@@ -32,13 +32,13 @@ export const AnalyticsPeriodCompareCard = ({
         <div className="flex items-center justify-between gap-2 text-sm">
           <span className="text-muted-foreground">Текущий период</span>
           <span className="font-semibold text-foreground">
-            {formatTonnageInTons(comparison.currentValue)} т
+            {formatTonnage(comparison.currentValue)}
           </span>
         </div>
         <div className="flex items-center justify-between gap-2 text-sm">
           <span className="text-muted-foreground">Прошлый период</span>
           <span className="font-semibold text-foreground">
-            {formatTonnageInTons(comparison.previousValue)} т
+            {formatTonnage(comparison.previousValue)}
           </span>
         </div>
         <div className="flex items-start justify-between gap-2 text-sm">
@@ -53,7 +53,7 @@ export const AnalyticsPeriodCompareCard = ({
                   : "text-muted-foreground",
             )}
           >
-            {deltaText.signedDelta} т ({deltaText.percent})
+            {deltaText.signedDelta} ({deltaText.percent})
           </span>
         </div>
       </div>

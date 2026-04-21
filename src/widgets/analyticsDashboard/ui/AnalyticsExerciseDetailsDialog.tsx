@@ -1,5 +1,6 @@
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import type { ExerciseTrendRow } from "@/entities/analytics";
+import { formatTonnage } from "@/shared/lib";
 import {
   Dialog,
   DialogContent,
@@ -73,7 +74,7 @@ export const AnalyticsExerciseDetailsDialog = ({
               tickLine={false}
               axisLine={false}
               width={38}
-              tickFormatter={(value) => `${(Number(value) / 1000).toFixed(1)}т`}
+              tickFormatter={(value) => formatTonnage(Number(value))}
             />
             <ChartTooltip
               cursor={false}
@@ -102,7 +103,7 @@ export const AnalyticsExerciseDetailsDialog = ({
             <div className="rounded-lg border border-border bg-muted/30 px-3 py-2 flex-auto">
               <p className="text-[11px] text-muted-foreground">Всего тоннаж</p>
               <p className="text-base font-semibold text-primary">
-                {(row.tonnage / 1000).toFixed(1)}т
+                {formatTonnage(row.tonnage)}
               </p>
             </div>
             <div className="rounded-lg border border-border bg-muted/30 px-3 py-2 flex-auto">
@@ -117,13 +118,13 @@ export const AnalyticsExerciseDetailsDialog = ({
               Средний тоннаж за тренировку
             </p>
             <p className="text-base font-semibold text-foreground">
-              {(averageTonnagePerSession / 1000).toFixed(1)}т
+              {formatTonnage(averageTonnagePerSession)}
             </p>
           </div>
           <div className="rounded-lg border border-border bg-muted/30 px-3 py-2">
             <p className="text-[11px] text-muted-foreground">Пиковый день</p>
             <p className="text-base font-semibold text-foreground">
-              {(peakDayTonnage / 1000).toFixed(1)}т
+              {formatTonnage(peakDayTonnage)}
             </p>
             <p className="text-[11px] text-muted-foreground">
               {activeDaysCount} активных дней

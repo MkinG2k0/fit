@@ -1,4 +1,5 @@
 import type { AnalyticsPeriod, PeriodComparison } from "@/entities/analytics";
+import { formatTonnage } from "@/shared/lib";
 
 const PERIOD_LABEL: Record<AnalyticsPeriod, string> = {
   "7d": "7 дней",
@@ -14,15 +15,11 @@ const formatDeltaSign = (value: number) => {
   return "";
 };
 
-export const formatTonnageInTons = (valueInKg: number) => {
-  const tons = valueInKg / 1000;
-  return tons.toFixed(3).replace(/\.?0+$/, "");
-};
-
 export const getPeriodLabel = (period: AnalyticsPeriod) => PERIOD_LABEL[period];
 
 export const formatPeriodDelta = (comparison: PeriodComparison) => {
-  const signedDelta = `${formatDeltaSign(comparison.delta)}${formatTonnageInTons(comparison.delta)}`;
+  const absDelta = Math.abs(comparison.delta);
+  const signedDelta = `${formatDeltaSign(comparison.delta)}${formatTonnage(absDelta)}`;
   const percent =
     comparison.deltaPercent === null
       ? "новый период"

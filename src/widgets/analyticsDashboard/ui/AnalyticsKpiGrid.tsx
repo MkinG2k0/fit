@@ -1,4 +1,5 @@
 import type { ExerciseAnalyticsSummary } from "@/entities/analytics";
+import { formatTonnage } from "@/shared/lib";
 import {
   Card,
   CardContent,
@@ -24,10 +25,10 @@ export const AnalyticsKpiGrid = ({ summary }: AnalyticsKpiGridProps) => {
     {
       id: "total-tonnage",
       metric: "Объем",
-      value: `${toFixed(summary.volume.totalTonnage)} кг`,
-      details: `Средний тоннаж за день: ${toFixed(
+      value: formatTonnage(summary.volume.totalTonnage),
+      details: `Средний тоннаж за день: ${formatTonnage(
         summary.volume.averageTonnagePerTrainingDay,
-      )} кг`,
+      )}`,
     },
     {
       id: "max-weight",

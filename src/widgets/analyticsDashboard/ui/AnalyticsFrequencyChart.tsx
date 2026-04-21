@@ -1,5 +1,6 @@
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis } from "recharts";
 import type { PeriodComparison, TrendPoint } from "@/entities/analytics";
+import { formatTonnage } from "@/shared/lib";
 import {
   Card,
   CardContent,
@@ -63,7 +64,7 @@ export const AnalyticsFrequencyChart = ({
           </div>
           <div className="rounded-md border p-2">
             <div className="text-xs text-muted-foreground">Средний объем</div>
-            <div className="text-lg font-semibold">{avgTonnage.toFixed(0)} кг</div>
+            <div className="text-lg font-semibold">{formatTonnage(avgTonnage)}</div>
           </div>
           <div className="rounded-md border p-2">
             <div className="text-xs text-muted-foreground">Изм. к прошлому</div>

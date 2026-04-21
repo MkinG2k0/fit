@@ -38,7 +38,7 @@ export const ExerciseSetRow = ({
   return (
     <div
       className={cn(
-        "grid w-full items-center gap-3",
+        "grid w-full items-center gap-3 max-w-[800px]",
         showKcalColumn
           ? "grid-cols-[2.25rem_minmax(0,1fr)_minmax(0,1fr)_3rem_2.25rem]"
           : "grid-cols-[2.25rem_minmax(0,1fr)_minmax(0,1fr)_2.25rem]",

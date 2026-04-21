@@ -82,7 +82,7 @@ export const ExerciseBody = ({
   }, [addSetToExercise, exercise]);
 
   return (
-    <div className="flex flex-col gap-2 p-4 pt-0 min-w-[373px] max-w-[738px]">
+    <div className="flex flex-col w-full gap-2 p-4 pt-0 max-w-[800px]">
       {lastSession !== null ? (
         <p
           className="w-full px-4 text-center text-xs leading-snug text-muted-foreground"
@@ -91,28 +91,31 @@ export const ExerciseBody = ({
           Прошлый раз, {lastSession.dateLabel}: {lastSession.setsSummary}
         </p>
       ) : null}
-      <div
-        className={cn(
-          "grid w-full items-center gap-2",
-          showCaloriesUi
-            ? "grid-cols-[2.25rem_minmax(0,1fr)_minmax(0,1fr)_3rem_2.25rem]"
-            : "grid-cols-[2.25rem_minmax(0,1fr)_minmax(0,1fr)_2.25rem]",
-        )}
-      >
-        <span className="w-1" />
-        <span className="min-w-0 text-center text-xs font-semibold leading-tight text-muted-foreground">
-          Кол-во
-        </span>
-        <span className="min-w-0 text-center text-xs font-semibold leading-tight text-muted-foreground">
-          Кг
-        </span>
-        {showCaloriesUi ? (
+
+      {exercise.sets.length > 0 && (
+        <div
+          className={cn(
+            "grid w-full items-center gap-2",
+            showCaloriesUi
+              ? "grid-cols-[2.25rem_minmax(0,1fr)_minmax(0,1fr)_3rem_2.25rem]"
+              : "grid-cols-[2.25rem_minmax(0,1fr)_minmax(0,1fr)_2.25rem]",
+          )}
+        >
+          <span className="w-1" />
           <span className="min-w-0 text-center text-xs font-semibold leading-tight text-muted-foreground">
-            Ккал
+            Повторений
           </span>
-        ) : null}
-        <span className="w-1" />
-      </div>
+          <span className="min-w-0 text-center text-xs font-semibold leading-tight text-muted-foreground">
+            Кг
+          </span>
+          {showCaloriesUi ? (
+            <span className="min-w-0 text-center text-xs font-semibold leading-tight text-muted-foreground">
+              Ккал
+            </span>
+          ) : null}
+          <span className="w-1" />
+        </div>
+      )}
 
       <AnimatePresence>
         {exercise.sets.map((set, idx) => {

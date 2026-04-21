@@ -5,7 +5,6 @@ import {
   ChartContainer,
   type ChartConfig,
 } from "@/shared/ui/shadCNComponents/ui/chart";
-import { Divide } from "lucide-react";
 
 interface AnalyticsMuscleBalanceCardProps {
   muscleBalance: MuscleBalance;

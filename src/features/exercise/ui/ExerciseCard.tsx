@@ -1,7 +1,7 @@
 import type { PanInfo } from "motion";
 import { AnimatePresence } from "motion/react";
 import { useState, useEffect, useMemo, useRef, type MouseEvent } from "react";
-import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
+import { ChartColumnBig, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { useCalendarStore } from "@/entities/calendarDay";
 import {
   categoryContainsExerciseName,
@@ -10,7 +10,7 @@ import {
   useExerciseStore,
 } from "@/entities/exercise";
 import { AppNavIcon } from "@/shared/ui";
-import { cn } from "@shared/lib";
+import { cn, formatTonnageParts } from "@shared/lib";
 import { appStorage } from "@/shared/lib/storageAdapter";
 import * as motion from "motion/react-client";
 import { ExerciseBody } from "./ExerciseBody";
@@ -27,25 +27,6 @@ interface ExerciseCardProps {
 
 const SWIPE_DISTANCE_THRESHOLD = 100;
 const DRAG_CLICK_SUPPRESS_DELAY_MS = 120;
-
-const formatTotalLiftedKg = (totalKg: number): string => {
-  if (!Number.isFinite(totalKg) || totalKg <= 0) {
-    return "0";
-  }
-
-  const roundedTenths = Math.round(totalKg * 10) / 10;
-
-  if (Number.isInteger(roundedTenths)) {
-    return roundedTenths.toLocaleString("ru-RU", {
-      maximumFractionDigits: 0,
-    });
-  }
-
-  return roundedTenths.toLocaleString("ru-RU", {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
-  });
-};
 
 export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
   const showCaloriesUi = useWorkoutCaloriesUiEnabled();
@@ -154,7 +135,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
     }, 0);
   }, [exercise.sets]);
 
-  const totalLiftedLabel = formatTotalLiftedKg(totalLiftedKg);
+  const totalLifted = formatTonnageParts(totalLiftedKg);
 
   const totalKcal = useMemo(() => {
     return exercise.sets.reduce((sum, set) => {
@@ -184,7 +165,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
         transition={showHint ? { duration: 1.2, ease: "easeInOut" } : undefined}
       >
         <div className="pointer-events-none flex w-10 items-center h-full justify-center absolute -left-11.25 top-0 z-10">
-          <AppNavIcon variant="chart" />
+          <ChartColumnBig className="text-muted-foreground" />
         </div>
         <div
           className="relative flex w-full max-w-full self-stretch flex-col items-center justify-center rounded-xl border bg-card text-card-foreground shadow-sm"
@@ -195,11 +176,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
             className="flex w-full min-w-0 items-center justify-between gap-1 overflow-hidden"
           >
             <div className="flex min-w-0 flex-1 flex-row items-center overflow-hidden">
-              <div
-                className={cn(
-                  "flex items-center justify-center p-2",
-                )}
-              >
+              <div className={cn("flex items-center justify-center p-2")}>
                 <ExerciseCategoryIcon
                   category={exercise.category}
                   iconId={exercise.iconId}
@@ -235,9 +212,9 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
               }
             >
               <span className="text-base font-bold text-primary font-numeric">
-                {totalLiftedLabel}
+                {totalLifted.value}
               </span>
-              <span className="text-xs font-semibold">кг</span>
+              <span className="text-xs font-semibold">{totalLifted.unit}</span>
               {showCaloriesUi && totalKcal > 0 ? (
                 <>
                   <span
@@ -266,6 +243,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
                 style={{ overflow: "hidden" }}
+                className="w-full max-w-[800px]"
               >
                 <ExerciseBody
                   exercise={exercise}

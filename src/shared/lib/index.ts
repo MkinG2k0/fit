@@ -1,6 +1,7 @@
 export * from "./createRandomUuid";
 export * from "./publicAssetUrl";
 export * from "./classMerge";
+export * from "./formatTonnage";
 export * from "./stringFormat";
 export * from "./storage";
 export * from "./days";
