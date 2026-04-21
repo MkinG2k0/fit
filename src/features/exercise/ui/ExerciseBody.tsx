@@ -2,7 +2,6 @@ import { Trash2 } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
 import { type ChangeEvent, useCallback, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { useCalendarStore } from "@/entities/calendarDay";
 import type { Exercise, ExerciseSet } from "@/entities/exercise";
@@ -17,7 +16,6 @@ import {
   DEFAULT_SET_DURATION_SEC,
   getSetRowCalorieDisplay,
   getSetTimeRange,
-  useSetCalorieSession,
 } from "../calories";
 import { ExerciseSetRow } from "./ExerciseSetRow";
 
@@ -30,21 +28,12 @@ export const ExerciseBody = ({
   exercise,
   onDeleteRequested,
 }: ExerciseBodyProps) => {
-  const navigate = useNavigate();
   const lastSession = useLastExerciseSession(exercise.name);
   const showCaloriesUi = useWorkoutCaloriesUiEnabled();
 
   const onChangeHandler = useCalendarStore((store) => store.setExerciseValues);
   const addSetToExercise = useCalendarStore((store) => store.addSetToExercise);
   const addSetGuardRef = useRef(false);
-
-  const setCalorieSession = useSetCalorieSession({
-    exercise,
-    enabled: showCaloriesUi,
-    onProfileRequired: () => {
-      void navigate("/settings?calorieProfile=1");
-    },
-  });
 
   const INPUT_CLASSNAME =
     "font-numeric shadow-none ring-0 outline-none focus-visible:ring-0 focus-visible:ring-offset-0 text-center text-2xl text-foreground placeholder:text-muted-foreground";
@@ -68,34 +57,32 @@ export const ExerciseBody = ({
       return;
     }
     addSetGuardRef.current = true;
+    try {
+      const lastSet = exercise.sets.at(-1);
+      const previousEnd =
+        lastSet?.endTime !== undefined && lastSet.endTime !== ""
+          ? new Date(lastSet.endTime)
+          : null;
 
-    const lastSet = exercise.sets.at(-1);
-    const previousEnd =
-      lastSet?.endTime !== undefined && lastSet.endTime !== ""
-        ? new Date(lastSet.endTime)
-        : null;
+      const endNow = new Date();
+      const defaultSec =
+        useUserStore.getState().defaultSetDurationSec ?? DEFAULT_SET_DURATION_SEC;
+      const { startTime, endTime } = getSetTimeRange(
+        previousEnd,
+        defaultSec,
+        endNow,
+      );
 
-    const endNow = new Date();
-    const defaultSec =
-      useUserStore.getState().defaultSetDurationSec ?? DEFAULT_SET_DURATION_SEC;
-    const { startTime, endTime } = getSetTimeRange(
-      previousEnd,
-      defaultSec,
-      endNow,
-    );
-
-    const newSetId = addSetToExercise(exercise, {
-      weight: lastSet?.weight ?? 0,
-      reps: lastSet?.reps ?? 0,
-      endTime: endTime.toISOString(),
-    });
-
-    void setCalorieSession
-      .runSetCaloriesAfterAdd(newSetId, { startTime, endTime })
-      .finally(() => {
-        addSetGuardRef.current = false;
+      addSetToExercise(exercise, {
+        weight: lastSet?.weight ?? 0,
+        reps: lastSet?.reps ?? 0,
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString(),
       });
-  }, [addSetToExercise, exercise, setCalorieSession]);
+    } finally {
+      addSetGuardRef.current = false;
+    }
+  }, [addSetToExercise, exercise]);
 
   return (
     <div className="flex flex-col gap-2 p-4 pt-0 min-w-[352px] max-w-[738px]">
@@ -124,10 +111,7 @@ export const ExerciseBody = ({
 
       <AnimatePresence>
         {exercise.sets.map((set, idx) => {
-          const calorieDisplay = getSetRowCalorieDisplay(
-            set,
-            setCalorieSession.phaseBySetId[set.id],
-          );
+          const calorieDisplay = getSetRowCalorieDisplay(set, undefined);
           return (
             <motion.div
               key={set.id}

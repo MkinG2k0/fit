@@ -1,5 +1,6 @@
 export const MAX_SET_DURATION_SEC = 300;
 export const DEFAULT_SET_DURATION_SEC = 60;
+export const END_TIME_BUFFER_SEC = 15;
 
 export interface SetTimeRange {
   startTime: Date;
@@ -15,17 +16,23 @@ export const getSetTimeRange = (
   defaultDurationSec: number = DEFAULT_SET_DURATION_SEC,
   now: Date = new Date(),
 ): SetTimeRange => {
-  const endTime = now;
+  const endTime = new Date(now.getTime() + END_TIME_BUFFER_SEC * 1000);
   let startTime: Date;
 
-  if (previousSetEndTime) {
+  if (
+    previousSetEndTime &&
+    Number.isFinite(previousSetEndTime.getTime()) &&
+    previousSetEndTime.getTime() < endTime.getTime()
+  ) {
     startTime = previousSetEndTime;
   } else {
-    startTime = new Date(endTime.getTime() - defaultDurationSec * 1000);
+    startTime = new Date(now.getTime() - defaultDurationSec * 1000);
   }
 
   const durationSec = (endTime.getTime() - startTime.getTime()) / 1000;
-  if (durationSec > MAX_SET_DURATION_SEC) {
+  if (!Number.isFinite(durationSec) || durationSec <= 0) {
+    startTime = new Date(endTime.getTime() - defaultDurationSec * 1000);
+  } else if (durationSec > MAX_SET_DURATION_SEC) {
     startTime = new Date(endTime.getTime() - MAX_SET_DURATION_SEC * 1000);
   }
 

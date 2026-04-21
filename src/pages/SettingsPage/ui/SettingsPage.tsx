@@ -49,6 +49,8 @@ export const SettingsPage = () => {
           </Card>
 
           <SettingsTransferCard />
+
+          <div className="mb-2"></div>
         </div>
       </div>
     </div>

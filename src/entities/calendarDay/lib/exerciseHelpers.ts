@@ -13,12 +13,12 @@ export const generateExercise = (
 ): Exercise => {
   return {
     sets: [
-      {
-        weight: 0,
-        reps: 0,
-        id: createRandomUuid(),
-        endTime: new Date().toISOString(),
-      },
+      // {
+      //   weight: 0,
+      //   reps: 0,
+      //   id: createRandomUuid(),
+      //   endTime: new Date().toISOString(),
+      // },
     ],
     id: createRandomUuid(),
     category: group,

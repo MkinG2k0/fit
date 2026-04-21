@@ -11,7 +11,7 @@ import type {
 } from "@/entities/exercise";
 import type { CalendarDay } from "../model/types";
 import { createRandomUuid } from "@/shared/lib";
-import { getDaysFromLocalStorage } from "@/shared/lib/storage";
+import { getDaysFromLocalStorage, saveDaysToLocalStorage } from "@/shared/lib/storage";
 import {
   generateExercise,
   getDateKeyAndOldExercises,
@@ -49,9 +49,17 @@ interface CalendarStore {
     setId: string,
     calories: SetCalories,
   ) => void;
+  applySetCaloriesBatchByDateKey: (
+    dateKey: string,
+    patches: Array<{
+      exerciseId: string;
+      setId: string;
+      calories: SetCalories;
+    }>,
+  ) => void;
   addSetToExercise: (
     exercise: Exercise,
-    payload: { weight: number; reps: number; endTime: string },
+    payload: { weight: number; reps: number; startTime: string; endTime: string },
   ) => string;
   deleteExercise: (exercise: Exercise) => void;
   deleteSet: (exercise: Exercise, exerciseSet: ExerciseSet) => void;
@@ -169,6 +177,60 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
       return { days: newDays };
     }),
 
+  applySetCaloriesBatchByDateKey: (dateKey, patches) =>
+    set((state) => {
+      if (patches.length === 0) {
+        return state;
+      }
+
+      const day = state.days[dateKey];
+      if (!day || day.exercises.length === 0) {
+        return state;
+      }
+
+      const patchMap = new Map<string, SetCalories>();
+      for (const patch of patches) {
+        patchMap.set(`${patch.exerciseId}:${patch.setId}`, patch.calories);
+      }
+
+      let isChanged = false;
+      const newExercises = day.exercises.map((exerciseItem) => {
+        let exerciseChanged = false;
+        const newSets = exerciseItem.sets.map((setItem) => {
+          const calories = patchMap.get(`${exerciseItem.id}:${setItem.id}`);
+          if (!calories) {
+            return setItem;
+          }
+          exerciseChanged = true;
+          return { ...setItem, calories };
+        });
+
+        if (!exerciseChanged) {
+          return exerciseItem;
+        }
+
+        isChanged = true;
+        return {
+          ...exerciseItem,
+          sets: newSets,
+        };
+      });
+
+      if (!isChanged) {
+        return state;
+      }
+
+      const newDays = {
+        ...state.days,
+        [dateKey]: {
+          ...day,
+          exercises: newExercises,
+        },
+      };
+      void saveDaysToLocalStorage(state.selectedDate, newDays);
+      return { days: newDays };
+    }),
+
   addSetToExercise: (exercise, payload) => {
     const newSetId = createRandomUuid();
     set((state) => {
@@ -186,6 +248,7 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
               id: newSetId,
               weight: payload.weight,
               reps: payload.reps,
+              startTime: payload.startTime,
               endTime: payload.endTime,
             },
           ],

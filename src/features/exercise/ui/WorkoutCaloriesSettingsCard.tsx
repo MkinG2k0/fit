@@ -26,7 +26,7 @@ interface WorkoutCaloriesSettingsCardProps {
 
 const CARD_CLASS = "gap-3 py-4";
 const CARD_HEADER_CLASS = "px-4";
-const CARD_CONTENT_CLASS = "px-4";
+const CARD_CONTENT_CLASS = "flex flex-col gap-3 px-4";
 const ROW_CLASS = "flex items-start gap-3 rounded-md border border-border p-3";
 
 export const WorkoutCaloriesSettingsCard = ({

@@ -14,6 +14,8 @@ export interface ExerciseSet {
   id: string;
   weight: number;
   reps: number;
+  /** ISO 8601 — начало окна для расчёта калорий подхода. */
+  startTime?: string;
   /** ISO 8601 — момент «Добавить подход» для цепочки окон ккал. */
   endTime?: string;
   calories?: SetCalories;
