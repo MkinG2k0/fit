@@ -1,4 +1,3 @@
-import { Loader2 } from "lucide-react";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { Badge } from "@/shared/ui/shadCNComponents/ui/badge";
 import { formatKcalOneDecimal, type SetRowCalorieDisplay } from "../calories";
@@ -42,17 +41,6 @@ export const ExerciseSetKcalCell = ({
           {isHr ? "HR" : "MET"}
         </Badge>
       </Button>
-    );
-  }
-
-  if (calorieDisplay.kind === "calculating") {
-    return (
-      <div className={kcalCellWrap}>
-        <Loader2
-          className="size-5 shrink-0 animate-spin text-muted-foreground"
-          aria-hidden
-        />
-      </div>
     );
   }
 

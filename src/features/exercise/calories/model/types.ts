@@ -1,5 +1,3 @@
-export type SetCalorieUiPhase = "calculating";
-
 export interface SetCalorieProfileInput {
   userWeightKg: number;
   userAge: number;

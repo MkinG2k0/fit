@@ -111,7 +111,7 @@ export const ExerciseBody = ({
 
       <AnimatePresence>
         {exercise.sets.map((set, idx) => {
-          const calorieDisplay = getSetRowCalorieDisplay(set, undefined);
+          const calorieDisplay = getSetRowCalorieDisplay(set);
           return (
             <motion.div
               key={set.id}
