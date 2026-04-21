@@ -30,8 +30,8 @@ export const ExerciseNameSelector = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <div className="flex w-full min-w-0 items-center gap-2 overflow-hidden px-0 text-md">
-        <span className="block flex-1 min-w-0 truncate text-left">
+      <div className="flex w-full min-w-0 items-center overflow-hidden px-0 text-md">
+        <span className="block min-w-0 truncate text-left">
           {exerciseName || "Выберите упражнение"}
         </span>
         {isEditable && (

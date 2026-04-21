@@ -82,7 +82,10 @@ export const ExerciseBody = ({
   }, [addSetToExercise, exercise]);
 
   return (
-    <div className="flex flex-col w-full gap-2 p-4 pt-0 max-w-[800px]">
+    <div
+      className="flex flex-col w-full gap-2 p-4 pt-0 max-w-[800px]"
+      onClick={(event) => event.stopPropagation()}
+    >
       {lastSession !== null ? (
         <p
           className="w-full px-4 text-center text-xs leading-snug text-muted-foreground"

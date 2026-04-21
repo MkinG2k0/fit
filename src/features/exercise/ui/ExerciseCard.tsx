@@ -9,7 +9,6 @@ import {
   type Exercise,
   useExerciseStore,
 } from "@/entities/exercise";
-import { AppNavIcon } from "@/shared/ui";
 import { cn, formatTonnageParts } from "@shared/lib";
 import { appStorage } from "@/shared/lib/storageAdapter";
 import * as motion from "motion/react-client";
@@ -170,12 +169,10 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
         <div
           className="relative flex w-full max-w-full self-stretch flex-col items-center justify-center rounded-xl border bg-card text-card-foreground shadow-sm"
           style={{ borderColor: exerciseColor }}
+          onClick={handleCardHeadClick}
         >
-          <div
-            onClick={handleCardHeadClick}
-            className="flex w-full min-w-0 items-center justify-between gap-1 overflow-hidden"
-          >
-            <div className="flex min-w-0 flex-1 flex-row items-center overflow-hidden">
+          <div className="flex w-full min-w-0 items-center justify-between ">
+            <div className="flex min-w-0 flex-1 flex-row items-center ">
               <div className={cn("flex items-center justify-center p-2")}>
                 <ExerciseCategoryIcon
                   category={exercise.category}
@@ -183,7 +180,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
                   className="size-11 shrink-0"
                 />
               </div>
-              <div className="flex min-w-0 flex-1 items-center overflow-hidden pl-2.5 text-base">
+              <div className="flex min-w-0 flex-1 items-center  text-base">
                 <ExerciseNameSelector
                   allExercises={allExercises}
                   exerciseName={exercise.name}
@@ -193,16 +190,22 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
                   onSelect={inputChangeHandler}
                 />
               </div>
-
-              {/*{exercise.presetName && (*/}
-              {/*  <div*/}
-              {/*    style={{ borderColor: exerciseColor }}*/}
-              {/*    className="rounded-full border bg-card px-1.5 py-0.5 text-xs text-card-foreground"*/}
-              {/*  >*/}
-              {/*    Пресет: {exercise.presetName}*/}
-              {/*  </div>*/}
-              {/*)}*/}
             </div>
+
+            {showCaloriesUi && totalKcal > 0 && (
+              <>
+                <span
+                  className="text-muted-foreground shrink-0 px-0.5"
+                  aria-hidden
+                >
+                  •
+                </span>
+                <span className="text-base font-bold text-primary font-numeric">
+                  {formatKcalOneDecimal(totalKcal)}
+                </span>
+                <span className="text-xs font-semibold">ккал</span>
+              </>
+            )}
             <div
               className="flex shrink-0 items-baseline gap-1 whitespace-nowrap text-muted-foreground"
               title={
@@ -215,20 +218,6 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
                 {totalLifted.value}
               </span>
               <span className="text-xs font-semibold">{totalLifted.unit}</span>
-              {showCaloriesUi && totalKcal > 0 ? (
-                <>
-                  <span
-                    className="text-muted-foreground shrink-0 px-0.5"
-                    aria-hidden
-                  >
-                    •
-                  </span>
-                  <span className="text-base font-bold text-primary font-numeric">
-                    {formatKcalOneDecimal(totalKcal)}
-                  </span>
-                  <span className="text-xs font-semibold">ккал</span>
-                </>
-              ) : null}
             </div>
             <div className="p-4">
               {isEditable ? <ChevronUp /> : <ChevronDown />}

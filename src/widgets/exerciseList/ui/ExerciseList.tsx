@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useMemo } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { AddExercise } from "@/features/addExercise";
 import { ExerciseCard } from "@/features/exercise";
 import { formatKcalOneDecimal } from "@/features/exercise/calories";
@@ -9,6 +10,7 @@ import { cn, formatTonnage } from "@shared/lib";
 
 export const ExerciseList = () => {
   const showCaloriesUi = useWorkoutCaloriesUiEnabled();
+  const [isWorkoutExtraOpen, setIsWorkoutExtraOpen] = useState(false);
   const days = useCalendarStore((state) => state.days);
   const selectedDate = useCalendarStore((state) => state.selectedDate);
   const loadDaysFromLocalStorage = useCalendarStore(
@@ -22,10 +24,16 @@ export const ExerciseList = () => {
   const workoutSummary = useMemo(() => {
     return exerciseArray.reduce(
       (acc, exercise) => {
+        acc.totalSets += exercise.sets.length;
+
         for (const set of exercise.sets) {
           const reps = Number.isFinite(set.reps) ? set.reps : 0;
           const weight = Number.isFinite(set.weight) ? set.weight : 0;
           acc.totalTonnage += reps * weight;
+          acc.totalReps += reps;
+          if (weight > acc.maxWeightKg) {
+            acc.maxWeightKg = weight;
+          }
 
           const setKcal = set.calories?.kcal;
           if (typeof setKcal === "number" && Number.isFinite(setKcal)) {
@@ -39,6 +47,9 @@ export const ExerciseList = () => {
         exerciseCount: exerciseArray.length,
         totalKcal: 0,
         totalTonnage: 0,
+        totalSets: 0,
+        totalReps: 0,
+        maxWeightKg: 0,
       },
     );
   }, [exerciseArray]);
@@ -55,10 +66,30 @@ export const ExerciseList = () => {
         }
       >
         {exerciseArray.length > 0 ? (
-          <div className="rounded-xl border border-border bg-card p-2.5 text-card-foreground shadow-sm">
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-              Общая информация о тренировке
-            </p>
+          <div
+            role="button"
+            tabIndex={0}
+            aria-expanded={isWorkoutExtraOpen}
+            aria-label="Общая информация о тренировке. Нажмите, чтобы показать или скрыть дополнительные показатели."
+            className="cursor-pointer rounded-xl border border-border bg-card p-2.5 text-card-foreground shadow-sm outline-none select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            onClick={() => setIsWorkoutExtraOpen((prev) => !prev)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                setIsWorkoutExtraOpen((prev) => !prev);
+              }
+            }}
+          >
+            <div className="flex w-full items-center justify-between gap-2 text-left">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                Общая информация о тренировке
+              </p>
+              {isWorkoutExtraOpen ? (
+                <ChevronUp className="size-4 shrink-0 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
+              )}
+            </div>
             <div
               className={cn(
                 "mt-2 grid gap-2",
@@ -92,6 +123,45 @@ export const ExerciseList = () => {
                 </p>
               </div>
             </div>
+            <AnimatePresence initial={false}>
+              {isWorkoutExtraOpen ? (
+                <motion.div
+                  key="workout-summary-extra"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2, ease: "easeInOut" }}
+                  style={{ overflow: "hidden" }}
+                >
+                  <div className="mt-2 grid grid-cols-3 gap-2">
+                    <div className="flex flex-col items-center justify-center gap-1 rounded-md border border-border/60 bg-muted/40 p-2 text-center">
+                      <span className="text-[10px] font-medium text-muted-foreground">
+                        Подходов
+                      </span>
+                      <span className="text-base leading-none font-bold text-primary font-numeric">
+                        {workoutSummary.totalSets}
+                      </span>
+                    </div>
+                    <div className="flex flex-col items-center justify-center gap-1 rounded-md border border-border/60 bg-muted/40 p-2 text-center">
+                      <span className="text-[10px] font-medium text-muted-foreground">
+                        Повторений
+                      </span>
+                      <span className="text-base leading-none font-bold text-primary font-numeric">
+                        {workoutSummary.totalReps}
+                      </span>
+                    </div>
+                    <div className="flex flex-col items-center justify-center gap-1 rounded-md border border-border/60 bg-muted/40 p-2 text-center">
+                      <span className="text-[10px] font-medium text-muted-foreground">
+                        Макс. вес
+                      </span>
+                      <span className="text-base leading-none font-bold text-primary font-numeric">
+                        {formatTonnage(workoutSummary.maxWeightKg)}
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
           </div>
         ) : null}
         <AnimatePresence>

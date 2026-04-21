@@ -1,6 +1,10 @@
 import dayjs from "dayjs";
 import type { CalendarDay } from "@/entities/calendarDay";
-import { appStorage, listWorkoutMonthKeys, registerWorkoutMonthKey } from "./storageAdapter";
+import {
+  appStorage,
+  listWorkoutMonthKeys,
+  registerWorkoutMonthKey,
+} from "./storageAdapter";
 
 /** Ключи месяцев тренировочного журнала в localStorage (`MM-YYYY`). */
 export const MONTH_YEAR_STORAGE_KEY_REGEX = /^(0[1-9]|1[0-2])-\d{4}$/;
@@ -16,6 +20,24 @@ const readMonthBucket = async (
   }
 
   return parsed as Record<string, CalendarDay>;
+};
+
+/** Параллельное чтение выбранных месяцев журнала (ключ `MM-YYYY`). */
+export const readWorkoutMonthBucketsForKeys = async (
+  monthKeys: string[],
+): Promise<Map<string, Record<string, CalendarDay>>> => {
+  const filtered = [...new Set(monthKeys)].filter((key) =>
+    MONTH_YEAR_STORAGE_KEY_REGEX.test(key),
+  );
+  if (filtered.length === 0) {
+    return new Map();
+  }
+  const entries = await Promise.all(
+    filtered.map(
+      async (key) => [key, await readMonthBucket(key)] as const,
+    ),
+  );
+  return new Map(entries);
 };
 
 export const getDaysFromLocalStorage = async (date: dayjs.Dayjs) => {
@@ -74,9 +96,10 @@ export const getAllExercisesFromStorage = async () => {
 };
 
 /** Снимок всех сохранённых месяцев журнала (объект дней по ключу `DD-MM-YYYY`). */
-export const readAllWorkoutMonthBuckets = async (): Promise<
-  Record<string, unknown> | null
-> => {
+export const readAllWorkoutMonthBuckets = async (): Promise<Record<
+  string,
+  unknown
+> | null> => {
   const keys = await listWorkoutMonthKeys(MONTH_YEAR_STORAGE_KEY_REGEX);
   if (keys.length === 0) {
     return null;
@@ -106,4 +129,3 @@ export const writeWorkoutMonthBucket = async (
   await appStorage.setJson(monthKey, bucket);
   await registerWorkoutMonthKey(monthKey, MONTH_YEAR_STORAGE_KEY_REGEX);
 };
-

@@ -2,26 +2,19 @@ import dayjs from "dayjs";
 import "dayjs/locale/ru";
 import type { CalendarDay } from "@/entities/calendarDay";
 import type { Exercise, ExerciseSet } from "@/entities/exercise";
-import { readAllWorkoutMonthBuckets } from "./storage";
+import { readWorkoutMonthBucketsForKeys } from "./storage";
 
 dayjs.locale("ru");
 
-const DAY_KEY_REGEX = /^(\d{2})-(\d{2})-(\d{4})$/;
 const REPS_WEIGHT_SEPARATOR = "×";
 const SET_DISPLAY_SEPARATOR = " · ";
+/** Ключ дня в бакете месяца журнала. */
+const DAY_KEY_FORMAT = "DD-MM-YYYY";
+/** Ключ месяца в storage. */
+const MONTH_KEY_FORMAT = "MM-YYYY";
 
 const normalizeExerciseName = (name: string): string =>
   name.trim().toLowerCase();
-
-const parseDayKey = (key: string): dayjs.Dayjs | null => {
-  const match = DAY_KEY_REGEX.exec(key);
-  if (!match) {
-    return null;
-  }
-  const [, dd, mm, yyyy] = match;
-  const parsed = dayjs(`${yyyy}-${mm}-${dd}`);
-  return parsed.isValid() ? parsed : null;
-};
 
 const isCalendarDay = (value: unknown): value is CalendarDay => {
   if (!value || typeof value !== "object") {
@@ -73,6 +66,59 @@ const pickExerciseOnDay = (
   return (withData.length > 0 ? withData[0] : matches[0]) ?? null;
 };
 
+/**
+ * Полуинтервал [oldestInclusive, beforeStart): все дни, которые попадают в окно
+ * «месяц назад от выбранной даты», не включая саму выбранную дату.
+ */
+const monthKeysTouchingLookbackWindow = (
+  oldestInclusive: dayjs.Dayjs,
+  beforeStart: dayjs.Dayjs,
+): string[] => {
+  const keys = new Set<string>();
+  for (
+    let cursor = oldestInclusive;
+    cursor.isBefore(beforeStart, "day");
+    cursor = cursor.add(1, "day")
+  ) {
+    keys.add(cursor.format(MONTH_KEY_FORMAT));
+  }
+  return [...keys];
+};
+
+/** Дни от вчера относительно `beforeStart` к `oldestInclusive`, новые первыми. */
+const lookbackDaysNewestFirst = (
+  beforeStart: dayjs.Dayjs,
+  oldestInclusive: dayjs.Dayjs,
+): dayjs.Dayjs[] => {
+  const days: dayjs.Dayjs[] = [];
+  for (
+    let day = beforeStart.subtract(1, "day");
+    !day.isBefore(oldestInclusive, "day");
+    day = day.subtract(1, "day")
+  ) {
+    days.push(day);
+  }
+  return days;
+};
+
+const toLastSessionOrSkip = (
+  day: dayjs.Dayjs,
+  exercise: Exercise,
+): LastExerciseSession | null => {
+  const summaryParts = exercise.sets
+    .map(formatSetCompact)
+    .filter((part) => part.length > 0);
+
+  if (summaryParts.length === 0) {
+    return null;
+  }
+
+  return {
+    dateLabel: day.format("D MMM"),
+    setsSummary: summaryParts.join(SET_DISPLAY_SEPARATOR),
+  };
+};
+
 export const findLastExerciseSession = async (
   exerciseName: string,
   beforeDate: dayjs.Dayjs,
@@ -83,56 +129,35 @@ export const findLastExerciseSession = async (
   }
 
   const beforeStart = beforeDate.startOf("day");
-  const buckets = await readAllWorkoutMonthBuckets();
-  if (!buckets) {
-    return null;
-  }
+  const oldestInclusive = beforeStart.subtract(1, "month").startOf("day");
 
-  let bestDay: dayjs.Dayjs | null = null;
-  let bestExercise: Exercise | null = null;
+  const monthKeys = monthKeysTouchingLookbackWindow(
+    oldestInclusive,
+    beforeStart,
+  );
+  const bucketsByMonth = await readWorkoutMonthBucketsForKeys(monthKeys);
 
-  for (const monthBucket of Object.values(buckets)) {
-    if (!monthBucket || typeof monthBucket !== "object") {
+  for (const day of lookbackDaysNewestFirst(beforeStart, oldestInclusive)) {
+    const monthBucket = bucketsByMonth.get(day.format(MONTH_KEY_FORMAT));
+    if (!monthBucket) {
       continue;
     }
 
-    for (const [dayKey, rawDay] of Object.entries(
-      monthBucket as Record<string, unknown>,
-    )) {
-      const day = parseDayKey(dayKey);
-      if (!day || !day.isBefore(beforeStart)) {
-        continue;
-      }
-      if (!isCalendarDay(rawDay)) {
-        continue;
-      }
+    const rawDay = monthBucket[day.format(DAY_KEY_FORMAT)] as unknown;
+    if (!isCalendarDay(rawDay)) {
+      continue;
+    }
 
-      const exercise = pickExerciseOnDay(rawDay.exercises, normalizedTarget);
-      if (!exercise) {
-        continue;
-      }
+    const exercise = pickExerciseOnDay(rawDay.exercises, normalizedTarget);
+    if (!exercise) {
+      continue;
+    }
 
-      if (!bestDay || day.isAfter(bestDay, "day")) {
-        bestDay = day;
-        bestExercise = exercise;
-      }
+    const session = toLastSessionOrSkip(day, exercise);
+    if (session) {
+      return session;
     }
   }
 
-  if (!bestDay || !bestExercise) {
-    return null;
-  }
-
-  const summaryParts = bestExercise.sets
-    .map(formatSetCompact)
-    .filter((part) => part.length > 0);
-
-  if (summaryParts.length === 0) {
-    return null;
-  }
-
-  return {
-    dateLabel: bestDay.format("D MMM"),
-    setsSummary: summaryParts.join(SET_DISPLAY_SEPARATOR),
-  };
+  return null;
 };
