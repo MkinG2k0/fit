@@ -5,7 +5,6 @@ import { cn } from "@/shared/ui/lib/utils";
 import { AnalyticsActivityHeatmapCard } from "./AnalyticsActivityHeatmapCard";
 import { AnalyticsExerciseListCard } from "./AnalyticsExerciseListCard";
 import { AnalyticsHeroCard } from "./AnalyticsHeroCard";
-import { AnalyticsMainProgressChart } from "./AnalyticsMainProgressChart";
 import { AnalyticsMuscleBalanceCard } from "./AnalyticsMuscleBalanceCard";
 
 interface AnalyticsDashboardProps {

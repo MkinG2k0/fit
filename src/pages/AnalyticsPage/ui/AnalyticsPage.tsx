@@ -1,22 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import type { CalendarDay } from "@/entities/calendarDay";
 import { buildDashboardAnalytics } from "@/entities/analytics";
-import {
-  AnalyticsFilters,
-  useAnalyticsFilters,
-} from "@/features/analyticsFilters";
+import { useAnalyticsFilters } from "@/features/analyticsFilters";
 import { readAllTrainingDaysFromStorage } from "@/shared/lib/analyticsStorage";
 import { AnalyticsDashboard } from "@/widgets/analyticsDashboard";
 import { Header } from "@/widgets/header";
 
 export const AnalyticsPage = () => {
-  const {
-    filters,
-    handlePeriodChange,
-    handleExerciseNameChange,
-    handleCategoryChange,
-    resetFilters,
-  } = useAnalyticsFilters();
+  const { filters, handlePeriodChange } = useAnalyticsFilters();
 
   const [allTrainingDays, setAllTrainingDays] = useState<
     Record<string, CalendarDay>

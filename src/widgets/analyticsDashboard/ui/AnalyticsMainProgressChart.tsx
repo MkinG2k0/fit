@@ -1,6 +1,5 @@
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import type { TrendPoint } from "@/entities/analytics";
-import { AnalyticsCard, AnalyticsSectionTitle } from "@/shared/ui/analytics";
 import {
   ChartContainer,
   ChartTooltip,

@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import type { ExerciseTrendRow } from "@/entities/analytics";
 import {
