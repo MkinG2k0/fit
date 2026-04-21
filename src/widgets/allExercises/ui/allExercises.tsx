@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Dumbbell, FolderPlus, Zap } from "lucide-react";
+import { FixedBottomBar } from "@shared/ui";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
   Popover,
@@ -92,15 +93,12 @@ export const AllExercises = () => {
             onEditPreset={handleOpenPresetEditModal}
           />
         </div>
-        {/* Кнопка добавления */}
-        <div className={"flex justify-center items-center"}>
+        <FixedBottomBar className="text-xl max-w-[800px] mx-auto">
           <Popover open={openAddPopover} onOpenChange={setOpenAddPopover}>
             <PopoverTrigger asChild>
-              <div className="fixed right-0 bottom-0 p-2 text-xl w-full max-w-[800px] mx-auto">
-                <Button variant="outline" className="w-full p-6">
-                  Создать
-                </Button>
-              </div>
+              <Button variant="outline" className="w-full p-6">
+                Создать
+              </Button>
             </PopoverTrigger>
             <PopoverContent className="w-64 p-2" align="center">
               <div className="flex flex-col gap-2">
@@ -131,7 +129,7 @@ export const AllExercises = () => {
               </div>
             </PopoverContent>
           </Popover>
-        </div>
+        </FixedBottomBar>
       </div>
 
       {/* Модальное окно добавления упражнения */}

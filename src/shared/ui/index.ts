@@ -1,6 +1,8 @@
 export { AppNavIcon } from "./appNavIcon/AppNavIcon.tsx";
 export { AnalyticsCard, AnalyticsSectionTitle } from "./analytics";
 export { CustomButton } from "./button/CustomButton.tsx";
+export { FixedBottomBar } from "./fixedBottomBar/FixedBottomBar.tsx";
+export type { FixedBottomBarProps } from "./fixedBottomBar/FixedBottomBar.tsx";
 export { ExerciseIconGraphic } from "./exerciseIcon/ExerciseIconGraphic.tsx";
 export type { ExerciseIconGraphicProps } from "./exerciseIcon/ExerciseIconGraphic.tsx";
 export type { ExerciseIconGraphicId } from "./exerciseIcon/svgHtml.ts";
