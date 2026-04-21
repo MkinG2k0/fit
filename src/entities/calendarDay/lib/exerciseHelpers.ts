@@ -1,8 +1,16 @@
-import type { Exercise, ExerciseIconId } from "@/entities/exercise";
+import type { Exercise, ExerciseIconId, ExerciseSet } from "@/entities/exercise";
 import type { RgbaColor } from "react-colorful";
 import type { CalendarDay } from "../model/types";
 import { createRandomUuid, saveDaysToLocalStorage } from "@/shared/lib";
 import dayjs from "dayjs";
+
+export interface GenerateExerciseOptions {
+  /**
+   * Одна пустая строка подхода (0×0), если расчёт ккал на подход выключен —
+   * не нужен лишний клик «Добавить подход».
+   */
+  singleEmptySet?: boolean;
+}
 
 export const generateExercise = (
   name: string,
@@ -10,16 +18,15 @@ export const generateExercise = (
   presetName?: string,
   presetColor?: RgbaColor,
   iconId?: ExerciseIconId,
+  options?: GenerateExerciseOptions,
 ): Exercise => {
+  const sets: ExerciseSet[] =
+    options?.singleEmptySet === true
+      ? [{ id: createRandomUuid(), weight: 0, reps: 0 }]
+      : [];
+
   return {
-    sets: [
-      // {
-      //   weight: 0,
-      //   reps: 0,
-      //   id: createRandomUuid(),
-      //   endTime: new Date().toISOString(),
-      // },
-    ],
+    sets,
     id: createRandomUuid(),
     category: group,
     name: name,
