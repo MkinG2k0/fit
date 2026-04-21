@@ -10,7 +10,6 @@ export interface WorkoutSummary {
   totalTonnage: number;
   totalSets: number;
   totalReps: number;
-  maxWeightKg: number;
 }
 
 interface WorkoutSummaryCardProps {
@@ -92,7 +91,7 @@ export const WorkoutSummaryCard = ({
             transition={{ duration: 0.2, ease: "easeInOut" }}
             style={{ overflow: "hidden" }}
           >
-            <div className="mt-2 grid grid-cols-3 gap-2">
+            <div className="mt-2 grid grid-cols-2 gap-2">
               <div className="flex flex-col items-center justify-center gap-1 rounded-md border border-border/60 bg-muted/40 p-2 text-center">
                 <span className="text-[10px] font-medium text-muted-foreground">
                   Подходов
@@ -107,14 +106,6 @@ export const WorkoutSummaryCard = ({
                 </span>
                 <span className="text-base leading-none font-bold text-primary font-numeric">
                   {workoutSummary.totalReps}
-                </span>
-              </div>
-              <div className="flex flex-col items-center justify-center gap-1 rounded-md border border-border/60 bg-muted/40 p-2 text-center">
-                <span className="text-[10px] font-medium text-muted-foreground">
-                  Макс. вес
-                </span>
-                <span className="text-base leading-none font-bold text-primary font-numeric">
-                  {formatTonnage(workoutSummary.maxWeightKg)}
                 </span>
               </div>
             </div>

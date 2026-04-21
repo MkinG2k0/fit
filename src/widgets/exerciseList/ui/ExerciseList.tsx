@@ -34,9 +34,6 @@ export const ExerciseList = () => {
           const weight = Number.isFinite(set.weight) ? set.weight : 0;
           acc.totalTonnage += reps * weight;
           acc.totalReps += reps;
-          if (weight > acc.maxWeightKg) {
-            acc.maxWeightKg = weight;
-          }
 
           const setKcal = set.calories?.kcal;
           if (typeof setKcal === "number" && Number.isFinite(setKcal)) {
@@ -52,7 +49,6 @@ export const ExerciseList = () => {
         totalTonnage: 0,
         totalSets: 0,
         totalReps: 0,
-        maxWeightKg: 0,
       },
     );
   }, [exerciseArray]);
