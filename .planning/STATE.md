@@ -5,7 +5,7 @@ milestone_name: milestone
 status: executing
 stopped_at: Phase 1 UI-SPEC approved
 last_updated: "2026-04-22T12:00:00.000Z"
-last_activity: "2026-04-22 - Quick task: шапка карточки — объём и ккал"
+last_activity: "2026-04-22 - Completed quick task 260422-0w8: настройка блока «Общая информация о тренировке»"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -28,7 +28,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-14)
 Phase: 1 of 5 (Quick Logging Core & Local Persistence)
 Plan: 0 of 0 in current phase
 Status: Ready to execute
-Last activity: 2026-04-22 - Quick task: шапка карточки — объём и ккал
+Last activity: 2026-04-22 - Completed quick task 260422-0w8: настройка блока «Общая информация о тренировке»
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -86,6 +86,7 @@ None yet.
 | 260417 | ось графика замеров: подписи по дате замера (recordedAt) | 2026-04-17 | ebf3d77 | [260417-body-metrics-chart-recorded-dates](./quick/260417-body-metrics-chart-recorded-dates/) |
 | 260422 | настройка: результат прошлой тренировки в свёрнутой карточке упражнения | 2026-04-22 | b9bc79c | [260422-exercise-card-last-session](./quick/260422-exercise-card-last-session/) |
 | 260422b | настройки: суммарный объём и ккал в шапке карточки упражнения | 2026-04-22 | — | [260422-exercise-card-header-metrics](./quick/260422-exercise-card-header-metrics/) |
+| 260422-0w8 | настройки: отображение блока «Общая информация о тренировке» | 2026-04-22 | 66d422c | [260422-0w8-settings-workout-summary-visibility](./quick/260422-0w8-settings-workout-summary-visibility/) |
 
 ## Session Continuity
 
