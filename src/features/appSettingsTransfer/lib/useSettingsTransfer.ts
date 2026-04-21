@@ -26,10 +26,12 @@ export const useSettingsTransfer = () => {
 
   const [status, setStatus] = useState<StatusMessage | null>(null);
   const [importOpen, setImportOpen] = useState(false);
-  const [pendingBundle, setPendingBundle] = useState<AppSettingsBundle | null>(null);
-  const [selectedSectionIds, setSelectedSectionIds] = useState<ReadonlySet<string>>(
-    () => new Set(),
+  const [pendingBundle, setPendingBundle] = useState<AppSettingsBundle | null>(
+    null,
   );
+  const [selectedSectionIds, setSelectedSectionIds] = useState<
+    ReadonlySet<string>
+  >(() => new Set());
 
   const clearStatus = useCallback(() => {
     setStatus(null);
@@ -37,7 +39,9 @@ export const useSettingsTransfer = () => {
 
   const handleExport = useCallback(() => {
     void (async () => {
+      console.log("aa");
       const sections = await collectExportableSections(definitions);
+      console.log(sections);
       if (Object.keys(sections).length === 0) {
         setStatus({
           variant: "error",
@@ -48,7 +52,12 @@ export const useSettingsTransfer = () => {
       const bundle = buildAppSettingsBundle(sections);
       const datePart = bundle.exportedAt.slice(0, ISO_DATE_SLICE_LENGTH);
       const filename = `${APP_SETTINGS_EXPORT_FILENAME_PREFIX}-${datePart}.json`;
-      downloadTextFile(filename, stringifyAppSettingsBundle(bundle), JSON_FILE_MIME);
+
+      downloadTextFile(
+        filename,
+        stringifyAppSettingsBundle(bundle),
+        JSON_FILE_MIME,
+      );
       setStatus({
         variant: "success",
         text: "Файл с настройками сформирован и отправлен в загрузки браузера.",
@@ -92,7 +101,10 @@ export const useSettingsTransfer = () => {
         setImportOpen(true);
       };
       reader.onerror = () => {
-        setStatus({ variant: "error", text: "Не удалось прочитать выбранный файл." });
+        setStatus({
+          variant: "error",
+          text: "Не удалось прочитать выбранный файл.",
+        });
       };
       reader.readAsText(file, "utf-8");
     },
@@ -105,17 +117,20 @@ export const useSettingsTransfer = () => {
     setSelectedSectionIds(new Set());
   }, []);
 
-  const handleToggleSection = useCallback((sectionId: string, checked: boolean) => {
-    setSelectedSectionIds((previous) => {
-      const next = new Set(previous);
-      if (checked) {
-        next.add(sectionId);
-      } else {
-        next.delete(sectionId);
-      }
-      return next;
-    });
-  }, []);
+  const handleToggleSection = useCallback(
+    (sectionId: string, checked: boolean) => {
+      setSelectedSectionIds((previous) => {
+        const next = new Set(previous);
+        if (checked) {
+          next.add(sectionId);
+        } else {
+          next.delete(sectionId);
+        }
+        return next;
+      });
+    },
+    [],
+  );
 
   const handleConfirmImport = useCallback(() => {
     void (async () => {
@@ -171,7 +186,10 @@ export const useSettingsTransfer = () => {
       return [];
     }
     return definitions.filter((definition) =>
-      Object.prototype.hasOwnProperty.call(pendingBundle.sections, definition.id),
+      Object.prototype.hasOwnProperty.call(
+        pendingBundle.sections,
+        definition.id,
+      ),
     );
   }, [definitions, pendingBundle]);
 

@@ -1,12 +1,14 @@
 import { localStorageDriver } from "../storageAdapter/localStorageDriver";
 import { preferencesDriver } from "../storageAdapter/preferencesDriver";
 
-const STORAGE_MIGRATION_MARKER_KEY = "storage:migration:v1";
+const STORAGE_MIGRATION_MARKER_KEY = "storage:migration:v2";
 const STORAGE_MIGRATION_MARKER_VALUE = "completed";
 
 const shouldSkipMigration = async (): Promise<boolean> => {
   try {
-    const marker = await preferencesDriver.getItem(STORAGE_MIGRATION_MARKER_KEY);
+    const marker = await preferencesDriver.getItem(
+      STORAGE_MIGRATION_MARKER_KEY,
+    );
     return marker === STORAGE_MIGRATION_MARKER_VALUE;
   } catch {
     return false;

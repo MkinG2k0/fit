@@ -19,7 +19,9 @@ const CARD_HEADER_CLASS = "px-4";
 const CARD_CONTENT_CLASS = "space-y-3 px-4";
 const ACTION_ROW_CLASS = "flex flex-col gap-2 sm:flex-row sm:flex-wrap";
 
-export const SettingsTransferCard = ({ className }: SettingsTransferCardProps) => {
+export const SettingsTransferCard = ({
+  className,
+}: SettingsTransferCardProps) => {
   const {
     fileInputRef,
     status,
@@ -42,8 +44,8 @@ export const SettingsTransferCard = ({ className }: SettingsTransferCardProps) =
       <CardHeader className={CARD_HEADER_CLASS}>
         <CardTitle>Резервная копия настроек</CardTitle>
         <CardDescription>
-          Экспорт и импорт вынесены в единый JSON-файл. Новые разделы можно добавлять в
-          приложении без смены формата файла.
+          Экспорт и импорт вынесены в единый JSON-файл. Новые разделы можно
+          добавлять в приложении без смены формата файла.
         </CardDescription>
       </CardHeader>
       <CardContent className={CARD_CONTENT_CLASS}>
@@ -58,15 +60,20 @@ export const SettingsTransferCard = ({ className }: SettingsTransferCardProps) =
         />
         <div className={ACTION_ROW_CLASS}>
           <Button type="button" variant="secondary" onClick={handleExport}>
-            Скачать JSON
+            Экспорт настроек
           </Button>
-          <Button type="button" variant="outline" onClick={handlePickImportFile}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handlePickImportFile}
+          >
             Импорт из файла
           </Button>
         </div>
         <p className="text-xs text-muted-foreground">
-          В файл попадают тема, каталог упражнений и пресеты, журнал тренировок по дням и
-          профиль без токена входа. Импорт перезаписывает только отмеченные разделы.
+          В файл попадают тема, каталог упражнений и пресеты, журнал тренировок
+          по дням и профиль без токена входа. Импорт перезаписывает только
+          отмеченные разделы.
         </p>
         {status ? (
           <div
