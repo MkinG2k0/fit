@@ -16,7 +16,7 @@ export const ExerciseList = () => {
     days[selectedDate.format("DD-MM-YYYY")]?.exercises ?? [];
 
   useEffect(() => {
-    loadDaysFromLocalStorage(observableDate);
+    void loadDaysFromLocalStorage(observableDate);
   }, [observableDate, loadDaysFromLocalStorage]);
 
   return (

@@ -26,7 +26,7 @@ interface CalendarStore {
   setSelectedDate: (date: dayjs.Dayjs) => void;
   observableDate: dayjs.Dayjs;
   setObservableDate: (date: dayjs.Dayjs) => void;
-  loadDaysFromLocalStorage: (date: dayjs.Dayjs) => void;
+  loadDaysFromLocalStorage: (date: dayjs.Dayjs) => Promise<void>;
   addExercise: (
     name: string,
     group: string,
@@ -65,11 +65,10 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
   observableDate: dayjs(),
   setObservableDate: (date) => set({ observableDate: date }),
 
-  loadDaysFromLocalStorage: (date) =>
-    set(() => {
-      const days = getDaysFromLocalStorage(date);
-      return { days };
-    }),
+  loadDaysFromLocalStorage: async (date) => {
+    const days = await getDaysFromLocalStorage(date);
+    set(() => ({ days }));
+  },
 
   addExercise: (name, group, presetName?, presetColor?, iconId?) =>
     set((state) => {

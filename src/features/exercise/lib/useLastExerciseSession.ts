@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useCalendarStore } from "@/entities/calendarDay";
 import {
   findLastExerciseSession,
@@ -9,9 +9,24 @@ export const useLastExerciseSession = (
   exerciseName: string,
 ): LastExerciseSession | null => {
   const selectedDate = useCalendarStore((store) => store.selectedDate);
+  const [session, setSession] = useState<LastExerciseSession | null>(null);
 
-  return useMemo(
-    () => findLastExerciseSession(exerciseName, selectedDate),
-    [exerciseName, selectedDate],
-  );
+  useEffect(() => {
+    let isDisposed = false;
+
+    const loadSession = async () => {
+      const result = await findLastExerciseSession(exerciseName, selectedDate);
+      if (!isDisposed) {
+        setSession(result);
+      }
+    };
+
+    void loadSession();
+
+    return () => {
+      isDisposed = true;
+    };
+  }, [exerciseName, selectedDate]);
+
+  return session;
 };

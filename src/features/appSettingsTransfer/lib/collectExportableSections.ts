@@ -1,11 +1,11 @@
 import type { AppSettingsSectionDefinition } from "../model/types";
 
-export const collectExportableSections = (
+export const collectExportableSections = async (
   definitions: AppSettingsSectionDefinition[],
-): Record<string, unknown> => {
+): Promise<Record<string, unknown>> => {
   const sections: Record<string, unknown> = {};
   for (const definition of definitions) {
-    const snapshot = definition.exportSnapshot();
+    const snapshot = await definition.exportSnapshot();
     if (snapshot !== null && snapshot !== undefined) {
       sections[definition.id] = snapshot;
     }

@@ -3,6 +3,6 @@ export interface AppSettingsSectionDefinition {
   id: string;
   title: string;
   description: string;
-  exportSnapshot: () => unknown | null;
-  importSnapshot: (payload: unknown) => void;
+  exportSnapshot: () => Promise<unknown | null>;
+  importSnapshot: (payload: unknown) => Promise<void>;
 }

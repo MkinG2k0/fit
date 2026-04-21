@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { CalendarDay } from "@/entities/calendarDay";
 import { buildDashboardAnalytics } from "@/entities/analytics";
 import {
   AnalyticsFilters,
@@ -17,14 +18,34 @@ export const AnalyticsPage = () => {
     resetFilters,
   } = useAnalyticsFilters();
 
-  const allTrainingDays = useMemo(() => readAllTrainingDaysFromStorage(), []);
+  const [allTrainingDays, setAllTrainingDays] = useState<
+    Record<string, CalendarDay>
+  >({});
+
+  useEffect(() => {
+    let isDisposed = false;
+
+    const loadTrainingDays = async () => {
+      const days = await readAllTrainingDaysFromStorage();
+      if (!isDisposed) {
+        setAllTrainingDays(days);
+      }
+    };
+
+    void loadTrainingDays();
+
+    return () => {
+      isDisposed = true;
+    };
+  }, []);
+
   const analytics = useMemo(
     () => buildDashboardAnalytics(allTrainingDays, filters),
     [allTrainingDays, filters],
   );
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden">
+    <div className="flex h-dvh flex-col gap-2 overflow-hidden">
       <Header title="Аналитика" navigateBack />
 
       <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">

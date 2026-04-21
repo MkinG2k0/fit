@@ -5,3 +5,5 @@ export * from "./stringFormat";
 export * from "./storage";
 export * from "./days";
 export * from "./useSyncCalendarSwiperToDate";
+export * from "./storageAdapter";
+export * from "./storageMigration";

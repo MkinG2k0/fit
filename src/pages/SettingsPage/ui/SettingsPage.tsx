@@ -12,7 +12,7 @@ import {
 } from "@/shared/ui/shadCNComponents/ui/card";
 
 const PAGE_WRAPPER_CLASS =
-  "flex h-dvh flex-col overflow-hidden bg-background text-foreground";
+  "flex h-dvh flex-col overflow-hidden gap-2 bg-background text-foreground";
 const SCROLL_AREA_CLASS = "min-h-0 flex-1 overflow-x-hidden overflow-y-auto";
 const CONTENT_GRID_CLASS = "mx-auto grid w-full max-w-3xl gap-3 sm:gap-4";
 const CARD_CLASS = "gap-3 py-4";

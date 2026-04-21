@@ -1,8 +1,7 @@
 import type { CalendarDay } from "@/entities/calendarDay";
 import type { Exercise, ExerciseSet } from "@/entities/exercise";
 import type { RgbaColor } from "react-colorful";
-
-const monthYearRegex = /^(0[1-9]|1[0-2])-\d{4}$/;
+import { readAllWorkoutMonthBuckets } from "./storage";
 
 const isObjectRecord = (value: unknown): value is Record<string, unknown> => {
   return typeof value === "object" && value !== null;
@@ -97,25 +96,15 @@ const parseCalendarDay = (value: unknown): CalendarDay | null => {
   };
 };
 
-const safeParseJson = (value: string) => {
-  try {
-    return JSON.parse(value);
-  } catch {
-    return null;
+export const readAllTrainingDaysFromStorage = async () => {
+  const months = await readAllWorkoutMonthBuckets();
+  if (!months) {
+    return {};
   }
-};
 
-export const readAllTrainingDaysFromStorage = () => {
-  const monthKeys = Object.keys(localStorage).filter((key) => monthYearRegex.test(key));
   const mergedDays: Record<string, CalendarDay> = {};
 
-  monthKeys.forEach((monthKey) => {
-    const rawValue = localStorage.getItem(monthKey);
-    if (!rawValue) {
-      return;
-    }
-
-    const parsedMonth = safeParseJson(rawValue);
+  Object.values(months).forEach((parsedMonth) => {
     if (!isObjectRecord(parsedMonth)) {
       return;
     }

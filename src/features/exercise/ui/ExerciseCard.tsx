@@ -11,6 +11,7 @@ import {
 } from "@/entities/exercise";
 import { AppNavIcon } from "@/shared/ui";
 import { cn } from "@shared/lib";
+import { appStorage } from "@/shared/lib/storageAdapter";
 import * as motion from "motion/react-client";
 import { ExerciseBody } from "./ExerciseBody";
 import { ExerciseCategoryIcon } from "./ExerciseCategoryIcon";
@@ -62,12 +63,23 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
 
   // 🧠 1. Проверяем, был ли уже показан hint
   useEffect(() => {
-    const hintShown = localStorage.getItem("exerciseSwipeHintShown");
-    if (!hintShown) {
+    let isDisposed = false;
+
+    const loadHintFlag = async () => {
+      const hintShown = await appStorage.getString("exerciseSwipeHintShown");
+      if (hintShown || isDisposed) {
+        return;
+      }
+
       setShowHint(true);
-      // Сохраняем флаг, чтобы больше не показывать
-      localStorage.setItem("exerciseSwipeHintShown", "true");
-    }
+      await appStorage.setString("exerciseSwipeHintShown", "true");
+    };
+
+    void loadHintFlag();
+
+    return () => {
+      isDisposed = true;
+    };
   }, []);
 
   // 🧩 2. Функция удаления

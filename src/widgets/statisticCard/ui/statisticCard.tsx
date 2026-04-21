@@ -1,6 +1,6 @@
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { ChartColumnBig } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
   Dialog,
@@ -27,6 +27,9 @@ export const StatisticCard = ({
   showTrigger = true,
 }: StatisticCardProps) => {
   const [internalDialogOpen, setInternalDialogOpen] = useState(false);
+  const [chartData, setChartData] = useState<
+    ReturnType<typeof calculateTonnageForExercise>
+  >([]);
   const isControlled = typeof open === "boolean";
   const dialogOpen = isControlled ? open : internalDialogOpen;
 
@@ -37,13 +40,28 @@ export const StatisticCard = ({
     onOpenChange?.(nextOpen);
   };
 
-  const chartData = useMemo(() => {
-    if (!dialogOpen) {
-      return [];
-    }
+  useEffect(() => {
+    let isDisposed = false;
 
-    const allTrainingDays = readAllTrainingDaysFromStorage();
-    return calculateTonnageForExercise(allTrainingDays, exerciseName);
+    const loadChartData = async () => {
+      if (!dialogOpen) {
+        if (!isDisposed) {
+          setChartData([]);
+        }
+        return;
+      }
+
+      const allTrainingDays = await readAllTrainingDaysFromStorage();
+      if (!isDisposed) {
+        setChartData(calculateTonnageForExercise(allTrainingDays, exerciseName));
+      }
+    };
+
+    void loadChartData();
+
+    return () => {
+      isDisposed = true;
+    };
   }, [dialogOpen, exerciseName]);
 
   return (

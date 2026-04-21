@@ -36,22 +36,24 @@ export const useSettingsTransfer = () => {
   }, []);
 
   const handleExport = useCallback(() => {
-    const sections = collectExportableSections(definitions);
-    if (Object.keys(sections).length === 0) {
+    void (async () => {
+      const sections = await collectExportableSections(definitions);
+      if (Object.keys(sections).length === 0) {
+        setStatus({
+          variant: "error",
+          text: "Нечего экспортировать: в браузере ещё нет сохранённых настроек.",
+        });
+        return;
+      }
+      const bundle = buildAppSettingsBundle(sections);
+      const datePart = bundle.exportedAt.slice(0, ISO_DATE_SLICE_LENGTH);
+      const filename = `${APP_SETTINGS_EXPORT_FILENAME_PREFIX}-${datePart}.json`;
+      downloadTextFile(filename, stringifyAppSettingsBundle(bundle), JSON_FILE_MIME);
       setStatus({
-        variant: "error",
-        text: "Нечего экспортировать: в браузере ещё нет сохранённых настроек.",
+        variant: "success",
+        text: "Файл с настройками сформирован и отправлен в загрузки браузера.",
       });
-      return;
-    }
-    const bundle = buildAppSettingsBundle(sections);
-    const datePart = bundle.exportedAt.slice(0, ISO_DATE_SLICE_LENGTH);
-    const filename = `${APP_SETTINGS_EXPORT_FILENAME_PREFIX}-${datePart}.json`;
-    downloadTextFile(filename, stringifyAppSettingsBundle(bundle), JSON_FILE_MIME);
-    setStatus({
-      variant: "success",
-      text: "Файл с настройками сформирован и отправлен в загрузки браузера.",
-    });
+    })();
   }, [definitions]);
 
   const handlePickImportFile = useCallback(() => {
@@ -116,39 +118,44 @@ export const useSettingsTransfer = () => {
   }, []);
 
   const handleConfirmImport = useCallback(() => {
-    if (!pendingBundle) {
-      return;
-    }
-    if (selectedSectionIds.size === 0) {
-      setStatus({ variant: "error", text: "Отметьте хотя бы один раздел для импорта." });
-      return;
-    }
-    const result = applySelectedBundleSections(
-      pendingBundle,
-      selectedSectionIds,
-      definitions,
-    );
-    handleCloseImport();
-    if (result.errors.length > 0 && result.appliedIds.length === 0) {
-      const first = result.errors[0];
+    void (async () => {
+      if (!pendingBundle) {
+        return;
+      }
+      if (selectedSectionIds.size === 0) {
+        setStatus({
+          variant: "error",
+          text: "Отметьте хотя бы один раздел для импорта.",
+        });
+        return;
+      }
+      const result = await applySelectedBundleSections(
+        pendingBundle,
+        selectedSectionIds,
+        definitions,
+      );
+      handleCloseImport();
+      if (result.errors.length > 0 && result.appliedIds.length === 0) {
+        const first = result.errors[0];
+        setStatus({
+          variant: "error",
+          text: `Импорт не выполнен. «${first.sectionId}»: ${first.message}`,
+        });
+        return;
+      }
+      if (result.errors.length > 0) {
+        const first = result.errors[0];
+        setStatus({
+          variant: "error",
+          text: `Применено разделов: ${result.appliedIds.length}. Ошибка в «${first.sectionId}»: ${first.message}`,
+        });
+        return;
+      }
       setStatus({
-        variant: "error",
-        text: `Импорт не выполнен. «${first.sectionId}»: ${first.message}`,
+        variant: "success",
+        text: `Импортировано разделов: ${result.appliedIds.length}.`,
       });
-      return;
-    }
-    if (result.errors.length > 0) {
-      const first = result.errors[0];
-      setStatus({
-        variant: "error",
-        text: `Применено разделов: ${result.appliedIds.length}. Ошибка в «${first.sectionId}»: ${first.message}`,
-      });
-      return;
-    }
-    setStatus({
-      variant: "success",
-      text: `Импортировано разделов: ${result.appliedIds.length}.`,
-    });
+    })();
   }, [definitions, handleCloseImport, pendingBundle, selectedSectionIds]);
 
   const unknownSectionKeys = useMemo(() => {

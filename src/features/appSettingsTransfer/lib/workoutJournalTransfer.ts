@@ -43,8 +43,8 @@ const isWorkoutJournalImportPayload = (
   return true;
 };
 
-export const exportWorkoutJournalSnapshot = (): unknown | null => {
-  const months = readAllWorkoutMonthBuckets();
+export const exportWorkoutJournalSnapshot = async (): Promise<unknown | null> => {
+  const months = await readAllWorkoutMonthBuckets();
   if (!months) {
     return null;
   }
@@ -54,7 +54,9 @@ export const exportWorkoutJournalSnapshot = (): unknown | null => {
   };
 };
 
-export const importWorkoutJournalSnapshot = (payload: unknown): void => {
+export const importWorkoutJournalSnapshot = async (
+  payload: unknown,
+): Promise<void> => {
   if (!isWorkoutJournalImportPayload(payload)) {
     throw new Error("Журнал: ожидался объект с полем months.");
   }
@@ -66,8 +68,8 @@ export const importWorkoutJournalSnapshot = (payload: unknown): void => {
     }
     const bucket = payload.months[monthKey];
     assertMonthBucket(monthKey, bucket);
-    writeWorkoutMonthBucket(monthKey, bucket);
+    await writeWorkoutMonthBucket(monthKey, bucket);
   }
   const calendar = useCalendarStore.getState();
-  calendar.loadDaysFromLocalStorage(calendar.observableDate);
+  await calendar.loadDaysFromLocalStorage(calendar.observableDate);
 };

@@ -73,17 +73,17 @@ const pickExerciseOnDay = (
   return (withData.length > 0 ? withData[0] : matches[0]) ?? null;
 };
 
-export const findLastExerciseSession = (
+export const findLastExerciseSession = async (
   exerciseName: string,
   beforeDate: dayjs.Dayjs,
-): LastExerciseSession | null => {
+): Promise<LastExerciseSession | null> => {
   const normalizedTarget = normalizeExerciseName(exerciseName);
   if (!normalizedTarget) {
     return null;
   }
 
   const beforeStart = beforeDate.startOf("day");
-  const buckets = readAllWorkoutMonthBuckets();
+  const buckets = await readAllWorkoutMonthBuckets();
   if (!buckets) {
     return null;
   }

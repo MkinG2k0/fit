@@ -3,7 +3,7 @@ import { BodyMetricsDashboard } from "@/widgets/bodyMetricsDashboard";
 
 export const BodyMetricsPage = () => {
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-background text-foreground">
+    <div className="flex h-dvh flex-col overflow-hidden gap-2 bg-background text-foreground">
       <Header title="Параметры тела" navigateBack />
 
       <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">

@@ -8,6 +8,7 @@ import {
   type RingGoalsSettings,
 } from "@/entities/user";
 import { isPlainObject, isZustandPersistBlob } from "@/shared/lib/appSettingsTransfer";
+import { appStorage } from "@/shared/lib/storageAdapter";
 import type { AppSettingsSectionDefinition } from "../model/types";
 import { exportWorkoutJournalSnapshot, importWorkoutJournalSnapshot } from "./workoutJournalTransfer";
 
@@ -29,8 +30,8 @@ export const APP_SETTINGS_SECTION_IDS = {
   userProfile: "userProfile",
 } as const;
 
-const readJsonFromLocalStorage = (key: string): unknown | null => {
-  const raw = localStorage.getItem(key);
+const readJsonFromStorage = async (key: string): Promise<unknown | null> => {
+  const raw = await appStorage.getString(key);
   if (!raw) {
     return null;
   }
@@ -41,8 +42,8 @@ const readJsonFromLocalStorage = (key: string): unknown | null => {
   }
 };
 
-const writeJsonToLocalStorage = (key: string, value: unknown) => {
-  localStorage.setItem(key, JSON.stringify(value));
+const writeJsonToStorage = async (key: string, value: unknown) => {
+  await appStorage.setJson(key, value);
 };
 
 const assertPersistBlob = (value: unknown, label: string): void => {
@@ -115,10 +116,10 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
     id: APP_SETTINGS_SECTION_IDS.theme,
     title: "Тема оформления",
     description: "Светлая, тёмная или системная тема",
-    exportSnapshot: () => readJsonFromLocalStorage(THEME_STORAGE_KEY),
-    importSnapshot: (payload: unknown) => {
+    exportSnapshot: () => readJsonFromStorage(THEME_STORAGE_KEY),
+    importSnapshot: async (payload: unknown) => {
       assertPersistBlob(payload, "Тема");
-      writeJsonToLocalStorage(THEME_STORAGE_KEY, payload);
+      await writeJsonToStorage(THEME_STORAGE_KEY, payload);
       void useThemeStore.persist.rehydrate();
     },
   },
@@ -126,10 +127,10 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
     id: APP_SETTINGS_SECTION_IDS.exercises,
     title: "Каталог упражнений и пресеты",
     description: "Пользовательские упражнения, категории и тренировочные пресеты",
-    exportSnapshot: () => readJsonFromLocalStorage(EXERCISE_STORAGE_KEY),
-    importSnapshot: (payload: unknown) => {
+    exportSnapshot: () => readJsonFromStorage(EXERCISE_STORAGE_KEY),
+    importSnapshot: async (payload: unknown) => {
       assertPersistBlob(payload, "Упражнения");
-      writeJsonToLocalStorage(EXERCISE_STORAGE_KEY, payload);
+      await writeJsonToStorage(EXERCISE_STORAGE_KEY, payload);
       void useExerciseStore.persist.rehydrate();
     },
   },
@@ -138,17 +139,17 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
     title: "Журнал тренировок",
     description:
       "Записи по дням (вес, повторы) по всем месяцам в локальном хранилище",
-    exportSnapshot: () => exportWorkoutJournalSnapshot(),
-    importSnapshot: (payload: unknown) => {
-      importWorkoutJournalSnapshot(payload);
+    exportSnapshot: async () => exportWorkoutJournalSnapshot(),
+    importSnapshot: async (payload: unknown) => {
+      await importWorkoutJournalSnapshot(payload);
     },
   },
   {
     id: APP_SETTINGS_SECTION_IDS.userProfile,
     title: "Профиль (без токена входа)",
     description: "Имя пользователя и персональные поля. Секретные данные входа не экспортируются.",
-    exportSnapshot: () => {
-      const parsed = readJsonFromLocalStorage(USER_STORAGE_KEY);
+    exportSnapshot: async () => {
+      const parsed = await readJsonFromStorage(USER_STORAGE_KEY);
       if (!isZustandPersistBlob(parsed) || !isPlainObject(parsed.state)) {
         return null;
       }
@@ -169,11 +170,11 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         ),
       };
     },
-    importSnapshot: (payload: unknown) => {
+    importSnapshot: async (payload: unknown) => {
       if (!isUserProfileExport(payload)) {
         throw new Error("Профиль: некорректная структура данных.");
       }
-      const existingRaw = localStorage.getItem(USER_STORAGE_KEY);
+      const existingRaw = await appStorage.getString(USER_STORAGE_KEY);
       if (existingRaw) {
         let existing: unknown;
         try {
@@ -200,14 +201,14 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
               ),
             },
           };
-          writeJsonToLocalStorage(USER_STORAGE_KEY, next);
+          await writeJsonToStorage(USER_STORAGE_KEY, next);
         } else {
           throw new Error(
             "Профиль: не удалось объединить с текущими данными — сначала восстановите хранилище или выйдите из аккаунта.",
           );
         }
       } else {
-        writeJsonToLocalStorage(USER_STORAGE_KEY, {
+        await writeJsonToStorage(USER_STORAGE_KEY, {
           state: {
             user: payload.user,
             personalData: payload.personalData,

@@ -51,6 +51,6 @@ export const replaceExercises = (
       exercises: newExercises,
     },
   };
-  saveDaysToLocalStorage(selectedDate, newDays);
+  void saveDaysToLocalStorage(selectedDate, newDays);
   return newDays;
 };

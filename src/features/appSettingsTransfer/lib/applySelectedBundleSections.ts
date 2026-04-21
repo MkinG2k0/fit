@@ -6,11 +6,11 @@ export interface ApplySectionsResult {
   errors: { sectionId: string; message: string }[];
 }
 
-export const applySelectedBundleSections = (
+export const applySelectedBundleSections = async (
   bundle: AppSettingsBundle,
   selectedIds: ReadonlySet<string>,
   definitions: AppSettingsSectionDefinition[],
-): ApplySectionsResult => {
+): Promise<ApplySectionsResult> => {
   const appliedIds: string[] = [];
   const errors: { sectionId: string; message: string }[] = [];
   const definitionById = new Map(definitions.map((d) => [d.id, d]));
@@ -28,7 +28,7 @@ export const applySelectedBundleSections = (
       continue;
     }
     try {
-      definition.importSnapshot(bundle.sections[sectionId]);
+      await definition.importSnapshot(bundle.sections[sectionId]);
       appliedIds.push(sectionId);
     } catch (caught) {
       const message =

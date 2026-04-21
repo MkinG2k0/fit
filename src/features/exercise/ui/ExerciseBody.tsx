@@ -77,8 +77,7 @@ export const ExerciseBody = ({
 
     const endNow = new Date();
     const defaultSec =
-      useUserStore.getState().defaultSetDurationSec ??
-      DEFAULT_SET_DURATION_SEC;
+      useUserStore.getState().defaultSetDurationSec ?? DEFAULT_SET_DURATION_SEC;
     const { startTime, endTime } = getSetTimeRange(
       previousEnd,
       defaultSec,
@@ -99,7 +98,7 @@ export const ExerciseBody = ({
   }, [addSetToExercise, exercise, setCalorieSession]);
 
   return (
-    <div className="flex flex-col gap-2 p-4 pt-0">
+    <div className="flex flex-col gap-2 p-4 pt-0 min-w-[352px] max-w-[738px]">
       {lastSession !== null ? (
         <p
           className="w-full px-4 text-center text-xs leading-snug text-muted-foreground"
