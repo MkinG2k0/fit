@@ -79,7 +79,7 @@ export const HealthMetricsView = () => {
   }
 
   return (
-    <div className="flex min-w-0 flex-col gap-4">
+    <div className="flex flex-col gap-4">
       {isDemo ? (
         <div
           className="flex w-full min-w-0 gap-3 rounded-lg border border-dashed border-primary/40 bg-primary/5 px-4 py-3 text-sm text-foreground"
@@ -98,7 +98,11 @@ export const HealthMetricsView = () => {
       ) : null}
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className={cn("flex flex-col gap-1 rounded-lg border border-border bg-card p-4")}>
+        <div
+          className={cn(
+            "flex flex-col gap-1 rounded-lg border border-border bg-card p-4",
+          )}
+        >
           <div className="flex items-center gap-2 text-muted-foreground">
             <Footprints className="size-5 shrink-0" aria-hidden />
             <span className="text-sm font-medium">Шаги сегодня</span>
@@ -107,7 +111,11 @@ export const HealthMetricsView = () => {
             {metrics.steps.toLocaleString("ru-RU")}
           </p>
         </div>
-        <div className={cn("flex flex-col gap-1 rounded-lg border border-border bg-card p-4")}>
+        <div
+          className={cn(
+            "flex flex-col gap-1 rounded-lg border border-border bg-card p-4",
+          )}
+        >
           <div className="flex items-center gap-2 text-muted-foreground">
             <Activity className="size-5 shrink-0" aria-hidden />
             <span className="text-sm font-medium">Активные калории</span>

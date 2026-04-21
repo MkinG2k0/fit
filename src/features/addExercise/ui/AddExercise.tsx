@@ -30,9 +30,9 @@ export const AddExercise = () => {
   const [openExerciseModal, setOpenExerciseModal] = useState(false);
   const [openCategoryModal, setOpenCategoryModal] = useState(false);
   const [openPresetModal, setOpenPresetModal] = useState(false);
-  const [presetInitialExercises, setPresetInitialExercises] = useState<string[]>(
-    [],
-  );
+  const [presetInitialExercises, setPresetInitialExercises] = useState<
+    string[]
+  >([]);
   const isDrawerOpen =
     searchParams.get(DRAWER_QUERY_PARAM) === DRAWER_QUERY_VALUE;
 
@@ -106,13 +106,13 @@ export const AddExercise = () => {
         onOpenChange={handleDrawerOpenChange}
       >
         <DrawerTrigger asChild>
-          <Button className="text-xl font-bold justify-center w-full rounded-xl p-6">
+          <Button className="text-xl font-bold justify-center w-full p-6">
             Добавить упражнение
           </Button>
         </DrawerTrigger>
         <DrawerContent className="grid h-dvh grid-rows-[auto_1fr_auto] overflow-hidden">
           <div className="shrink-0">
-            <DrawerHeader>
+            <DrawerHeader className="p-2">
               <DrawerTitle
                 className={"text-2xl w-full flex justify-between items-center"}
               >
@@ -134,7 +134,7 @@ export const AddExercise = () => {
               <DrawerDescription></DrawerDescription>
             </DrawerHeader>
           </div>
-          <div className="flex-1 min-h-0 overflow-hidden">
+          <div className="flex-1 min-h-0 overflow-hidden px-2">
             <FullExerciseCommand
               selectedExerciseCheckboxes={selectedExerciseCheckboxes}
               selectedPresetCheckboxes={selectedPresetCheckboxes}
@@ -144,7 +144,7 @@ export const AddExercise = () => {
             />
           </div>
 
-          <DrawerFooter className="w-full shrink-0">
+          <DrawerFooter className="w-full shrink-0 p-2">
             <Button
               disabled={
                 selectedExerciseCheckboxes.length === 0 &&

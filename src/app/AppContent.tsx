@@ -1,12 +1,10 @@
-import { useLocation } from "react-router-dom";
 import { AppRoutes } from "./router/routes.tsx";
+import { AppLayout } from "./layout/AppLayout.tsx";
 
 export const AppContent = () => {
-  const { pathname } = useLocation();
-  const isOnboarding = pathname === "/onboarding";
   return (
-    <div className={isOnboarding ? "" : "p-2"}>
+    <AppLayout>
       <AppRoutes />
-    </div>
+    </AppLayout>
   );
 };

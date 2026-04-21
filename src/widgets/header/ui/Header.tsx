@@ -30,7 +30,7 @@ export const Header = ({ date, title, navigateBack }: HeaderProps) => {
 
   return (
     <div className="flex items-start justify-between gap-1 text-center font-bold">
-      <div className="flex min-w-0 items-center gap-2.5 max-[480px]:gap-2">
+      <div className="flex min-w-0 items-center gap-2.5 max-[480px]:gap-2 ">
         {navigateBack && (
           <Button variant="outline" onClick={() => navigate("/")}>
             <ArrowLeft />
@@ -47,8 +47,7 @@ export const Header = ({ date, title, navigateBack }: HeaderProps) => {
         {date && !isTodaySelected && (
           <Button
             variant="outline"
-            size="sm"
-            className="h-7 px-2 text-xs"
+            className="h-7 px-2 text-xs "
             onClick={handleNavigateToToday}
           >
             Сегодня
