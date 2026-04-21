@@ -4,8 +4,8 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 1 UI-SPEC approved
-last_updated: "2026-04-17T12:00:00.000Z"
-last_activity: 2026-04-17 - Quick task 260417: ось графика замеров по recordedAt (ebf3d77)
+last_updated: "2026-04-22T12:00:00.000Z"
+last_activity: 2026-04-22 - Quick task 260422: подсказка прошлой тренировки в карточке упражнения (b9bc79c)
 progress:
   total_phases: 5
   completed_phases: 0
@@ -28,7 +28,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-14)
 Phase: 1 of 5 (Quick Logging Core & Local Persistence)
 Plan: 0 of 0 in current phase
 Status: Ready to execute
-Last activity: 2026-04-17 - Quick task 260417: ось графика замеров по recordedAt (ebf3d77)
+Last activity: 2026-04-22 - Quick task 260422: подсказка прошлой тренировки в карточке упражнения (b9bc79c)
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -84,6 +84,7 @@ None yet.
 |---|-------------|------|--------|-----------|
 | 260414-nxs | добавить дефолтные категории упражнений, пресеты и т.д. | 2026-04-14 | 4c4bf3a | [260414-nxs-default-exercise-categories-presets](./quick/260414-nxs-default-exercise-categories-presets/) |
 | 260417 | ось графика замеров: подписи по дате замера (recordedAt) | 2026-04-17 | ebf3d77 | [260417-body-metrics-chart-recorded-dates](./quick/260417-body-metrics-chart-recorded-dates/) |
+| 260422 | настройка: результат прошлой тренировки в свёрнутой карточке упражнения | 2026-04-22 | b9bc79c | [260422-exercise-card-last-session](./quick/260422-exercise-card-last-session/) |
 
 ## Session Continuity
 
