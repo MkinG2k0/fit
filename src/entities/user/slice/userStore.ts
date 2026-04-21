@@ -35,6 +35,8 @@ interface UserState {
   exerciseCardShowKcalInHeader: boolean;
   /** Суммарный объём (повторы × вес) в шапке карточки. */
   exerciseCardShowTotalVolumeInHeader: boolean;
+  /** Сводка «Общая информация о тренировке» над списком упражнений на день. */
+  workoutListShowDaySummary: boolean;
 }
 
 interface ActionsState {
@@ -49,6 +51,7 @@ interface ActionsState {
   setExerciseCardShowLastSessionResult: (enabled: boolean) => void;
   setExerciseCardShowKcalInHeader: (enabled: boolean) => void;
   setExerciseCardShowTotalVolumeInHeader: (enabled: boolean) => void;
+  setWorkoutListShowDaySummary: (enabled: boolean) => void;
   setAccessToken: (token: string) => void;
   deleteUserData: () => void;
   reset: () => void;
@@ -70,6 +73,7 @@ export const useUserStore = create<UserState & ActionsState>()(
       exerciseCardShowLastSessionResult: false,
       exerciseCardShowKcalInHeader: false,
       exerciseCardShowTotalVolumeInHeader: true,
+      workoutListShowDaySummary: true,
       accessToken: "",
 
       setAccessToken: (token) => set({ accessToken: token }),
@@ -130,6 +134,11 @@ export const useUserStore = create<UserState & ActionsState>()(
           exerciseCardShowTotalVolumeInHeader: enabled,
         })),
 
+      setWorkoutListShowDaySummary: (enabled) =>
+        set(() => ({
+          workoutListShowDaySummary: enabled,
+        })),
+
       deleteUserData: () =>
         set(() => ({
           user: {
@@ -180,6 +189,10 @@ export const useUserStore = create<UserState & ActionsState>()(
             typeof p.exerciseCardShowTotalVolumeInHeader === "boolean"
               ? p.exerciseCardShowTotalVolumeInHeader
               : current.exerciseCardShowTotalVolumeInHeader,
+          workoutListShowDaySummary:
+            typeof p.workoutListShowDaySummary === "boolean"
+              ? p.workoutListShowDaySummary
+              : current.workoutListShowDaySummary,
         };
       },
     },

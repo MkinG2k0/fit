@@ -84,6 +84,7 @@ const isUserProfileExport = (
   exerciseCardShowLastSessionResult?: boolean;
   exerciseCardShowKcalInHeader?: boolean;
   exerciseCardShowTotalVolumeInHeader?: boolean;
+  workoutListShowDaySummary?: boolean;
 } => {
   if (!isPlainObject(value)) {
     return false;
@@ -126,6 +127,12 @@ const isUserProfileExport = (
   if (
     "exerciseCardShowTotalVolumeInHeader" in value &&
     typeof value.exerciseCardShowTotalVolumeInHeader !== "boolean"
+  ) {
+    return false;
+  }
+  if (
+    "workoutListShowDaySummary" in value &&
+    typeof value.workoutListShowDaySummary !== "boolean"
   ) {
     return false;
   }
@@ -183,6 +190,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         exerciseCardShowLastSessionResult?: boolean;
         exerciseCardShowKcalInHeader?: boolean;
         exerciseCardShowTotalVolumeInHeader?: boolean;
+        workoutListShowDaySummary?: boolean;
       };
       return {
         user: state.user ?? { userName: "" },
@@ -198,6 +206,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
           state.exerciseCardShowKcalInHeader ?? false,
         exerciseCardShowTotalVolumeInHeader:
           state.exerciseCardShowTotalVolumeInHeader ?? true,
+        workoutListShowDaySummary: state.workoutListShowDaySummary ?? true,
       };
     },
     importSnapshot: async (payload: unknown) => {
@@ -220,6 +229,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
             exerciseCardShowLastSessionResult?: boolean;
             exerciseCardShowKcalInHeader?: boolean;
             exerciseCardShowTotalVolumeInHeader?: boolean;
+            workoutListShowDaySummary?: boolean;
           };
           const next = {
             ...existing,
@@ -243,6 +253,10 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
               exerciseCardShowTotalVolumeInHeader:
                 payload.exerciseCardShowTotalVolumeInHeader ??
                 prevState.exerciseCardShowTotalVolumeInHeader ??
+                true,
+              workoutListShowDaySummary:
+                payload.workoutListShowDaySummary ??
+                prevState.workoutListShowDaySummary ??
                 true,
             },
           };
@@ -268,6 +282,8 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
               payload.exerciseCardShowKcalInHeader ?? false,
             exerciseCardShowTotalVolumeInHeader:
               payload.exerciseCardShowTotalVolumeInHeader ?? true,
+            workoutListShowDaySummary:
+              payload.workoutListShowDaySummary ?? true,
             accessToken: "",
           },
         });

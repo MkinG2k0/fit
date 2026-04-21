@@ -4,6 +4,7 @@ import { ProfileRingGoalsSettingsCard } from "@/features/profileRingGoalsSetting
 import {
   ExerciseCardDisplaySettingsCard,
   WorkoutCaloriesSettingsCard,
+  WorkoutSummaryDisplaySettingsCard,
 } from "@/features/exercise";
 import {
   Card,
@@ -25,6 +26,8 @@ export const SettingsPage = () => {
       <ProfileRingGoalsSettingsCard />
 
       <WorkoutCaloriesSettingsCard />
+
+      <WorkoutSummaryDisplaySettingsCard />
 
       <ExerciseCardDisplaySettingsCard />
 

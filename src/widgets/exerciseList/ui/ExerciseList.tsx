@@ -4,12 +4,16 @@ import { AddExercise } from "@/features/addExercise";
 import { ExerciseCard } from "@/features/exercise";
 import { useWorkoutCaloriesUiEnabled } from "@/features/exercise/lib/useWorkoutCaloriesUiEnabled";
 import { useCalendarStore } from "@/entities/calendarDay";
+import { useUserStore } from "@/entities/user";
 import { cn } from "@shared/lib";
 import { FixedBottomBar } from "@shared/ui";
 import { WorkoutSummaryCard } from "./WorkoutSummaryCard";
 
 export const ExerciseList = () => {
   const showCaloriesUi = useWorkoutCaloriesUiEnabled();
+  const workoutListShowDaySummary = useUserStore(
+    (s) => s.workoutListShowDaySummary ?? true,
+  );
   const days = useCalendarStore((state) => state.days);
   const selectedDate = useCalendarStore((state) => state.selectedDate);
   const loadDaysFromLocalStorage = useCalendarStore(
@@ -64,7 +68,7 @@ export const ExerciseList = () => {
           "min-h-0 flex flex-1 flex-col gap-2 overflow-x-hidden overflow-y-auto pb-[calc(5.75rem+env(safe-area-inset-bottom,0px))]"
         }
       >
-        {exerciseArray.length > 0 ? (
+        {exerciseArray.length > 0 && workoutListShowDaySummary ? (
           <WorkoutSummaryCard
             showCaloriesUi={showCaloriesUi}
             workoutSummary={workoutSummary}
