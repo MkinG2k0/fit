@@ -1,6 +1,7 @@
 import type { ExerciseIconId } from "@/entities/exercise";
 
 export { ExerciseCard } from "./ui/ExerciseCard";
+export { ExerciseCardDisplaySettingsCard } from "./ui/ExerciseCardDisplaySettingsCard";
 export { WorkoutCaloriesSettingsCard } from "./ui/WorkoutCaloriesSettingsCard";
 export { useWorkoutCaloriesRecalculationRunner } from "./calories/lib/useWorkoutCaloriesRecalculationRunner";
 

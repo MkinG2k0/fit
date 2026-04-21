@@ -81,6 +81,7 @@ const isUserProfileExport = (
   ringGoals: RingGoalsSettings;
   workoutCaloriesEnabled?: boolean;
   defaultSetDurationSec?: number;
+  exerciseCardShowLastSessionResult?: boolean;
 } => {
   if (!isPlainObject(value)) {
     return false;
@@ -105,6 +106,12 @@ const isUserProfileExport = (
     value.defaultSetDurationSec !== undefined &&
     (typeof value.defaultSetDurationSec !== "number" ||
       !Number.isFinite(value.defaultSetDurationSec))
+  ) {
+    return false;
+  }
+  if (
+    "exerciseCardShowLastSessionResult" in value &&
+    typeof value.exerciseCardShowLastSessionResult !== "boolean"
   ) {
     return false;
   }
@@ -159,6 +166,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         ringGoals?: RingGoalsSettings;
         workoutCaloriesEnabled?: boolean;
         defaultSetDurationSec?: number;
+        exerciseCardShowLastSessionResult?: boolean;
       };
       return {
         user: state.user ?? { userName: "" },
@@ -168,6 +176,8 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         defaultSetDurationSec: clampExportedDefaultSetDurationSec(
           state.defaultSetDurationSec,
         ),
+        exerciseCardShowLastSessionResult:
+          state.exerciseCardShowLastSessionResult ?? false,
       };
     },
     importSnapshot: async (payload: unknown) => {
@@ -187,6 +197,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         if (isZustandPersistBlob(existing) && isPlainObject(existing.state)) {
           const prevState = existing.state as {
             defaultSetDurationSec?: number;
+            exerciseCardShowLastSessionResult?: boolean;
           };
           const next = {
             ...existing,
@@ -199,6 +210,10 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
               defaultSetDurationSec: clampExportedDefaultSetDurationSec(
                 payload.defaultSetDurationSec ?? prevState.defaultSetDurationSec,
               ),
+              exerciseCardShowLastSessionResult:
+                payload.exerciseCardShowLastSessionResult ??
+                prevState.exerciseCardShowLastSessionResult ??
+                false,
             },
           };
           await writeJsonToStorage(USER_STORAGE_KEY, next);
@@ -217,6 +232,8 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
             defaultSetDurationSec: clampExportedDefaultSetDurationSec(
               payload.defaultSetDurationSec,
             ),
+            exerciseCardShowLastSessionResult:
+              payload.exerciseCardShowLastSessionResult ?? false,
             accessToken: "",
           },
         });

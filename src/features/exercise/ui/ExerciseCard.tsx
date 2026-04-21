@@ -17,8 +17,10 @@ import { ExerciseCategoryIcon } from "./ExerciseCategoryIcon";
 import { ExerciseDeleteDialog } from "./ExerciseDeleteDialog";
 import { ExerciseNameSelector } from "./ExerciseNameSelector";
 import { StatisticCard } from "@/widgets/statisticCard";
+import { useUserStore } from "@/entities/user";
 import { formatKcalOneDecimal } from "../calories";
 import { useWorkoutCaloriesUiEnabled } from "../lib/useWorkoutCaloriesUiEnabled";
+import { ExerciseCardLastSessionHint } from "./ExerciseCardLastSessionHint";
 
 interface ExerciseCardProps {
   exercise: Exercise;
@@ -29,6 +31,9 @@ const DRAG_CLICK_SUPPRESS_DELAY_MS = 120;
 
 export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
   const showCaloriesUi = useWorkoutCaloriesUiEnabled();
+  const exerciseCardShowLastSessionResult = useUserStore(
+    (s) => s.exerciseCardShowLastSessionResult ?? false,
+  );
   const [isEditable, setIsEditable] = useState(false);
   const [modalVisibility, setModalVisibility] = useState(false);
   const [showHint, setShowHint] = useState(false);
@@ -194,16 +199,20 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
 
             {showCaloriesUi && totalKcal > 0 && (
               <>
-                <span
-                  className="text-muted-foreground shrink-0 px-0.5"
-                  aria-hidden
-                >
-                  •
-                </span>
-                <span className="text-base font-bold text-primary font-numeric">
-                  {formatKcalOneDecimal(totalKcal)}
-                </span>
-                <span className="text-xs font-semibold">ккал</span>
+                <div className="flex items-center gap-1">
+                  <span className="text-base font-bold text-primary font-numeric">
+                    {formatKcalOneDecimal(totalKcal)}
+                  </span>
+                  <span className="text-xs font-semibold text-muted-foreground">
+                    ккал
+                  </span>
+                  <span
+                    className="text-muted-foreground shrink-0 px-0.5"
+                    aria-hidden
+                  >
+                    •
+                  </span>
+                </div>
               </>
             )}
             <div
@@ -223,6 +232,9 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
               {isEditable ? <ChevronUp /> : <ChevronDown />}
             </div>
           </div>
+          {exerciseCardShowLastSessionResult && !isEditable ? (
+            <ExerciseCardLastSessionHint exerciseName={exercise.name} />
+          ) : null}
           <AnimatePresence>
             {isEditable && (
               <motion.div

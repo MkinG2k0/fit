@@ -29,6 +29,8 @@ interface UserState {
   defaultSetDurationSec: number;
   /** Онбординг: вес/возраст/пол (persist в user). */
   workoutCalorieProfileOnboarding: WorkoutCalorieProfileOnboardingStatus;
+  /** Подсказка прошлой тренировки в свёрнутой карточке упражнения. */
+  exerciseCardShowLastSessionResult: boolean;
 }
 
 interface ActionsState {
@@ -40,6 +42,7 @@ interface ActionsState {
   setWorkoutCalorieProfileOnboarding: (
     status: WorkoutCalorieProfileOnboardingStatus,
   ) => void;
+  setExerciseCardShowLastSessionResult: (enabled: boolean) => void;
   setAccessToken: (token: string) => void;
   deleteUserData: () => void;
   reset: () => void;
@@ -58,6 +61,7 @@ export const useUserStore = create<UserState & ActionsState>()(
         DEFAULT_SET_DURATION_FALLBACK_SEC,
       ),
       workoutCalorieProfileOnboarding: "pending",
+      exerciseCardShowLastSessionResult: false,
       accessToken: "",
 
       setAccessToken: (token) => set({ accessToken: token }),
@@ -102,6 +106,11 @@ export const useUserStore = create<UserState & ActionsState>()(
           workoutCalorieProfileOnboarding: status,
         })),
 
+      setExerciseCardShowLastSessionResult: (enabled) =>
+        set(() => ({
+          exerciseCardShowLastSessionResult: enabled,
+        })),
+
       deleteUserData: () =>
         set(() => ({
           user: {
@@ -140,6 +149,10 @@ export const useUserStore = create<UserState & ActionsState>()(
             Number.isFinite(p.defaultSetDurationSec)
               ? clampDefaultSetDurationSec(p.defaultSetDurationSec)
               : current.defaultSetDurationSec,
+          exerciseCardShowLastSessionResult:
+            typeof p.exerciseCardShowLastSessionResult === "boolean"
+              ? p.exerciseCardShowLastSessionResult
+              : current.exerciseCardShowLastSessionResult,
         };
       },
     },
