@@ -1,5 +1,8 @@
 import type { CalendarDay } from "@/entities/calendarDay";
 import type { AnalyticsFilters, DashboardAnalytics } from "../model/types";
+import { calculateActivityHeatmap } from "./calculateActivityHeatmap";
+import { calculateExerciseRows } from "./calculateExerciseRows";
+import { calculateMuscleBalance } from "./calculateMuscleBalance";
 import { calculatePeriodComparison } from "./calculatePeriodComparison";
 import { calculateSummaryMetrics } from "./calculateSummaryMetrics";
 import { calculateTrends } from "./calculateTrends";
@@ -24,6 +27,9 @@ export const buildDashboardAnalytics = (
     summary: calculateSummaryMetrics(currentSessions),
     trends: calculateTrends(currentSessions),
     tonnageComparison: calculatePeriodComparison(currentSessions, previousSessions),
+    activityHeatmap: calculateActivityHeatmap(currentSessions, filters.period),
+    muscleBalance: calculateMuscleBalance(currentSessions),
+    exerciseRows: calculateExerciseRows(currentSessions, filters.period),
   };
 };
 

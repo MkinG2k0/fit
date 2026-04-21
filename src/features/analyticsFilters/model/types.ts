@@ -15,5 +15,6 @@ export const ANALYTICS_PERIOD_OPTIONS: AnalyticsPeriodOption[] = [
   { value: "7d", label: "7 дней" },
   { value: "30d", label: "30 дней" },
   { value: "90d", label: "90 дней" },
+  { value: "365d", label: "1 год" },
 ];
 

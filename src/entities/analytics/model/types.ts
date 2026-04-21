@@ -1,4 +1,4 @@
-export type AnalyticsPeriod = "7d" | "30d" | "90d";
+export type AnalyticsPeriod = "7d" | "30d" | "90d" | "365d";
 
 export interface DateRange {
   startDateKey: string;
@@ -31,6 +31,20 @@ export interface TrendPoint {
   totalReps: number;
   maxWeight: number;
   sessions: number;
+}
+
+export interface ActivityHeatmapCell {
+  id: string;
+  dateKey: string;
+  weekIndex: number;
+  dayIndex: number;
+  sessions: number;
+  intensity: 0 | 1 | 2 | 3 | 4;
+}
+
+export interface ActivityHeatmap {
+  weeks: number;
+  cells: ActivityHeatmapCell[];
 }
 
 export interface VolumeMetrics {
@@ -71,8 +85,32 @@ export interface ExerciseAnalyticsSummary {
   frequency: FrequencyMetrics;
 }
 
+export interface MuscleBalanceItem {
+  muscle: string;
+  tonnage: number;
+  percent: number;
+}
+
+export interface MuscleBalance {
+  items: MuscleBalanceItem[];
+}
+
+export interface ExerciseTrendRow {
+  id: string;
+  name: string;
+  sessions: number;
+  tonnage: number;
+  trend: {
+    dateKey: string;
+    tonnage: number;
+  }[];
+}
+
 export interface DashboardAnalytics {
   summary: ExerciseAnalyticsSummary;
   trends: TrendPoint[];
   tonnageComparison: PeriodComparison;
+  activityHeatmap: ActivityHeatmap;
+  muscleBalance: MuscleBalance;
+  exerciseRows: ExerciseTrendRow[];
 }

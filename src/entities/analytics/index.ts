@@ -1,9 +1,14 @@
 export type {
+  ActivityHeatmap,
+  ActivityHeatmapCell,
   AnalyticsFilters,
   AnalyticsPeriod,
   DashboardAnalytics,
+  ExerciseTrendRow,
   ExerciseAnalyticsSummary,
   FrequencyMetrics,
+  MuscleBalance,
+  MuscleBalanceItem,
   PeriodComparison,
   TrendPoint,
 } from "./model/types";

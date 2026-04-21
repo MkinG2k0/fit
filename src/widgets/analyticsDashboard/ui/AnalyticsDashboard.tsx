@@ -1,71 +1,59 @@
 import type { AnalyticsPeriod, DashboardAnalytics } from "@/entities/analytics";
 import { AnalyticsPeriodCompareCard } from "@/features/analyticsPeriodCompare";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/shared/ui/shadCNComponents/ui/card";
+import { AnalyticsCard } from "@/shared/ui/analytics";
 import { cn } from "@/shared/ui/lib/utils";
-import { AnalyticsFrequencyChart } from "./AnalyticsFrequencyChart";
-import { AnalyticsKpiGrid } from "./AnalyticsKpiGrid";
-import { AnalyticsProgressChart } from "./AnalyticsProgressChart";
+import { AnalyticsActivityHeatmapCard } from "./AnalyticsActivityHeatmapCard";
+import { AnalyticsExerciseListCard } from "./AnalyticsExerciseListCard";
+import { AnalyticsHeroCard } from "./AnalyticsHeroCard";
+import { AnalyticsMainProgressChart } from "./AnalyticsMainProgressChart";
+import { AnalyticsMuscleBalanceCard } from "./AnalyticsMuscleBalanceCard";
 
 interface AnalyticsDashboardProps {
   analytics: DashboardAnalytics;
   period: AnalyticsPeriod;
+  onPeriodChange: (period: AnalyticsPeriod) => void;
   className?: string;
 }
 
 export const AnalyticsDashboard = ({
   analytics,
   period,
+  onPeriodChange,
   className,
 }: AnalyticsDashboardProps) => {
   if (analytics.trends.length === 0) {
     return (
-      <Card className={cn(className)}>
-        <CardHeader>
-          <CardTitle>Нет данных для аналитики</CardTitle>
-          <CardDescription>
-            Добавьте упражнения или измените фильтры для построения метрик.
-          </CardDescription>
-        </CardHeader>
-      </Card>
+      <AnalyticsCard className={cn(className)}>
+        <p className="text-lg font-semibold text-foreground">
+          Нет данных для аналитики
+        </p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Добавьте упражнения или измените фильтры для построения метрик.
+        </p>
+      </AnalyticsCard>
     );
   }
 
   return (
     <section className={cn("grid gap-3 sm:gap-4", className)}>
-      <AnalyticsKpiGrid summary={analytics.summary} />
-      <div className="grid gap-4 lg:grid-cols-2">
-        <AnalyticsProgressChart trends={analytics.trends} />
-        <AnalyticsFrequencyChart
-          trends={analytics.trends}
+      <AnalyticsHeroCard
+        analytics={analytics}
+        summary={analytics.summary}
+        comparison={analytics.tonnageComparison}
+        period={period}
+        onPeriodChange={onPeriodChange}
+      />
+      <div className="grid gap-3 sm:grid-cols-2">
+        <AnalyticsActivityHeatmapCard heatmap={analytics.activityHeatmap} />
+        <AnalyticsMuscleBalanceCard muscleBalance={analytics.muscleBalance} />
+      </div>
+      <div className="grid gap-3 sm:grid-cols-[1.5fr_1fr]">
+        <AnalyticsExerciseListCard rows={analytics.exerciseRows} />
+        <AnalyticsPeriodCompareCard
+          period={period}
           comparison={analytics.tonnageComparison}
         />
       </div>
-      <AnalyticsPeriodCompareCard
-        period={period}
-        comparison={analytics.tonnageComparison}
-      />
-      <Card>
-        <CardHeader>
-          <CardTitle>Ключевые факты</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-1 text-sm text-muted-foreground">
-          <p>
-            Лучший дневной объем:{" "}
-            {analytics.summary.volume.bestDayTonnage.toFixed(0)} кг
-          </p>
-          <p>
-            Средняя плотность по неделе:{" "}
-            {analytics.summary.frequency.averageSessionsPerWeek.toFixed(1)} сессий
-          </p>
-        </CardContent>
-      </Card>
     </section>
   );
 };
-

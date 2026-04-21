@@ -10,7 +10,6 @@ const shouldSkipMigration = async (): Promise<boolean> => {
       STORAGE_MIGRATION_MARKER_KEY,
     );
 
-    console.log(marker);
     return marker === STORAGE_MIGRATION_MARKER_VALUE;
   } catch {
     return false;

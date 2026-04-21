@@ -1,18 +1,10 @@
 import { RotateCcw } from "lucide-react";
 import { useMemo } from "react";
-import type {
-  AnalyticsFilters as AnalyticsFiltersState,
-  AnalyticsPeriod,
-} from "@/entities/analytics";
+import type { AnalyticsFilters as AnalyticsFiltersState } from "@/entities/analytics";
 import { allExercises } from "@/shared/config/constants";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { Label } from "@/shared/ui/shadCNComponents/ui/label";
-import {
-  RadioGroup,
-  RadioGroupItem,
-} from "@/shared/ui/shadCNComponents/ui/radio-group";
 import { cn } from "@/shared/ui/lib/utils";
-import { ANALYTICS_PERIOD_OPTIONS } from "../model/types";
 import {
   SearchableSelect,
   type SearchableSelectOption,
@@ -20,7 +12,6 @@ import {
 
 interface AnalyticsFiltersProps {
   filters: AnalyticsFiltersState;
-  onPeriodChange: (period: AnalyticsPeriod) => void;
   onExerciseNameChange: (exerciseName: string) => void;
   onCategoryChange: (category: string) => void;
   onReset: () => void;
@@ -29,7 +20,6 @@ interface AnalyticsFiltersProps {
 
 export const AnalyticsFilters = ({
   filters,
-  onPeriodChange,
   onExerciseNameChange,
   onCategoryChange,
   onReset,
@@ -82,24 +72,28 @@ export const AnalyticsFilters = ({
     }
   };
 
-  const handlePeriodValueChange = (value: string) => {
-    if (value === "7d" || value === "30d" || value === "90d") {
-      onPeriodChange(value);
-    }
-  };
-
   return (
-    <section className={cn("rounded-lg border p-3 sm:p-4", className)}>
-      <div className="mb-3 flex items-start justify-between gap-2 sm:mb-4 sm:flex-row sm:items-center">
-        <h2 className="text-lg font-semibold">Фильтры аналитики</h2>
-        <Button variant="ghost" size="sm" onClick={onReset}>
+    <section
+      className={cn(
+        "rounded-xl border border-border bg-card p-3 sm:p-4",
+        className,
+      )}
+    >
+      <div className="mb-3 flex flex-col gap-2 sm:mb-4 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="text-base font-semibold text-foreground">Фильтры</h2>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onReset}
+          className="self-start text-muted-foreground hover:text-foreground sm:self-auto"
+        >
           <RotateCcw className="size-4" />
           Сброс
         </Button>
       </div>
-      <div className="grid gap-4">
+      <div className="grid gap-3 sm:grid-cols-2">
         <div className="grid gap-2">
-          <Label>Упражнение</Label>
+          <Label className="text-muted-foreground">Упражнение</Label>
           <SearchableSelect
             value={filters.exerciseName}
             options={exerciseOptions}
@@ -110,7 +104,7 @@ export const AnalyticsFilters = ({
           />
         </div>
         <div className="grid gap-2">
-          <Label>Категория</Label>
+          <Label className="text-muted-foreground">Категория</Label>
           <SearchableSelect
             value={filters.category}
             options={categoryOptions}
@@ -119,28 +113,6 @@ export const AnalyticsFilters = ({
             emptyText="Категории не найдены"
             onValueChange={handleCategorySelect}
           />
-        </div>
-        <div className="grid gap-2">
-          <Label>Период</Label>
-          <RadioGroup
-            className="flex gap-2"
-            value={filters.period}
-            onValueChange={handlePeriodValueChange}
-          >
-            {ANALYTICS_PERIOD_OPTIONS.map((option) => {
-              const itemId = `period-${option.value}`;
-              return (
-                <Label
-                  key={option.value}
-                  htmlFor={itemId}
-                  className="flex flex-1 cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm"
-                >
-                  <RadioGroupItem id={itemId} value={option.value} />
-                  <span>{option.label}</span>
-                </Label>
-              );
-            })}
-          </RadioGroup>
         </div>
       </div>
     </section>

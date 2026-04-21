@@ -1,13 +1,11 @@
 import type { AnalyticsPeriod, PeriodComparison } from "@/entities/analytics";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/shared/ui/shadCNComponents/ui/card";
+import { AnalyticsCard, AnalyticsSectionTitle } from "@/shared/ui/analytics";
 import { cn } from "@/shared/ui/lib/utils";
-import { formatPeriodDelta, getPeriodLabel } from "../model/formatPeriodComparison";
+import {
+  formatPeriodDelta,
+  formatTonnageInTons,
+  getPeriodLabel,
+} from "../model/formatPeriodComparison";
 
 interface AnalyticsPeriodCompareCardProps {
   period: AnalyticsPeriod;
@@ -24,21 +22,24 @@ export const AnalyticsPeriodCompareCard = ({
   const deltaText = formatPeriodDelta(comparison);
 
   return (
-    <Card className={cn(className)}>
-      <CardHeader>
-        <CardTitle>Сравнение периодов</CardTitle>
-        <CardDescription>
-          Изменение тоннажа за последние {periodLabel}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="grid gap-2">
+    <AnalyticsCard className={cn(className)}>
+      <AnalyticsSectionTitle
+        subtitle={`Изменение тоннажа за последние ${periodLabel}`}
+      >
+        Сравнение периодов
+      </AnalyticsSectionTitle>
+      <div className="grid gap-2">
         <div className="flex items-center justify-between gap-2 text-sm">
           <span className="text-muted-foreground">Текущий период</span>
-          <span className="font-semibold">{comparison.currentValue.toFixed(0)} кг</span>
+          <span className="font-semibold text-foreground">
+            {formatTonnageInTons(comparison.currentValue)} т
+          </span>
         </div>
         <div className="flex items-center justify-between gap-2 text-sm">
           <span className="text-muted-foreground">Прошлый период</span>
-          <span className="font-semibold">{comparison.previousValue.toFixed(0)} кг</span>
+          <span className="font-semibold text-foreground">
+            {formatTonnageInTons(comparison.previousValue)} т
+          </span>
         </div>
         <div className="flex items-start justify-between gap-2 text-sm">
           <span className="text-muted-foreground">Разница</span>
@@ -46,17 +47,16 @@ export const AnalyticsPeriodCompareCard = ({
             className={cn(
               "text-right font-semibold",
               comparison.delta > 0
-                ? "text-primary"
+                ? "text-emerald-400"
                 : comparison.delta < 0
-                  ? "text-destructive"
+                  ? "text-red-400"
                   : "text-muted-foreground",
             )}
           >
-            {deltaText.signedDelta} кг ({deltaText.percent})
+            {deltaText.signedDelta} т ({deltaText.percent})
           </span>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </AnalyticsCard>
   );
 };
-
