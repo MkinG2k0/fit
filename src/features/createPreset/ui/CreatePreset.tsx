@@ -23,15 +23,19 @@ interface CreatePresetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   editingPreset?: TrainingPreset;
+  initialExercises?: string[];
 }
 
 const DEFAULT_PRESET_COLOR: RgbaColor = { r: 255, g: 0, b: 0, a: 1 };
 
-const createInitialPreset = (editingPreset?: TrainingPreset): NewPreset => {
+const createInitialPreset = (
+  editingPreset?: TrainingPreset,
+  initialExercises: string[] = [],
+): NewPreset => {
   if (!editingPreset) {
     return {
       presetName: "",
-      exercises: [],
+      exercises: [...initialExercises],
       presetColor: DEFAULT_PRESET_COLOR,
     };
   }
@@ -47,10 +51,11 @@ export const CreatePreset = ({
   open,
   onOpenChange,
   editingPreset,
+  initialExercises = [],
 }: CreatePresetProps) => {
   const isEditMode = Boolean(editingPreset);
   const [newPreset, setNewPreset] = useState<NewPreset>(() =>
-    createInitialPreset(editingPreset),
+    createInitialPreset(editingPreset, initialExercises),
   );
   const [error, setError] = useState<string>("");
   const [expandedCategories, setExpandedCategories] = useState<
@@ -79,13 +84,23 @@ export const CreatePreset = ({
     });
   }, [allExercises]);
 
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    setNewPreset(createInitialPreset(editingPreset, initialExercises));
+    setError("");
+    setExerciseSearch("");
+  }, [open, editingPreset, initialExercises]);
+
   const handleColorPicker = (newColor: RgbaColor) => {
     setNewPreset({ ...newPreset, presetColor: newColor });
   };
 
   const handleClose = () => {
     onOpenChange(false);
-    setNewPreset(createInitialPreset(editingPreset));
+    setNewPreset(createInitialPreset(editingPreset, initialExercises));
     setError("");
     setExerciseSearch("");
   };

@@ -19,6 +19,7 @@ import { FullExerciseCommand } from "@/features/fullExerciseList";
 import { useExerciseSelection } from "../lib/useExerciseSelection";
 import { submitExercises } from "../lib/submitExercises";
 import { CreateButtons } from "./CreateButtons";
+import { mapCurrentWorkoutToPresetExercises } from "@/features/createPreset/lib/mapCurrentWorkoutToPresetExercises";
 
 const DRAWER_QUERY_PARAM = "add-exercise";
 const DRAWER_QUERY_VALUE = "1";
@@ -29,12 +30,23 @@ export const AddExercise = () => {
   const [openExerciseModal, setOpenExerciseModal] = useState(false);
   const [openCategoryModal, setOpenCategoryModal] = useState(false);
   const [openPresetModal, setOpenPresetModal] = useState(false);
+  const [presetInitialExercises, setPresetInitialExercises] = useState<string[]>(
+    [],
+  );
   const isDrawerOpen =
     searchParams.get(DRAWER_QUERY_PARAM) === DRAWER_QUERY_VALUE;
 
   const addExercise = useCalendarStore((state) => state.addExercise);
+  const days = useCalendarStore((state) => state.days);
+  const selectedDate = useCalendarStore((state) => state.selectedDate);
   const allExercises = useExerciseStore((state) => state.exercises);
   const trainingPreset = useExerciseStore((state) => state.trainingPreset);
+  const currentWorkoutExercises =
+    days[selectedDate.format("DD-MM-YYYY")]?.exercises ?? [];
+  const currentWorkoutPresetExercises = mapCurrentWorkoutToPresetExercises(
+    currentWorkoutExercises,
+    allExercises,
+  );
 
   const {
     selectedPresetCheckboxes,
@@ -76,6 +88,16 @@ export const AddExercise = () => {
     setSearchParams(nextSearchParams, { replace: true });
   };
 
+  const handleOpenPresetModal = () => {
+    setPresetInitialExercises([]);
+    setOpenPresetModal(true);
+  };
+
+  const handleOpenPresetFromCurrentWorkoutModal = () => {
+    setPresetInitialExercises(currentWorkoutPresetExercises);
+    setOpenPresetModal(true);
+  };
+
   return (
     <>
       <Drawer
@@ -100,7 +122,13 @@ export const AddExercise = () => {
                   onOpenAddPopoverChange={setOpenAddPopover}
                   onOpenExerciseModal={() => setOpenExerciseModal(true)}
                   onOpenCategoryModal={() => setOpenCategoryModal(true)}
-                  onOpenPresetModal={() => setOpenPresetModal(true)}
+                  onOpenPresetModal={handleOpenPresetModal}
+                  onOpenPresetFromCurrentWorkoutModal={
+                    handleOpenPresetFromCurrentWorkoutModal
+                  }
+                  isCreateFromCurrentWorkoutDisabled={
+                    currentWorkoutPresetExercises.length === 0
+                  }
                 />
               </DrawerTitle>
               <DrawerDescription></DrawerDescription>
@@ -144,7 +172,11 @@ export const AddExercise = () => {
         open={openCategoryModal}
         onOpenChange={setOpenCategoryModal}
       />
-      <CreatePreset open={openPresetModal} onOpenChange={setOpenPresetModal} />
+      <CreatePreset
+        open={openPresetModal}
+        onOpenChange={setOpenPresetModal}
+        initialExercises={presetInitialExercises}
+      />
     </>
   );
 };
