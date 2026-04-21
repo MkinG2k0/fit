@@ -29,9 +29,6 @@ export const AllExercises = () => {
   const [preselectedCategory, setPreselectedCategory] = useState<
     string | undefined
   >(undefined);
-  const addActionButtonClassName = "justify-start text-lg py-3";
-  const createButtonClassName =
-    "fixed bottom-0 left-1/2 right-0 mb-8 -translate-x-1/2 justify-center border-1 border-black bg-white p-6 text-xl text-black";
 
   const handleOpenExerciseModal = () => {
     setOpenAddPopover(false);
@@ -99,7 +96,10 @@ export const AllExercises = () => {
         <div className={"flex justify-center items-center"}>
           <Popover open={openAddPopover} onOpenChange={setOpenAddPopover}>
             <PopoverTrigger asChild>
-              <Button variant="outline" className={createButtonClassName}>
+              <Button
+                variant="outline"
+                className="fixed right-0 bottom-0 left-1/2 mb-8 -translate-x-1/2 justify-center border border-black bg-white p-6 text-xl text-black"
+              >
                 Создать
               </Button>
             </PopoverTrigger>
@@ -107,7 +107,7 @@ export const AllExercises = () => {
               <div className="flex flex-col gap-2">
                 <Button
                   variant="ghost"
-                  className={addActionButtonClassName}
+                  className="justify-start py-3 text-lg"
                   onClick={handleOpenExerciseModal}
                 >
                   <Dumbbell className="mr-2 h-5 w-5" />
@@ -115,7 +115,7 @@ export const AllExercises = () => {
                 </Button>
                 <Button
                   variant="ghost"
-                  className={addActionButtonClassName}
+                  className="justify-start py-3 text-lg"
                   onClick={handleOpenCategoryModal}
                 >
                   <FolderPlus className="mr-2 h-5 w-5" />
@@ -123,7 +123,7 @@ export const AllExercises = () => {
                 </Button>
                 <Button
                   variant="ghost"
-                  className={addActionButtonClassName}
+                  className="justify-start py-3 text-lg"
                   onClick={handleOpenPresetModal}
                 >
                   <Zap className="mr-2 h-5 w-5" />

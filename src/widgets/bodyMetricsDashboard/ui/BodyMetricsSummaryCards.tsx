@@ -13,9 +13,6 @@ interface BodyMetricsSummaryCardsProps {
   className?: string;
 }
 
-const SUMMARY_GRID_CLASS = "grid gap-2 sm:grid-cols-2 lg:grid-cols-4";
-const SUMMARY_CARD_CLASS = "rounded-lg border border-border p-3";
-
 const formatSignedDelta = (value: number) => {
   if (value === 0) {
     return "0";
@@ -47,7 +44,10 @@ const getTrendLabel = (trendSummary: BodyMetricTrendSummary) => {
 
 const renderSummaryCard = (item: BodyMetricTrendSummary) => {
   return (
-    <article key={item.key} className={cn(SUMMARY_CARD_CLASS, "min-w-0")}>
+    <article
+      key={item.key}
+      className={cn("min-w-0 rounded-lg border border-border p-3")}
+    >
       <p className="truncate text-sm text-muted-foreground">{item.label}</p>
       <p className="truncate text-lg font-semibold sm:text-xl">
         {item.currentValue === null ? "—" : `${item.currentValue.toFixed(1)} ${item.unit}`}
@@ -79,7 +79,9 @@ export const BodyMetricsSummaryCards = ({
             Нет данных для анализа. Добавьте первый замер через форму ниже.
           </p>
         ) : (
-          <div className={SUMMARY_GRID_CLASS}>{visibleSummary.map(renderSummaryCard)}</div>
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            {visibleSummary.map(renderSummaryCard)}
+          </div>
         )}
       </CardContent>
     </Card>

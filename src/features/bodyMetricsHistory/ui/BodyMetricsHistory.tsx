@@ -24,12 +24,6 @@ interface BodyMetricsHistoryProps {
   onDelete: (entryId: string) => void;
 }
 
-const HISTORY_LIST_CLASS = "grid gap-2";
-const ENTRY_CARD_CLASS = "grid gap-2 rounded-lg border border-border p-3";
-const ENTRY_HEAD_CLASS = "flex items-center justify-between gap-2";
-const ENTRY_MEASUREMENTS_CLASS = "grid gap-1 text-sm text-muted-foreground";
-const ENTRY_ACTIONS_CLASS = "flex items-center gap-1";
-
 const formatMetricValue = (definition: BodyMetricDefinition, value: number) => {
   return `${definition.label}: ${value.toFixed(1)} ${definition.unit}`;
 };
@@ -72,20 +66,20 @@ export const BodyMetricsHistory = ({
             Пока нет записей. Добавьте первый замер, чтобы увидеть историю.
           </p>
         ) : (
-          <div className={HISTORY_LIST_CLASS}>
+          <div className="grid gap-2">
             {entries.map((entry) => (
               <article
                 key={entry.id}
                 className={cn(
-                  ENTRY_CARD_CLASS,
+                  "grid gap-2 rounded-lg border border-border p-3",
                   entry.id === activeEntryId && "border-primary/60 bg-primary/5",
                 )}
               >
-                <div className={ENTRY_HEAD_CLASS}>
+                <div className="flex items-center justify-between gap-2">
                   <p className="text-sm font-medium">
                     {formatBodyMetricsRecordedAt(entry.recordedAt)}
                   </p>
-                  <div className={ENTRY_ACTIONS_CLASS}>
+                  <div className="flex items-center gap-1">
                     <Button
                       type="button"
                       variant="ghost"
@@ -107,7 +101,7 @@ export const BodyMetricsHistory = ({
                   </div>
                 </div>
 
-                <div className={ENTRY_MEASUREMENTS_CLASS}>
+                <div className="grid gap-1 text-sm text-muted-foreground">
                   {metricDefinitions.map((definition) => {
                     const value = entry.measurements[definition.key];
                     if (typeof value !== "number") {

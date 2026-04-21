@@ -39,17 +39,6 @@ interface BodyMetricsFormProps {
   onCancelEdit?: () => void;
 }
 
-const FORM_GRID_CLASS = "grid gap-3 sm:grid-cols-2";
-const FIELD_CLASS = "grid gap-1.5";
-const ERROR_CLASS =
-  "rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive";
-const HINT_CLASS = "text-xs text-muted-foreground";
-const METRIC_TRIGGER_CLASS = "w-full justify-between";
-const METRIC_OPTION_CLASS = "flex items-center justify-between gap-2";
-const METRIC_CHECK_VISIBLE_CLASS = "text-primary";
-const METRIC_CHECK_HIDDEN_CLASS = "opacity-0";
-const METRIC_POPOVER_CLASS = "w-[var(--radix-popover-trigger-width)] p-0";
-
 export const BodyMetricsForm = ({
   initialEntry = null,
   metricDefinitions,
@@ -127,7 +116,7 @@ export const BodyMetricsForm = ({
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="grid gap-3 px-4">
-          <div className={FIELD_CLASS}>
+          <div className="grid gap-1.5">
             <Label htmlFor="body-metrics-recorded-at">Дата</Label>
             <Input
               id="body-metrics-recorded-at"
@@ -137,8 +126,8 @@ export const BodyMetricsForm = ({
             />
           </div>
 
-          <div className={FORM_GRID_CLASS}>
-            <div className={FIELD_CLASS}>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-1.5">
               <Label htmlFor="body-metrics-parameter">Параметр</Label>
               <Popover open={isMetricSelectOpen} onOpenChange={setIsMetricSelectOpen}>
                 <PopoverTrigger asChild>
@@ -146,14 +135,17 @@ export const BodyMetricsForm = ({
                     id="body-metrics-parameter"
                     type="button"
                     variant="outline"
-                    className={METRIC_TRIGGER_CLASS}
+                    className="w-full justify-between"
                     aria-expanded={isMetricSelectOpen}
                   >
                     <span className="truncate text-left">{selectedMetricLabel}</span>
                     <ChevronsUpDown className="size-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className={METRIC_POPOVER_CLASS} align="start">
+                <PopoverContent
+                  className="w-[var(--radix-popover-trigger-width)] p-0"
+                  align="start"
+                >
                   <Command>
                     <CommandList>
                       <CommandEmpty>Параметры не найдены</CommandEmpty>
@@ -167,14 +159,12 @@ export const BodyMetricsForm = ({
                               value={field.key}
                               onSelect={() => handleMetricOptionSelect(field.key)}
                             >
-                              <span className={METRIC_OPTION_CLASS}>
+                              <span className="flex items-center justify-between gap-2">
                                 {optionLabel}
                                 <Check
                                   className={cn(
                                     "size-4",
-                                    isSelected
-                                      ? METRIC_CHECK_VISIBLE_CLASS
-                                      : METRIC_CHECK_HIDDEN_CLASS,
+                                    isSelected ? "text-primary" : "opacity-0",
                                   )}
                                 />
                               </span>
@@ -188,7 +178,7 @@ export const BodyMetricsForm = ({
               </Popover>
             </div>
 
-            <div className={FIELD_CLASS}>
+            <div className="grid gap-1.5">
               <Label htmlFor={selectedDefinition.key}>
                 Значение ({selectedDefinition.unit})
               </Label>
@@ -205,13 +195,15 @@ export const BodyMetricsForm = ({
               />
             </div>
           </div>
-          <p className={HINT_CLASS}>
+          <p className="text-xs text-muted-foreground">
             Один параметр сохраняется как отдельная запись. Для следующего параметра
             выберите его в списке и сохраните снова.
           </p>
 
           {(errorMessage ?? "").length > 0 && (
-            <p className={ERROR_CLASS}>{errorMessage}</p>
+            <p className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              {errorMessage}
+            </p>
           )}
         </CardContent>
         <CardFooter className="gap-2 px-4">

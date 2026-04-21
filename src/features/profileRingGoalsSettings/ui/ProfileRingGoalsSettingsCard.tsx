@@ -21,13 +21,6 @@ interface ProfileRingGoalsSettingsCardProps {
   className?: string;
 }
 
-const CARD_CLASS = "gap-3 py-4";
-const CARD_HEADER_CLASS = "px-4";
-const CARD_CONTENT_CLASS = "px-4";
-const INPUT_GROUP_CLASS = "grid gap-3 sm:grid-cols-2";
-const INPUT_WRAPPER_CLASS = "flex flex-col gap-2";
-const HINT_CLASS = "text-xs text-muted-foreground mt-2";
-const ACTIONS_CLASS = "mt-1 flex flex-wrap gap-2";
 const VALID_INTEGER_PATTERN = /^\d+$/;
 
 const parseGoalValue = (value: string): number | null => {
@@ -104,8 +97,8 @@ export const ProfileRingGoalsSettingsCard = ({
   };
 
   return (
-    <Card className={cn(CARD_CLASS, className)}>
-      <CardHeader className={CARD_HEADER_CLASS}>
+    <Card className={cn("gap-3 py-4", className)}>
+      <CardHeader className="px-4">
         <CardTitle className="flex items-center gap-2">
           <Target className="h-4 w-4 text-muted-foreground" />
           Цели колец календаря
@@ -115,9 +108,9 @@ export const ProfileRingGoalsSettingsCard = ({
           для дневных колец
         </CardDescription>
       </CardHeader>
-      <CardContent className={CARD_CONTENT_CLASS}>
-        <div className={INPUT_GROUP_CLASS}>
-          <div className={INPUT_WRAPPER_CLASS}>
+      <CardContent className="px-4">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="ring-set-goal">Подходы для полного круга</Label>
             <Input
               id="ring-set-goal"
@@ -127,7 +120,7 @@ export const ProfileRingGoalsSettingsCard = ({
             />
           </div>
 
-          <div className={INPUT_WRAPPER_CLASS}>
+          <div className="flex flex-col gap-2">
             <Label htmlFor="ring-volume-goal">Объем для полного круга</Label>
             <Input
               id="ring-volume-goal"
@@ -138,12 +131,12 @@ export const ProfileRingGoalsSettingsCard = ({
           </div>
         </div>
 
-        <p className={HINT_CLASS}>
+        <p className="mt-2 text-xs text-muted-foreground">
           По умолчанию: {DEFAULT_RING_GOALS.fullSetCount} подходов и{" "}
           {DEFAULT_RING_GOALS.fullVolume} объема.
         </p>
 
-        <div className={ACTIONS_CLASS}>
+        <div className="mt-1 flex flex-wrap gap-2">
           <Button
             type="button"
             onClick={handleSaveRingGoals}

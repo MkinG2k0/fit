@@ -16,9 +16,6 @@ interface CreateCustomMetricCardProps {
   className?: string;
 }
 
-const FORM_GRID_CLASS = "grid gap-3 sm:grid-cols-2";
-const FIELD_CLASS = "grid gap-1.5";
-
 export const CreateCustomMetricCard = ({
   onCreateCustomMetric,
   className,
@@ -52,8 +49,8 @@ export const CreateCustomMetricCard = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-3 px-4">
-        <div className={FORM_GRID_CLASS}>
-          <div className={FIELD_CLASS}>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-1.5">
             <Label htmlFor="body-metrics-custom-label">Название</Label>
             <Input
               id="body-metrics-custom-label"
@@ -62,7 +59,7 @@ export const CreateCustomMetricCard = ({
               placeholder="Например: Предплечье"
             />
           </div>
-          <div className={FIELD_CLASS}>
+          <div className="grid gap-1.5">
             <Label htmlFor="body-metrics-custom-unit">Ед. измерения</Label>
             <Input
               id="body-metrics-custom-unit"

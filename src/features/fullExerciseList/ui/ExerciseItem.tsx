@@ -8,9 +8,6 @@ import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { CommandItem } from "@/shared/ui/shadCNComponents/ui/command";
 import { RadioGroupItem } from "../../../shared/ui/shadCNComponents/ui/radio-group.tsx";
 
-const exerciseItemIconClassName =
-  "size-14 shrink-0 object-contain opacity-80 [&_svg]:!block [&_svg]:!size-14";
-
 interface ExerciseItemProps {
   name: string;
   iconId: ExerciseIconId;
@@ -60,7 +57,9 @@ export const ExerciseItem = ({
       <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
         <ExerciseIconGraphic
           iconId={iconId}
-          className={cn(exerciseItemIconClassName)}
+          className={cn(
+            "size-14 shrink-0 object-contain opacity-80 [&_svg]:!block [&_svg]:!size-14",
+          )}
         />
         <span className="text-base overflow-hidden truncate font-medium">
           {name}

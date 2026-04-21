@@ -27,10 +27,6 @@ interface AnalyticsFiltersProps {
   className?: string;
 }
 
-const periodGroupClassName = "flex gap-2";
-const periodOptionClassName =
-  "flex flex-1 cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm";
-
 export const AnalyticsFilters = ({
   filters,
   onPeriodChange,
@@ -127,7 +123,7 @@ export const AnalyticsFilters = ({
         <div className="grid gap-2">
           <Label>Период</Label>
           <RadioGroup
-            className={periodGroupClassName}
+            className="flex gap-2"
             value={filters.period}
             onValueChange={handlePeriodValueChange}
           >
@@ -137,7 +133,7 @@ export const AnalyticsFilters = ({
                 <Label
                   key={option.value}
                   htmlFor={itemId}
-                  className={periodOptionClassName}
+                  className="flex flex-1 cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm"
                 >
                   <RadioGroupItem id={itemId} value={option.value} />
                   <span>{option.label}</span>

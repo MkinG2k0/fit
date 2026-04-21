@@ -5,7 +5,6 @@ const RING_SIZE = 44;
 const RING_CENTER = 22;
 const OUTER_RING_RADIUS = 19;
 const INNER_RING_RADIUS = 14.5;
-const DAY_BADGE_SIZE_CLASS = "h-6 w-6";
 
 const LOW_VOLUME_THRESHOLD = 0.33;
 const HIGH_VOLUME_THRESHOLD = 0.66;
@@ -140,7 +139,7 @@ export const Day = ({
         <div
           className={cn(
             "relative z-10 flex items-center justify-center rounded-full text-base",
-            DAY_BADGE_SIZE_CLASS,
+            "h-6 w-6",
             selectedFlag && "bg-primary! text-primary-foreground",
             todayFlag && "bg-primary/50 text-primary-foreground",
           )}

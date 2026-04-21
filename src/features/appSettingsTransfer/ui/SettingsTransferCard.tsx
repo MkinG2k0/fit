@@ -14,11 +14,6 @@ interface SettingsTransferCardProps {
   className?: string;
 }
 
-const CARD_CLASS = "gap-3 py-4";
-const CARD_HEADER_CLASS = "px-4";
-const CARD_CONTENT_CLASS = "space-y-3 px-4";
-const ACTION_ROW_CLASS = "flex flex-col gap-2 sm:flex-row sm:flex-wrap";
-
 export const SettingsTransferCard = ({
   className,
 }: SettingsTransferCardProps) => {
@@ -40,15 +35,15 @@ export const SettingsTransferCard = ({
   } = useSettingsTransfer();
 
   return (
-    <Card className={cn(CARD_CLASS, className)}>
-      <CardHeader className={CARD_HEADER_CLASS}>
+    <Card className={cn("gap-3 py-4", className)}>
+      <CardHeader className="px-4">
         <CardTitle>Резервная копия настроек</CardTitle>
         <CardDescription>
           Экспорт и импорт вынесены в единый JSON-файл. Новые разделы можно
           добавлять в приложении без смены формата файла.
         </CardDescription>
       </CardHeader>
-      <CardContent className={CARD_CONTENT_CLASS}>
+      <CardContent className="space-y-3 px-4">
         <input
           ref={fileInputRef}
           type="file"
@@ -58,7 +53,7 @@ export const SettingsTransferCard = ({
           aria-label="Выберите JSON-файл с настройками"
           onChange={handleImportFileSelected}
         />
-        <div className={ACTION_ROW_CLASS}>
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           <Button type="button" variant="secondary" onClick={handleExport}>
             Экспорт настроек
           </Button>

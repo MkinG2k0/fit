@@ -3,7 +3,6 @@ import { type MouseEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserStore } from "@/entities/user";
 import { loginRequest, registrationRequest } from "@/entities/user/api/userApi";
-import styles from "./LoginForm.module.css";
 
 export const LoginForm = () => {
   const [loginFormState, setLoginFormState] = useState({
@@ -51,33 +50,43 @@ export const LoginForm = () => {
   };
 
   return (
-    <div className={styles.wrapper}>
-      <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
-        <div>
+    <div className="flex h-dvh w-dvw flex-col items-center justify-center p-2.5">
+      <form
+        className="flex w-full max-w-sm flex-col items-center gap-2.5 rounded-2xl border border-border bg-card p-4 text-lg shadow-sm"
+        onSubmit={(e) => e.preventDefault()}
+      >
+        <div className="w-full">
           <input
+            className="w-full rounded-lg border border-input bg-background p-2.5 text-base font-bold transition-colors duration-300 ease-in-out"
             value={loginFormState.login}
             onChange={(e) => inputHandler(e.target.value, "login")}
             placeholder={"Login"}
           />
-          <div style={{ color: "red", fontSize: "15px" }}>
+          <div className="text-sm text-destructive">
             {error && error.cause === "user" && error.message}
           </div>
         </div>
-        <div>
+        <div className="w-full">
           <input
+            className="w-full rounded-lg border border-input bg-background p-2.5 text-base font-bold transition-colors duration-300 ease-in-out"
             value={loginFormState.password}
             onChange={(e) => inputHandler(e.target.value, "password")}
             placeholder={"Password"}
           />
-          <div style={{ color: "red", fontSize: "15px" }}>
+          <div className="text-sm text-destructive">
             {error && error.cause === "password" && error.message}
           </div>
         </div>
-        <button type="button" onClick={(event) => loginButtonHandler(event)}>
+        <button
+          type="button"
+          className="w-full cursor-pointer rounded-lg bg-foreground p-2.5 text-base font-bold text-background transition-all duration-300 ease-in-out hover:scale-105 hover:bg-background hover:text-foreground"
+          onClick={(event) => loginButtonHandler(event)}
+        >
           Login
         </button>
         <button
           type="button"
+          className="w-full cursor-pointer rounded-lg bg-foreground p-2.5 text-base font-bold text-background transition-all duration-300 ease-in-out hover:scale-105 hover:bg-background hover:text-foreground"
           onClick={(event) => registrationButtonHandler(event)}
         >
           Register

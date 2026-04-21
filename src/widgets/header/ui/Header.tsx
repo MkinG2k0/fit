@@ -3,7 +3,6 @@ import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import { useCalendarStore } from "@/entities/calendarDay";
 import { firstLetterToUpperCase } from "@/shared/lib";
-import style from "./Header.module.css";
 import { ProfileDropDownMenu } from "@/features/profileDropDownMenu";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 
@@ -30,16 +29,18 @@ export const Header = ({ date, title, navigateBack }: HeaderProps) => {
   };
 
   return (
-    <div className={style.header}>
-      <div className={style.title}>
+    <div className="flex items-start justify-between gap-1 text-center font-bold">
+      <div className="flex min-w-0 items-center gap-2.5 max-[480px]:gap-2">
         {navigateBack && (
           <Button variant="outline" onClick={() => navigate("/")}>
             <ArrowLeft />
           </Button>
         )}
-        <div className={style.pageName}>{title}</div>
+        <div className="text-left text-3xl leading-none max-[480px]:text-2xl">
+          {title}
+        </div>
         {date && (
-          <div className={style.month}>
+          <div className="text-sm text-muted-foreground max-[320px]:text-xs">
             {firstLetterToUpperCase(observableDate.format("MMMM YYYY"))}
           </div>
         )}

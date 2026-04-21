@@ -5,14 +5,7 @@ interface ThemeProviderProps {
   children: ReactNode;
 }
 
-const DARK_THEME_CLASSNAME = "dark";
-const AGGRESSIVE_THEME_CLASSNAME = "theme-aggressive";
-const CALM_THEME_CLASSNAME = "theme-calm";
 const DARK_SCHEME_QUERY = "(prefers-color-scheme: dark)";
-const CUSTOM_THEME_CLASSNAMES = [
-  AGGRESSIVE_THEME_CLASSNAME,
-  CALM_THEME_CLASSNAME,
-] as const;
 
 interface ResolvedThemeMode {
   shouldUseDarkTheme: boolean;
@@ -30,12 +23,12 @@ const resolveThemeMode = (themeMode: ThemeMode): ResolvedThemeMode => {
     case "aggressive":
       return {
         shouldUseDarkTheme: true,
-        customThemeClassName: AGGRESSIVE_THEME_CLASSNAME,
+        customThemeClassName: "theme-aggressive",
       };
     case "calm":
       return {
         shouldUseDarkTheme: false,
-        customThemeClassName: CALM_THEME_CLASSNAME,
+        customThemeClassName: "theme-calm",
       };
     case "system":
       return { shouldUseDarkTheme: isDarkThemePreferred };
@@ -48,8 +41,8 @@ const applyThemeMode = (themeMode: ThemeMode) => {
   const rootElement = document.documentElement;
   const { shouldUseDarkTheme, customThemeClassName } = resolveThemeMode(themeMode);
 
-  rootElement.classList.toggle(DARK_THEME_CLASSNAME, shouldUseDarkTheme);
-  rootElement.classList.remove(...CUSTOM_THEME_CLASSNAMES);
+  rootElement.classList.toggle("dark", shouldUseDarkTheme);
+  rootElement.classList.remove("theme-aggressive", "theme-calm");
 
   if (customThemeClassName) {
     rootElement.classList.add(customThemeClassName);

@@ -58,14 +58,6 @@ const THEME_OPTIONS: ThemeOption[] = [
   },
 ];
 
-const CARD_CLASS = "gap-3 py-4";
-const CARD_HEADER_CLASS = "px-4";
-const CARD_CONTENT_CLASS = "px-4";
-const OPTION_WRAPPER_CLASS =
-  "flex items-start gap-3 rounded-md border border-border p-3 transition-colors hover:bg-muted/40";
-const OPTION_TITLE_CLASS = "text-sm font-medium";
-const OPTION_DESCRIPTION_CLASS = "text-xs text-muted-foreground";
-const RADIO_GROUP_CLASS = "gap-2";
 const VALID_THEME_MODES = new Set<string>([
   "system",
   "light",
@@ -79,13 +71,17 @@ const isThemeMode = (value: string): value is ThemeMode =>
 
 const renderThemeOption = ({ value, title, description, icon: Icon }: ThemeOption) => {
   return (
-    <Label key={value} htmlFor={`theme-${value}`} className={OPTION_WRAPPER_CLASS}>
+    <Label
+      key={value}
+      htmlFor={`theme-${value}`}
+      className="flex items-start gap-3 rounded-md border border-border p-3 transition-colors hover:bg-muted/40"
+    >
       <RadioGroupItem id={`theme-${value}`} value={value} />
       <div className="flex min-w-0 flex-1 items-start gap-2">
         <Icon className="mt-0.5 h-4 w-4 text-muted-foreground" />
         <div className="flex flex-col gap-1">
-          <span className={OPTION_TITLE_CLASS}>{title}</span>
-          <span className={OPTION_DESCRIPTION_CLASS}>{description}</span>
+          <span className="text-sm font-medium">{title}</span>
+          <span className="text-xs text-muted-foreground">{description}</span>
         </div>
       </div>
     </Label>
@@ -105,16 +101,16 @@ export const ThemeSettingsCard = ({ className }: ThemeSettingsCardProps) => {
   };
 
   return (
-    <Card className={cn(CARD_CLASS, className)}>
-      <CardHeader className={CARD_HEADER_CLASS}>
+    <Card className={cn("gap-3 py-4", className)}>
+      <CardHeader className="px-4">
         <CardTitle>Тема приложения</CardTitle>
         <CardDescription>
           Выберите внешний вид приложения для удобного ведения дневника
         </CardDescription>
       </CardHeader>
-      <CardContent className={CARD_CONTENT_CLASS}>
+      <CardContent className="px-4">
         <RadioGroup
-          className={RADIO_GROUP_CLASS}
+          className="gap-2"
           value={themeMode}
           onValueChange={handleThemeModeChange}
         >

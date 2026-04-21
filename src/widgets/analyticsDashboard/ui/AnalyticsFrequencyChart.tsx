@@ -31,12 +31,6 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const weightChartClassName = "h-40 w-full aspect-auto";
-const tonnageChartClassName = "h-40 w-full aspect-auto";
-const positiveDeltaClassName = "text-primary";
-const negativeDeltaClassName = "text-destructive";
-const neutralDeltaClassName = "text-muted-foreground";
-
 export const AnalyticsFrequencyChart = ({
   trends,
   comparison,
@@ -52,12 +46,6 @@ export const AnalyticsFrequencyChart = ({
     comparison.deltaPercent === null
       ? "новый период"
       : `${comparison.deltaPercent > 0 ? "+" : ""}${comparison.deltaPercent.toFixed(1)}%`;
-  const deltaClassName =
-    comparison.delta > 0
-      ? positiveDeltaClassName
-      : comparison.delta < 0
-        ? negativeDeltaClassName
-        : neutralDeltaClassName;
 
   return (
     <Card>
@@ -79,7 +67,16 @@ export const AnalyticsFrequencyChart = ({
           </div>
           <div className="rounded-md border p-2">
             <div className="text-xs text-muted-foreground">Изм. к прошлому</div>
-            <div className={cn("text-lg font-semibold", deltaClassName)}>
+            <div
+              className={cn(
+                "text-lg font-semibold",
+                comparison.delta > 0
+                  ? "text-primary"
+                  : comparison.delta < 0
+                    ? "text-destructive"
+                    : "text-muted-foreground",
+              )}
+            >
               {deltaText}
             </div>
           </div>
@@ -89,7 +86,7 @@ export const AnalyticsFrequencyChart = ({
           <div className="mb-1 text-xs text-muted-foreground">
             Максимальный вес: {maxWeight.toFixed(0)} кг
           </div>
-          <ChartContainer config={chartConfig} className={weightChartClassName}>
+          <ChartContainer config={chartConfig} className="h-40 w-full aspect-auto">
             <LineChart data={trends} margin={{ left: 8, right: 8 }}>
               <CartesianGrid vertical={false} />
               <XAxis
@@ -117,7 +114,7 @@ export const AnalyticsFrequencyChart = ({
 
         <div className="rounded-md border p-2">
           <div className="mb-1 text-xs text-muted-foreground">Объем по датам</div>
-          <ChartContainer config={chartConfig} className={tonnageChartClassName}>
+          <ChartContainer config={chartConfig} className="h-40 w-full aspect-auto">
             <BarChart data={trends} margin={{ left: 8, right: 8 }}>
               <CartesianGrid vertical={false} />
               <XAxis

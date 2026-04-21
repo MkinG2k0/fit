@@ -20,7 +20,6 @@ import { ExerciseNameSelector } from "./ExerciseNameSelector";
 import { StatisticCard } from "@/widgets/statisticCard";
 import { formatKcalOneDecimal } from "../calories";
 import { useWorkoutCaloriesUiEnabled } from "../lib/useWorkoutCaloriesUiEnabled";
-import style from "./ExerciseCard.module.css";
 
 interface ExerciseCardProps {
   exercise: Exercise;
@@ -188,24 +187,26 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
           <AppNavIcon variant="chart" />
         </div>
         <div
-          className={cn(style.card, "rounded-xl")}
+          className="relative flex w-full max-w-full self-stretch flex-col items-center justify-center rounded-xl border bg-card text-card-foreground shadow-sm"
           style={{ borderColor: exerciseColor }}
         >
-          <div onClick={handleCardHeadClick} className={style.cardHead}>
-            <div className={style.info}>
+          <div
+            onClick={handleCardHeadClick}
+            className="flex w-full min-w-0 items-center justify-between gap-1 overflow-hidden"
+          >
+            <div className="flex min-w-0 flex-1 flex-row items-center overflow-hidden">
               <div
                 className={cn(
-                  style.icon,
                   "flex items-center justify-center p-2",
                 )}
               >
                 <ExerciseCategoryIcon
                   category={exercise.category}
                   iconId={exercise.iconId}
-                  className={style.iconGraphic}
+                  className="size-11 shrink-0"
                 />
               </div>
-              <div className={style.exerciseName}>
+              <div className="flex min-w-0 flex-1 items-center overflow-hidden pl-2.5 text-base">
                 <ExerciseNameSelector
                   allExercises={allExercises}
                   exerciseName={exercise.name}
@@ -219,24 +220,24 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
               {/*{exercise.presetName && (*/}
               {/*  <div*/}
               {/*    style={{ borderColor: exerciseColor }}*/}
-              {/*    className={style.presetName}*/}
+              {/*    className="rounded-full border bg-card px-1.5 py-0.5 text-xs text-card-foreground"*/}
               {/*  >*/}
               {/*    Пресет: {exercise.presetName}*/}
               {/*  </div>*/}
               {/*)}*/}
             </div>
             <div
-              className={style.liftedTotal}
+              className="flex shrink-0 items-baseline gap-1 whitespace-nowrap text-muted-foreground"
               title={
                 showCaloriesUi
                   ? "Суммарный объём и оценка ккал по завершённым подходам"
                   : "Суммарный объём: повторения × вес по подходам"
               }
             >
-              <span className={cn(style.liftedTotalValue, "font-numeric")}>
+              <span className="text-base font-bold text-primary font-numeric">
                 {totalLiftedLabel}
               </span>
-              <span className={style.liftedTotalUnit}>кг</span>
+              <span className="text-xs font-semibold">кг</span>
               {showCaloriesUi && totalKcal > 0 ? (
                 <>
                   <span
@@ -245,10 +246,10 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
                   >
                     •
                   </span>
-                  <span className={cn(style.liftedTotalValue, "font-numeric")}>
+                  <span className="text-base font-bold text-primary font-numeric">
                     {formatKcalOneDecimal(totalKcal)}
                   </span>
-                  <span className={style.liftedTotalUnit}>ккал</span>
+                  <span className="text-xs font-semibold">ккал</span>
                 </>
               ) : null}
             </div>

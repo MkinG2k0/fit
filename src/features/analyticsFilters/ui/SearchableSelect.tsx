@@ -31,14 +31,6 @@ interface SearchableSelectProps {
   className?: string;
 }
 
-const containerClassName = "flex w-full items-center gap-2";
-const triggerClassName = "min-w-0 flex-1 justify-between";
-const clearButtonClassName = "h-8 w-8 shrink-0 p-0";
-const optionBaseClassName = "flex items-center justify-between gap-2";
-const selectedIconClassName = "text-primary";
-const unselectedIconClassName = "opacity-0";
-const popoverContentClassName = "w-72 p-0 sm:w-80";
-
 export const SearchableSelect = ({
   value,
   options,
@@ -54,17 +46,17 @@ export const SearchableSelect = ({
   const hasValue = value.length > 0;
 
   return (
-    <div className={cn(containerClassName, className)}>
+    <div className={cn("flex w-full items-center gap-2", className)}>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline" className={triggerClassName}>
+          <Button variant="outline" className="min-w-0 flex-1 justify-between">
             <span className="truncate text-left">
               {selectedOption?.label ?? placeholder}
             </span>
             <ChevronsUpDown className="size-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className={popoverContentClassName} align="start">
+        <PopoverContent className="w-72 p-0 sm:w-80" align="start">
           <Command>
             <CommandInput placeholder={searchPlaceholder} />
             <CommandList>
@@ -83,14 +75,12 @@ export const SearchableSelect = ({
                       value={option.label}
                       onSelect={handleSelectOption}
                     >
-                      <span className={optionBaseClassName}>
+                      <span className="flex items-center justify-between gap-2">
                         {option.label}
                         <Check
                           className={cn(
                             "size-4",
-                            isSelected
-                              ? selectedIconClassName
-                              : unselectedIconClassName,
+                            isSelected ? "text-primary" : "opacity-0",
                           )}
                         />
                       </span>
@@ -106,7 +96,7 @@ export const SearchableSelect = ({
         type="button"
         size="icon"
         variant="ghost"
-        className={clearButtonClassName}
+        className="h-8 w-8 shrink-0 p-0"
         disabled={!hasValue}
         onClick={handleClearClick}
         aria-label="Очистить выбор"

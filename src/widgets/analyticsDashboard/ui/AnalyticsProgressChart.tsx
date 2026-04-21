@@ -29,8 +29,6 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const chartClassName = "h-56 w-full aspect-auto sm:h-72 sm:aspect-video";
-
 export const AnalyticsProgressChart = ({ trends }: AnalyticsProgressChartProps) => {
   return (
     <Card>
@@ -41,7 +39,10 @@ export const AnalyticsProgressChart = ({ trends }: AnalyticsProgressChartProps) 
         </CardDescription>
       </CardHeader>
       <CardContent className="px-2 pb-3 sm:px-6 sm:pb-6">
-        <ChartContainer config={chartConfig} className={chartClassName}>
+        <ChartContainer
+          config={chartConfig}
+          className="h-56 w-full aspect-auto sm:h-72 sm:aspect-video"
+        >
           <LineChart data={trends} margin={{ left: 12, right: 12 }}>
             <CartesianGrid vertical={false} />
             <XAxis

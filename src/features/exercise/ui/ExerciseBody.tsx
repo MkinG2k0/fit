@@ -8,7 +8,6 @@ import type { Exercise, ExerciseSet } from "@/entities/exercise";
 import { useUserStore } from "@/entities/user";
 import { StatisticCard } from "@/widgets/statisticCard";
 import { cn } from "@/shared/lib/classMerge";
-import style from "./ExerciseCard.module.css";
 import { CustomButton } from "@/shared/ui";
 import { useLastExerciseSession } from "../lib/useLastExerciseSession";
 import { useWorkoutCaloriesUiEnabled } from "../lib/useWorkoutCaloriesUiEnabled";
@@ -34,9 +33,6 @@ export const ExerciseBody = ({
   const onChangeHandler = useCalendarStore((store) => store.setExerciseValues);
   const addSetToExercise = useCalendarStore((store) => store.addSetToExercise);
   const addSetGuardRef = useRef(false);
-
-  const INPUT_CLASSNAME =
-    "font-numeric shadow-none ring-0 outline-none focus-visible:ring-0 focus-visible:ring-offset-0 text-center text-2xl text-foreground placeholder:text-muted-foreground";
 
   const inputHandler = useCallback(
     (
@@ -66,7 +62,8 @@ export const ExerciseBody = ({
 
       const endNow = new Date();
       const defaultSec =
-        useUserStore.getState().defaultSetDurationSec ?? DEFAULT_SET_DURATION_SEC;
+        useUserStore.getState().defaultSetDurationSec ??
+        DEFAULT_SET_DURATION_SEC;
       const { startTime, endTime } = getSetTimeRange(
         previousEnd,
         defaultSec,
@@ -85,7 +82,7 @@ export const ExerciseBody = ({
   }, [addSetToExercise, exercise]);
 
   return (
-    <div className="flex flex-col gap-2 p-4 pt-0 min-w-[352px] max-w-[738px]">
+    <div className="flex flex-col gap-2 p-4 pt-0 min-w-[373px] max-w-[738px]">
       {lastSession !== null ? (
         <p
           className="w-full px-4 text-center text-xs leading-snug text-muted-foreground"
@@ -96,17 +93,25 @@ export const ExerciseBody = ({
       ) : null}
       <div
         className={cn(
-          style.inputsHeader,
-          !showCaloriesUi && style.inputsHeaderWeb,
+          "grid w-full items-center gap-2",
+          showCaloriesUi
+            ? "grid-cols-[2.25rem_minmax(0,1fr)_minmax(0,1fr)_3rem_2.25rem]"
+            : "grid-cols-[2.25rem_minmax(0,1fr)_minmax(0,1fr)_2.25rem]",
         )}
       >
-        <span className={style.inputsHeaderSpacer} />
-        <span className={style.inputLabel}>Кол-во</span>
-        <span className={style.inputLabel}>Кг</span>
+        <span className="w-1" />
+        <span className="min-w-0 text-center text-xs font-semibold leading-tight text-muted-foreground">
+          Кол-во
+        </span>
+        <span className="min-w-0 text-center text-xs font-semibold leading-tight text-muted-foreground">
+          Кг
+        </span>
         {showCaloriesUi ? (
-          <span className={style.inputLabelKcal}>Ккал</span>
+          <span className="min-w-0 text-center text-xs font-semibold leading-tight text-muted-foreground">
+            Ккал
+          </span>
         ) : null}
-        <span className={style.inputsHeaderSpacer} />
+        <span className="w-1" />
       </div>
 
       <AnimatePresence>
@@ -127,7 +132,6 @@ export const ExerciseBody = ({
                 index={idx}
                 showKcalColumn={showCaloriesUi}
                 calorieDisplay={calorieDisplay}
-                inputClassName={INPUT_CLASSNAME}
                 onInputChange={inputHandler}
               />
             </motion.div>

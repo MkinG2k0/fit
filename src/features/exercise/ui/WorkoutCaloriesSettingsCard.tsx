@@ -24,11 +24,6 @@ interface WorkoutCaloriesSettingsCardProps {
   className?: string;
 }
 
-const CARD_CLASS = "gap-3 py-4";
-const CARD_HEADER_CLASS = "px-4";
-const CARD_CONTENT_CLASS = "flex flex-col gap-3 px-4";
-const ROW_CLASS = "flex items-start gap-3 rounded-md border border-border p-3";
-
 export const WorkoutCaloriesSettingsCard = ({
   className,
 }: WorkoutCaloriesSettingsCardProps) => {
@@ -61,12 +56,12 @@ export const WorkoutCaloriesSettingsCard = ({
   );
 
   return (
-    <Card className={cn(CARD_CLASS, className)}>
+    <Card className={cn("gap-3 py-4", className)}>
       <WorkoutCalorieProfileDialog
         open={profileDialogOpen}
         onOpenChange={setProfileDialogOpen}
       />
-      <CardHeader className={CARD_HEADER_CLASS}>
+      <CardHeader className="px-4">
         <CardTitle className="flex items-center gap-2">
           <FlaskConical className="size-5 text-muted-foreground" aria-hidden />
           Ккал на подход
@@ -76,8 +71,8 @@ export const WorkoutCaloriesSettingsCard = ({
           подхода. Доступно в приложении на Android; на сайте выключено.
         </CardDescription>
       </CardHeader>
-      <CardContent className={CARD_CONTENT_CLASS}>
-        <div className={ROW_CLASS}>
+      <CardContent className="flex flex-col gap-3 px-4">
+        <div className="flex items-start gap-3 rounded-md border border-border p-3">
           <Checkbox
             id="workout-calories-enabled"
             checked={checked}
@@ -101,7 +96,7 @@ export const WorkoutCaloriesSettingsCard = ({
           </div>
         </div>
         {checked && !profileComplete ? (
-          <div className={ROW_CLASS}>
+          <div className="flex items-start gap-3 rounded-md border border-border p-3">
             <div className="grid min-w-0 flex-1 gap-2">
               <p className="text-sm text-muted-foreground">
                 Для расчёта ккал укажите вес, возраст и пол (сохраняются в этом
@@ -122,7 +117,7 @@ export const WorkoutCaloriesSettingsCard = ({
           </div>
         ) : null}
         {checked ? (
-          <div className={ROW_CLASS}>
+          <div className="flex items-start gap-3 rounded-md border border-border p-3">
             <div className="grid min-w-0 flex-1 gap-2">
               <Label
                 htmlFor="workout-default-set-duration"

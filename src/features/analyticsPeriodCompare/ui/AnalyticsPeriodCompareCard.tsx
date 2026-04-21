@@ -15,16 +15,6 @@ interface AnalyticsPeriodCompareCardProps {
   className?: string;
 }
 
-const getDeltaColorClassName = (delta: number) => {
-  if (delta > 0) {
-    return "text-primary";
-  }
-  if (delta < 0) {
-    return "text-destructive";
-  }
-  return "text-muted-foreground";
-};
-
 export const AnalyticsPeriodCompareCard = ({
   period,
   comparison,
@@ -32,7 +22,6 @@ export const AnalyticsPeriodCompareCard = ({
 }: AnalyticsPeriodCompareCardProps) => {
   const periodLabel = getPeriodLabel(period);
   const deltaText = formatPeriodDelta(comparison);
-  const deltaColorClassName = getDeltaColorClassName(comparison.delta);
 
   return (
     <Card className={cn(className)}>
@@ -53,7 +42,16 @@ export const AnalyticsPeriodCompareCard = ({
         </div>
         <div className="flex items-start justify-between gap-2 text-sm">
           <span className="text-muted-foreground">Разница</span>
-          <span className={cn("text-right font-semibold", deltaColorClassName)}>
+          <span
+            className={cn(
+              "text-right font-semibold",
+              comparison.delta > 0
+                ? "text-primary"
+                : comparison.delta < 0
+                  ? "text-destructive"
+                  : "text-muted-foreground",
+            )}
+          >
             {deltaText.signedDelta} кг ({deltaText.percent})
           </span>
         </div>

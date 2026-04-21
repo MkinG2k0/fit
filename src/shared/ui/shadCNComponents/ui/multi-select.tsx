@@ -27,9 +27,6 @@ interface MultiSelectProps {
   onSelectedValuesChange: (values: string[]) => void;
 }
 
-const TRIGGER_CLASS = "w-full justify-between";
-const CONTENT_CLASS = "w-[var(--radix-popover-trigger-width)] p-0";
-
 export const MultiSelect = ({
   options,
   selectedValues,
@@ -65,12 +62,15 @@ export const MultiSelect = ({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className={cn(TRIGGER_CLASS, className)}>
+        <Button variant="outline" className={cn("w-full justify-between", className)}>
           <span className="truncate text-left">{triggerLabel}</span>
           <ChevronsUpDown className="size-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="start" className={CONTENT_CLASS}>
+      <PopoverContent
+        align="start"
+        className="w-[var(--radix-popover-trigger-width)] p-0"
+      >
         <Command>
           <CommandInput placeholder={searchPlaceholder} />
           <CommandList>

@@ -21,8 +21,6 @@ export const CreateButtons = ({
   onOpenCategoryModal,
   onOpenPresetModal,
 }: CreateButtonsProps) => {
-  const createButtonClasses = "justify-start py-3 text-lg";
-
   const handleOpenExerciseModal = () => {
     onOpenAddPopoverChange(false);
     onOpenExerciseModal();
@@ -47,7 +45,7 @@ export const CreateButtons = ({
         <div className="flex flex-col gap-2">
           <Button
             variant="ghost"
-            className={createButtonClasses}
+            className="justify-start py-3 text-lg"
             onClick={handleOpenExerciseModal}
           >
             <Dumbbell className="mr-2 h-5 w-5" />
@@ -55,7 +53,7 @@ export const CreateButtons = ({
           </Button>
           <Button
             variant="ghost"
-            className={createButtonClasses}
+            className="justify-start py-3 text-lg"
             onClick={handleOpenCategoryModal}
           >
             <FolderPlus className="mr-2 h-5 w-5" />
@@ -63,7 +61,7 @@ export const CreateButtons = ({
           </Button>
           <Button
             variant="ghost"
-            className={createButtonClasses}
+            className="justify-start py-3 text-lg"
             onClick={handleOpenPresetModal}
           >
             <Zap className="mr-2 h-5 w-5" />

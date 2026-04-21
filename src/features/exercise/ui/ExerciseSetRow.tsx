@@ -6,7 +6,6 @@ import type { Exercise, ExerciseSet } from "@/entities/exercise";
 import { useCalendarStore } from "@/entities/calendarDay";
 import type { SetRowCalorieDisplay } from "../calories";
 import { cn } from "@/shared/lib/classMerge";
-import style from "./ExerciseCard.module.css";
 import { ExerciseSetKcalCell } from "./ExerciseSetKcalCell";
 
 interface ExerciseSetRowProps {
@@ -16,7 +15,6 @@ interface ExerciseSetRowProps {
   /** На web колонка ккал скрыта — Health недоступен. */
   showKcalColumn: boolean;
   calorieDisplay: SetRowCalorieDisplay;
-  inputClassName: string;
   onInputChange: (
     event: ChangeEvent<HTMLInputElement>,
     setItem: ExerciseSet,
@@ -29,7 +27,6 @@ export const ExerciseSetRow = ({
   index,
   showKcalColumn,
   calorieDisplay,
-  inputClassName,
   onInputChange,
 }: ExerciseSetRowProps) => {
   const deleteSet = useCalendarStore((s) => s.deleteSet);
@@ -41,23 +38,24 @@ export const ExerciseSetRow = ({
   return (
     <div
       className={cn(
-        style.setGridRow,
-        !showKcalColumn && style.setGridRowWeb,
-        "gap-3",
+        "grid w-full items-center gap-3",
+        showKcalColumn
+          ? "grid-cols-[2.25rem_minmax(0,1fr)_minmax(0,1fr)_3rem_2.25rem]"
+          : "grid-cols-[2.25rem_minmax(0,1fr)_minmax(0,1fr)_2.25rem]",
       )}
     >
       <Button
         variant="outline"
         size="icon"
-        className={cn(style.setIndex, "flex-auto w-full h-full")}
+        className="h-full w-full flex-auto text-center text-xl text-muted-foreground"
       >
         {index + 1}
       </Button>
-      <div className={style.cell}>
+      <div className="w-full rounded-full bg-muted">
         <Input
           className={cn(
-            inputClassName,
-            "text-primary bg-background w-full border-primary h-12 rounded-md",
+            "h-12 w-full rounded-md border-primary bg-background text-center text-2xl text-foreground font-numeric shadow-none ring-0 outline-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0",
+            "text-primary",
           )}
           type="number"
           placeholder="Кол-во"
@@ -68,11 +66,11 @@ export const ExerciseSetRow = ({
           }}
         />
       </div>
-      <div className={style.cell}>
+      <div className="w-full rounded-full bg-muted">
         <Input
           className={cn(
-            inputClassName,
-            "text-primary bg-background w-full border-primary h-12 rounded-md",
+            "h-12 w-full rounded-md border-primary bg-background text-center text-2xl text-foreground font-numeric shadow-none ring-0 outline-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0",
+            "text-primary",
           )}
           type="number"
           placeholder="Кг"

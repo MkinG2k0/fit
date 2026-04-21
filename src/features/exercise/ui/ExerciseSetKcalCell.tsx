@@ -3,12 +3,6 @@ import { Badge } from "@/shared/ui/shadCNComponents/ui/badge";
 import { formatKcalOneDecimal, type SetRowCalorieDisplay } from "../calories";
 import { cn } from "@/shared/lib/classMerge";
 
-const kcalCellWrap =
-  "flex flex-col h-12 min-w-0 items-center justify-center gap-0.5 font-numeric";
-
-const kcalBadgeClass =
-  "h-4 shrink-0 px-1 py-0 text-[8px] font-semibold leading-none";
-
 interface ExerciseSetKcalCellProps {
   calorieDisplay: SetRowCalorieDisplay;
 }
@@ -23,7 +17,7 @@ export const ExerciseSetKcalCell = ({
     return (
       <Button
         variant="outline"
-        className={kcalCellWrap}
+        className="flex h-12 min-w-0 flex-col items-center justify-center gap-0.5 font-numeric"
         title={isHr ? "По пульсу" : "Оценка по MET (без пульса)"}
       >
         <div
@@ -37,7 +31,10 @@ export const ExerciseSetKcalCell = ({
           {isHr ? "" : "~"}
           {formatKcalOneDecimal(calories.kcal)}
         </div>
-        <Badge variant={isHr ? "hr" : "met"} className={kcalBadgeClass}>
+        <Badge
+          variant={isHr ? "hr" : "met"}
+          className="h-4 shrink-0 px-1 py-0 text-xs font-semibold leading-none"
+        >
           {isHr ? "HR" : "MET"}
         </Badge>
       </Button>
@@ -47,7 +44,7 @@ export const ExerciseSetKcalCell = ({
   return (
     <div
       className={cn(
-        kcalCellWrap,
+        "flex h-12 min-w-0 flex-col items-center justify-center gap-0.5 font-numeric",
         "rounded-md border border-border text-sm tabular-nums text-muted-foreground",
       )}
       aria-hidden
