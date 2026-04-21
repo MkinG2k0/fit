@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import type { ExerciseTrendRow } from "@/entities/analytics";
 import {
@@ -83,10 +84,6 @@ export const AnalyticsExerciseDetailsDialog = ({
                   labelFormatter={(_, payload) =>
                     String(payload?.[0]?.payload?.dateKey ?? "")
                   }
-                  formatter={(value) => [
-                    `${(Number(value) / 1000).toFixed(1)}т`,
-                    "Тоннаж",
-                  ]}
                 />
               }
             />
@@ -96,21 +93,25 @@ export const AnalyticsExerciseDetailsDialog = ({
               stroke="var(--color-tonnage)"
               strokeWidth={2.5}
               dot={false}
+              activeDot={{ r: 4 }}
             />
           </LineChart>
         </ChartContainer>
+
         <div className="grid gap-2 sm:grid-cols-2">
-          <div className="rounded-lg border border-border bg-muted/30 px-3 py-2">
-            <p className="text-[11px] text-muted-foreground">Всего тоннаж</p>
-            <p className="text-base font-semibold text-primary">
-              {(row.tonnage / 1000).toFixed(1)}т
-            </p>
-          </div>
-          <div className="rounded-lg border border-border bg-muted/30 px-3 py-2">
-            <p className="text-[11px] text-muted-foreground">Тренировок</p>
-            <p className="text-base font-semibold text-foreground">
-              {row.sessions}
-            </p>
+          <div className="flex  gap-2">
+            <div className="rounded-lg border border-border bg-muted/30 px-3 py-2 flex-auto">
+              <p className="text-[11px] text-muted-foreground">Всего тоннаж</p>
+              <p className="text-base font-semibold text-primary">
+                {(row.tonnage / 1000).toFixed(1)}т
+              </p>
+            </div>
+            <div className="rounded-lg border border-border bg-muted/30 px-3 py-2 flex-auto">
+              <p className="text-[11px] text-muted-foreground">Тренировок</p>
+              <p className="text-base font-semibold text-foreground">
+                {row.sessions}
+              </p>
+            </div>
           </div>
           <div className="rounded-lg border border-border bg-muted/30 px-3 py-2">
             <p className="text-[11px] text-muted-foreground">
