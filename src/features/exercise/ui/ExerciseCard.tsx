@@ -34,6 +34,12 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
   const exerciseCardShowLastSessionResult = useUserStore(
     (s) => s.exerciseCardShowLastSessionResult ?? false,
   );
+  const exerciseCardShowKcalInHeader = useUserStore(
+    (s) => s.exerciseCardShowKcalInHeader ?? true,
+  );
+  const exerciseCardShowTotalVolumeInHeader = useUserStore(
+    (s) => s.exerciseCardShowTotalVolumeInHeader ?? true,
+  );
   const [isEditable, setIsEditable] = useState(false);
   const [modalVisibility, setModalVisibility] = useState(false);
   const [showHint, setShowHint] = useState(false);
@@ -151,6 +157,12 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
     }, 0);
   }, [exercise.sets]);
 
+  const showKcalInHeader =
+    showCaloriesUi &&
+    exerciseCardShowKcalInHeader &&
+    totalKcal > 0;
+  const showVolumeInHeader = exerciseCardShowTotalVolumeInHeader;
+
   return (
     <div className="relative overflow-hidden cursor-pointer">
       <motion.div
@@ -197,37 +209,39 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
               </div>
             </div>
 
-            {showCaloriesUi && totalKcal > 0 && (
-              <>
-                <div className="flex items-center gap-1">
-                  <span className="text-base font-bold text-primary font-numeric">
-                    {formatKcalOneDecimal(totalKcal)}
-                  </span>
-                  <span className="text-xs font-semibold text-muted-foreground">
-                    ккал
-                  </span>
+            {showKcalInHeader ? (
+              <div className="flex items-center gap-1">
+                <span className="text-base font-bold text-primary font-numeric">
+                  {formatKcalOneDecimal(totalKcal)}
+                </span>
+                <span className="text-xs font-semibold text-muted-foreground">
+                  ккал
+                </span>
+                {showVolumeInHeader ? (
                   <span
                     className="text-muted-foreground shrink-0 px-0.5"
                     aria-hidden
                   >
                     •
                   </span>
-                </div>
-              </>
-            )}
-            <div
-              className="flex shrink-0 items-baseline gap-1 whitespace-nowrap text-muted-foreground"
-              title={
-                showCaloriesUi
-                  ? "Суммарный объём и оценка ккал по завершённым подходам"
-                  : "Суммарный объём: повторения × вес по подходам"
-              }
-            >
-              <span className="text-base font-bold text-primary font-numeric">
-                {totalLifted.value}
-              </span>
-              <span className="text-xs font-semibold">{totalLifted.unit}</span>
-            </div>
+                ) : null}
+              </div>
+            ) : null}
+            {showVolumeInHeader ? (
+              <div
+                className="flex shrink-0 items-baseline gap-1 whitespace-nowrap text-muted-foreground"
+                title={
+                  showKcalInHeader
+                    ? "Суммарный объём и оценка ккал по завершённым подходам"
+                    : "Суммарный объём: повторения × вес по подходам"
+                }
+              >
+                <span className="text-base font-bold text-primary font-numeric">
+                  {totalLifted.value}
+                </span>
+                <span className="text-xs font-semibold">{totalLifted.unit}</span>
+              </div>
+            ) : null}
             <div className="p-4">
               {isEditable ? <ChevronUp /> : <ChevronDown />}
             </div>

@@ -31,6 +31,10 @@ interface UserState {
   workoutCalorieProfileOnboarding: WorkoutCalorieProfileOnboardingStatus;
   /** Подсказка прошлой тренировки в свёрнутой карточке упражнения. */
   exerciseCardShowLastSessionResult: boolean;
+  /** Ккал в шапке карточки (имеет смысл при включённом учёте ккал в нативном приложении). */
+  exerciseCardShowKcalInHeader: boolean;
+  /** Суммарный объём (повторы × вес) в шапке карточки. */
+  exerciseCardShowTotalVolumeInHeader: boolean;
 }
 
 interface ActionsState {
@@ -43,6 +47,8 @@ interface ActionsState {
     status: WorkoutCalorieProfileOnboardingStatus,
   ) => void;
   setExerciseCardShowLastSessionResult: (enabled: boolean) => void;
+  setExerciseCardShowKcalInHeader: (enabled: boolean) => void;
+  setExerciseCardShowTotalVolumeInHeader: (enabled: boolean) => void;
   setAccessToken: (token: string) => void;
   deleteUserData: () => void;
   reset: () => void;
@@ -62,6 +68,8 @@ export const useUserStore = create<UserState & ActionsState>()(
       ),
       workoutCalorieProfileOnboarding: "pending",
       exerciseCardShowLastSessionResult: false,
+      exerciseCardShowKcalInHeader: true,
+      exerciseCardShowTotalVolumeInHeader: true,
       accessToken: "",
 
       setAccessToken: (token) => set({ accessToken: token }),
@@ -94,6 +102,7 @@ export const useUserStore = create<UserState & ActionsState>()(
       setWorkoutCaloriesEnabled: (enabled) =>
         set(() => ({
           workoutCaloriesEnabled: enabled,
+          ...(enabled ? {} : { exerciseCardShowKcalInHeader: false }),
         })),
 
       setDefaultSetDurationSec: (sec) =>
@@ -109,6 +118,16 @@ export const useUserStore = create<UserState & ActionsState>()(
       setExerciseCardShowLastSessionResult: (enabled) =>
         set(() => ({
           exerciseCardShowLastSessionResult: enabled,
+        })),
+
+      setExerciseCardShowKcalInHeader: (enabled) =>
+        set(() => ({
+          exerciseCardShowKcalInHeader: enabled,
+        })),
+
+      setExerciseCardShowTotalVolumeInHeader: (enabled) =>
+        set(() => ({
+          exerciseCardShowTotalVolumeInHeader: enabled,
         })),
 
       deleteUserData: () =>
@@ -153,6 +172,14 @@ export const useUserStore = create<UserState & ActionsState>()(
             typeof p.exerciseCardShowLastSessionResult === "boolean"
               ? p.exerciseCardShowLastSessionResult
               : current.exerciseCardShowLastSessionResult,
+          exerciseCardShowKcalInHeader:
+            typeof p.exerciseCardShowKcalInHeader === "boolean"
+              ? p.exerciseCardShowKcalInHeader
+              : current.exerciseCardShowKcalInHeader,
+          exerciseCardShowTotalVolumeInHeader:
+            typeof p.exerciseCardShowTotalVolumeInHeader === "boolean"
+              ? p.exerciseCardShowTotalVolumeInHeader
+              : current.exerciseCardShowTotalVolumeInHeader,
         };
       },
     },

@@ -82,6 +82,8 @@ const isUserProfileExport = (
   workoutCaloriesEnabled?: boolean;
   defaultSetDurationSec?: number;
   exerciseCardShowLastSessionResult?: boolean;
+  exerciseCardShowKcalInHeader?: boolean;
+  exerciseCardShowTotalVolumeInHeader?: boolean;
 } => {
   if (!isPlainObject(value)) {
     return false;
@@ -112,6 +114,18 @@ const isUserProfileExport = (
   if (
     "exerciseCardShowLastSessionResult" in value &&
     typeof value.exerciseCardShowLastSessionResult !== "boolean"
+  ) {
+    return false;
+  }
+  if (
+    "exerciseCardShowKcalInHeader" in value &&
+    typeof value.exerciseCardShowKcalInHeader !== "boolean"
+  ) {
+    return false;
+  }
+  if (
+    "exerciseCardShowTotalVolumeInHeader" in value &&
+    typeof value.exerciseCardShowTotalVolumeInHeader !== "boolean"
   ) {
     return false;
   }
@@ -167,6 +181,8 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         workoutCaloriesEnabled?: boolean;
         defaultSetDurationSec?: number;
         exerciseCardShowLastSessionResult?: boolean;
+        exerciseCardShowKcalInHeader?: boolean;
+        exerciseCardShowTotalVolumeInHeader?: boolean;
       };
       return {
         user: state.user ?? { userName: "" },
@@ -178,6 +194,10 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         ),
         exerciseCardShowLastSessionResult:
           state.exerciseCardShowLastSessionResult ?? false,
+        exerciseCardShowKcalInHeader:
+          state.exerciseCardShowKcalInHeader ?? true,
+        exerciseCardShowTotalVolumeInHeader:
+          state.exerciseCardShowTotalVolumeInHeader ?? true,
       };
     },
     importSnapshot: async (payload: unknown) => {
@@ -198,6 +218,8 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
           const prevState = existing.state as {
             defaultSetDurationSec?: number;
             exerciseCardShowLastSessionResult?: boolean;
+            exerciseCardShowKcalInHeader?: boolean;
+            exerciseCardShowTotalVolumeInHeader?: boolean;
           };
           const next = {
             ...existing,
@@ -214,6 +236,14 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
                 payload.exerciseCardShowLastSessionResult ??
                 prevState.exerciseCardShowLastSessionResult ??
                 false,
+              exerciseCardShowKcalInHeader:
+                payload.exerciseCardShowKcalInHeader ??
+                prevState.exerciseCardShowKcalInHeader ??
+                true,
+              exerciseCardShowTotalVolumeInHeader:
+                payload.exerciseCardShowTotalVolumeInHeader ??
+                prevState.exerciseCardShowTotalVolumeInHeader ??
+                true,
             },
           };
           await writeJsonToStorage(USER_STORAGE_KEY, next);
@@ -234,6 +264,10 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
             ),
             exerciseCardShowLastSessionResult:
               payload.exerciseCardShowLastSessionResult ?? false,
+            exerciseCardShowKcalInHeader:
+              payload.exerciseCardShowKcalInHeader ?? true,
+            exerciseCardShowTotalVolumeInHeader:
+              payload.exerciseCardShowTotalVolumeInHeader ?? true,
             accessToken: "",
           },
         });
