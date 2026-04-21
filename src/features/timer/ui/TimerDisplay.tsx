@@ -28,12 +28,18 @@ export const TimerDisplay = ({
         size={380}
         totalSeconds={initialMinutes * 60 + initialSeconds}
         currentSeconds={minutes * 60 + seconds}
-        color={isRunning ? "black" : "#6b7280"}
+        color={
+          isRunning
+            ? "hsl(var(--foreground))"
+            : "hsl(var(--muted-foreground))"
+        }
       />
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <Input
-          className={`text-8xl disabled:opacity-100 min-[330px]:text-9xl h-auto w-auto border-none shadow-none font-light text-center transition-[font-weight,color] duration-500 ${
-            isRunning ? "font-bold text-black" : "text-gray-500"
+          className={`text-8xl disabled:opacity-100 bg-transparent! min-[330px]:text-9xl h-auto w-auto border-none shadow-none font-light text-center transition-[font-weight,color] duration-500 ${
+            isRunning
+              ? "font-bold text-foreground"
+              : "text-muted-foreground"
           }`}
           onChange={(e) =>
             onTimeChange(parseInt(e.target.value) || 0, initialSeconds)
@@ -42,8 +48,10 @@ export const TimerDisplay = ({
           value={formatTime(minutes)}
         />
         <Input
-          className={`text-8xl disabled:opacity-100 min-[330px]:text-9xl h-auto w-auto border-none shadow-none font-light text-center transition-[font-weight,color] duration-500 ${
-            isRunning ? "font-bold text-black" : "text-gray-500"
+          className={`text-8xl disabled:opacity-100 bg-transparent! min-[330px]:text-9xl h-auto w-auto border-none shadow-none font-light text-center transition-[font-weight,color] duration-500 ${
+            isRunning
+              ? "font-bold text-foreground"
+              : "text-muted-foreground"
           }`}
           onChange={(e) =>
             onTimeChange(initialMinutes, parseInt(e.target.value) || 0)
@@ -55,4 +63,3 @@ export const TimerDisplay = ({
     </div>
   );
 };
-
