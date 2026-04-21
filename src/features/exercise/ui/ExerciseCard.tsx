@@ -35,7 +35,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
     (s) => s.exerciseCardShowLastSessionResult ?? false,
   );
   const exerciseCardShowKcalInHeader = useUserStore(
-    (s) => s.exerciseCardShowKcalInHeader ?? true,
+    (s) => s.exerciseCardShowKcalInHeader ?? false,
   );
   const exerciseCardShowTotalVolumeInHeader = useUserStore(
     (s) => s.exerciseCardShowTotalVolumeInHeader ?? true,

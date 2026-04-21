@@ -68,7 +68,7 @@ export const useUserStore = create<UserState & ActionsState>()(
       ),
       workoutCalorieProfileOnboarding: "pending",
       exerciseCardShowLastSessionResult: false,
-      exerciseCardShowKcalInHeader: true,
+      exerciseCardShowKcalInHeader: false,
       exerciseCardShowTotalVolumeInHeader: true,
       accessToken: "",
 

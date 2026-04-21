@@ -195,7 +195,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         exerciseCardShowLastSessionResult:
           state.exerciseCardShowLastSessionResult ?? false,
         exerciseCardShowKcalInHeader:
-          state.exerciseCardShowKcalInHeader ?? true,
+          state.exerciseCardShowKcalInHeader ?? false,
         exerciseCardShowTotalVolumeInHeader:
           state.exerciseCardShowTotalVolumeInHeader ?? true,
       };
@@ -239,7 +239,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
               exerciseCardShowKcalInHeader:
                 payload.exerciseCardShowKcalInHeader ??
                 prevState.exerciseCardShowKcalInHeader ??
-                true,
+                false,
               exerciseCardShowTotalVolumeInHeader:
                 payload.exerciseCardShowTotalVolumeInHeader ??
                 prevState.exerciseCardShowTotalVolumeInHeader ??
@@ -265,7 +265,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
             exerciseCardShowLastSessionResult:
               payload.exerciseCardShowLastSessionResult ?? false,
             exerciseCardShowKcalInHeader:
-              payload.exerciseCardShowKcalInHeader ?? true,
+              payload.exerciseCardShowKcalInHeader ?? false,
             exerciseCardShowTotalVolumeInHeader:
               payload.exerciseCardShowTotalVolumeInHeader ?? true,
             accessToken: "",

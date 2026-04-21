@@ -28,7 +28,7 @@ export const ExerciseCardDisplaySettingsCard = ({
     (s) => s.setExerciseCardShowLastSessionResult,
   );
   const exerciseCardShowKcalInHeader = useUserStore(
-    (s) => s.exerciseCardShowKcalInHeader ?? true,
+    (s) => s.exerciseCardShowKcalInHeader ?? false,
   );
   const setExerciseCardShowKcalInHeader = useUserStore(
     (s) => s.setExerciseCardShowKcalInHeader,
