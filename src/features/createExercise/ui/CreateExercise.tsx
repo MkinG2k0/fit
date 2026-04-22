@@ -1,4 +1,5 @@
-import { type ChangeEvent, useEffect, useState } from "react";
+import { Camera, MediaTypeSelection } from "@capacitor/camera";
+import { useEffect, useState } from "react";
 import {
   DEFAULT_EXERCISE_ICON_ID,
   EXERCISE_ICON_PICKER_IDS,
@@ -154,7 +155,7 @@ export const CreateExercise = ({
     handleClose();
   };
 
-  const readFileAsDataUrl = (file: File): Promise<string> =>
+  const readBlobAsDataUrl = (blob: Blob): Promise<string> =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => {
@@ -162,33 +163,60 @@ export const CreateExercise = ({
         resolve(result.trim());
       };
       reader.onerror = () => reject(new Error("read-error"));
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(blob);
     });
 
-  const handlePhotoChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files ?? []);
-    if (files.length === 0) {
-      return;
-    }
+  const webPathToDataUrl = async (webPath: string): Promise<string> => {
+    const response = await fetch(webPath);
+    const blob = await response.blob();
+    return readBlobAsDataUrl(blob);
+  };
 
-    const invalidType = files.some((file) => !file.type.startsWith("image/"));
-    if (invalidType) {
-      setPhotoError("Можно загрузить только изображения.");
-      event.target.value = "";
-      return;
-    }
-
-    const tooLarge = files.some((file) => file.size > MAX_PHOTO_SIZE_BYTES);
-    if (tooLarge) {
-      setPhotoError("Каждое фото должно быть меньше 2 МБ.");
-      event.target.value = "";
+  const handlePickPhotos = async () => {
+    const slotsLeft = MAX_PHOTOS_COUNT - newExercise.photoDataUrls.length;
+    if (slotsLeft <= 0) {
+      setPhotoError(`Можно добавить максимум ${MAX_PHOTOS_COUNT} фото.`);
       return;
     }
 
     try {
-      const loadedDataUrls = await Promise.all(
-        files.map((file) => readFileAsDataUrl(file)),
-      );
+      const { results } = await Camera.chooseFromGallery({
+        mediaType: MediaTypeSelection.Photo,
+        allowMultipleSelection: true,
+        limit: slotsLeft,
+        includeMetadata: true,
+        quality: 90,
+      });
+
+      if (!results.length) {
+        return;
+      }
+
+      const loadedDataUrls: string[] = [];
+      let skippedLarge = 0;
+
+      for (const mediaResult of results) {
+        const size = mediaResult.metadata?.size;
+        if (typeof size === "number" && size > MAX_PHOTO_SIZE_BYTES) {
+          skippedLarge += 1;
+          continue;
+        }
+        if (!mediaResult.webPath) {
+          continue;
+        }
+        const dataUrl = await webPathToDataUrl(mediaResult.webPath);
+        loadedDataUrls.push(dataUrl);
+      }
+
+      if (!loadedDataUrls.length) {
+        setPhotoError(
+          skippedLarge > 0
+            ? "Выбранные фото превышают 2 МБ."
+            : "Не удалось получить выбранные фото.",
+        );
+        return;
+      }
+
       setNewExercise((prevState) => {
         const mergedPhotoDataUrls = [
           ...prevState.photoDataUrls,
@@ -199,11 +227,13 @@ export const CreateExercise = ({
           photoDataUrls: mergedPhotoDataUrls,
         };
       });
-      setPhotoError("");
+      setPhotoError(
+        skippedLarge > 0
+          ? `Некоторые фото пропущены: размер больше 2 МБ (${skippedLarge}).`
+          : "",
+      );
     } catch {
-      setPhotoError("Не удалось прочитать одно из фото. Попробуйте снова.");
-    } finally {
-      event.target.value = "";
+      setPhotoError("Не удалось выбрать фото через галерею.");
     }
   };
 
@@ -281,13 +311,9 @@ export const CreateExercise = ({
                 <label htmlFor="exercise-photo" className="text-sm font-medium">
                   Фото упражнения
                 </label>
-                <Input
-                  id="exercise-photo"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handlePhotoChange}
-                />
+                <Button type="button" variant="outline" onClick={handlePickPhotos}>
+                  Выбрать фото
+                </Button>
                 {photoError ? (
                   <p className="text-sm text-red-500">{photoError}</p>
                 ) : null}

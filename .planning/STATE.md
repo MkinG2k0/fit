@@ -5,7 +5,7 @@ milestone_name: milestone
 status: executing
 stopped_at: Phase 1 UI-SPEC approved
 last_updated: "2026-04-22T12:00:00.000Z"
-last_activity: "2026-04-22 - Completed quick task 260422-pod: закрытие fullscreen по клику вне"
+last_activity: "2026-04-22 - Completed quick task 260422-pto: выбор фото через Capacitor Camera"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -28,7 +28,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-14)
 Phase: 1 of 5 (Quick Logging Core & Local Persistence)
 Plan: 0 of 0 in current phase
 Status: Ready to execute
-Last activity: 2026-04-22 - Completed quick task 260422-pod: закрытие fullscreen по клику вне
+Last activity: 2026-04-22 - Completed quick task 260422-pto: выбор фото через Capacitor Camera
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -92,6 +92,7 @@ None yet.
 | 260422-pg7 | поддержка нескольких фото для упражнения | 2026-04-22 | — | [260422-pg7-exercise-multi-photo-support](./quick/260422-pg7-exercise-multi-photo-support/) |
 | 260422-pmd | fullscreen открытие фото упражнения по клику | 2026-04-22 | — | [260422-pmd-fullscreen-exercise-photo](./quick/260422-pmd-fullscreen-exercise-photo/) |
 | 260422-pod | закрытие fullscreen фото по клику вне изображения | 2026-04-22 | — | [260422-pod-fullscreen](./quick/260422-pod-fullscreen/) |
+| 260422-pto | выбор фото упражнения через Capacitor Camera API | 2026-04-22 | — | [260422-pto-capacitor-camera-choosefromgallery](./quick/260422-pto-capacitor-camera-choosefromgallery/) |
 
 ## Session Continuity
 
