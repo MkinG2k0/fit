@@ -1,5 +1,7 @@
 import { Camera, MediaTypeSelection } from "@capacitor/camera";
 import { useEffect, useState } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
 import {
   DEFAULT_EXERCISE_ICON_ID,
   EXERCISE_ICON_PICKER_IDS,
@@ -21,7 +23,7 @@ import { DeleteDialog } from "@/features/fullExerciseList/ui/DeleteDialog";
 import type { CatalogExerciseEditSource, NewExercise } from "../model/types";
 import { ExerciseIconOption } from "./ExerciseIconOption";
 
-const MAX_PHOTO_SIZE_BYTES = 2 * 1024 * 1024;
+const MAX_PHOTO_SIZE_BYTES = 10 * 1024 * 1024;
 const MAX_PHOTOS_COUNT = 8;
 
 interface CreateExerciseProps {
@@ -172,7 +174,53 @@ export const CreateExercise = ({
     return readBlobAsDataUrl(blob);
   };
 
+  const appendPhotoDataUrls = (newPhotoDataUrls: string[]) => {
+    setNewExercise((prevState) => {
+      const mergedPhotoDataUrls = [
+        ...prevState.photoDataUrls,
+        ...newPhotoDataUrls,
+      ].slice(0, MAX_PHOTOS_COUNT);
+      return {
+        ...prevState,
+        photoDataUrls: mergedPhotoDataUrls,
+      };
+    });
+  };
+
   const handlePickPhotos = async () => {
+    const slotsLeft = MAX_PHOTOS_COUNT - newExercise.photoDataUrls.length;
+    if (slotsLeft <= 0) {
+      setPhotoError(`Можно добавить максимум ${MAX_PHOTOS_COUNT} фото.`);
+      return;
+    }
+
+    try {
+      const result = await Camera.takePhoto({
+        includeMetadata: true,
+        quality: 90,
+        saveToGallery: false,
+      });
+
+      if (!result.webPath) {
+        setPhotoError("Не удалось получить фото с камеры.");
+        return;
+      }
+
+      const size = result.metadata?.size;
+      if (typeof size === "number" && size > MAX_PHOTO_SIZE_BYTES) {
+        setPhotoError("Фото превышает 10 МБ.");
+        return;
+      }
+
+      const dataUrl = await webPathToDataUrl(result.webPath);
+      appendPhotoDataUrls([dataUrl]);
+      setPhotoError("");
+    } catch {
+      setPhotoError("Не удалось сделать фото через камеру.");
+    }
+  };
+
+  const handlePickFromGallery = async () => {
     const slotsLeft = MAX_PHOTOS_COUNT - newExercise.photoDataUrls.length;
     if (slotsLeft <= 0) {
       setPhotoError(`Можно добавить максимум ${MAX_PHOTOS_COUNT} фото.`);
@@ -211,29 +259,20 @@ export const CreateExercise = ({
       if (!loadedDataUrls.length) {
         setPhotoError(
           skippedLarge > 0
-            ? "Выбранные фото превышают 2 МБ."
+            ? "Выбранные фото превышают 10 МБ."
             : "Не удалось получить выбранные фото.",
         );
         return;
       }
 
-      setNewExercise((prevState) => {
-        const mergedPhotoDataUrls = [
-          ...prevState.photoDataUrls,
-          ...loadedDataUrls,
-        ].slice(0, MAX_PHOTOS_COUNT);
-        return {
-          ...prevState,
-          photoDataUrls: mergedPhotoDataUrls,
-        };
-      });
+      appendPhotoDataUrls(loadedDataUrls);
       setPhotoError(
         skippedLarge > 0
-          ? `Некоторые фото пропущены: размер больше 2 МБ (${skippedLarge}).`
+          ? `Некоторые фото пропущены: размер больше 10 МБ (${skippedLarge}).`
           : "",
       );
     } catch {
-      setPhotoError("Не удалось выбрать фото через галерею.");
+      setPhotoError("Не удалось выбрать фото из галереи.");
     }
   };
 
@@ -307,62 +346,70 @@ export const CreateExercise = ({
                   className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs ring-offset-background placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                 />
               </div>
-              <div className="min-w-0 space-y-2">
+              <div className="flex gap-2 flex-col ">
                 <label htmlFor="exercise-photo" className="text-sm font-medium">
                   Фото упражнения
                 </label>
-                <Button type="button" variant="outline" onClick={handlePickPhotos}>
-                  Выбрать фото
-                </Button>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handlePickPhotos}
+                  >
+                    Сделать фото
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handlePickFromGallery}
+                  >
+                    Выбрать из галереи
+                  </Button>
+                </div>
                 {photoError ? (
                   <p className="text-sm text-red-500">{photoError}</p>
                 ) : null}
                 <p className="text-xs text-muted-foreground">
-                  До {MAX_PHOTOS_COUNT} фото, каждое до 2 МБ.
+                  До {MAX_PHOTOS_COUNT} фото, каждое до 10 МБ.
                 </p>
                 {newExercise.photoDataUrls.length > 0 ? (
                   <div className="space-y-2">
-                    <div className="grid grid-cols-2 gap-2">
-                      {newExercise.photoDataUrls.map((photoDataUrl, index) => (
-                        <div
-                          key={`${photoDataUrl.slice(0, 32)}-${index}`}
-                          className="space-y-1"
-                        >
-                          <img
-                            src={photoDataUrl}
-                            alt={`Фото упражнения ${newExercise.name || ""} #${index + 1}`}
-                            className="h-28 w-full rounded-md border object-cover"
-                          />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            className="w-full"
-                            onClick={() =>
-                              setNewExercise((prevState) => ({
-                                ...prevState,
-                                photoDataUrls: prevState.photoDataUrls.filter(
-                                  (_, photoIndex) => photoIndex !== index,
-                                ),
-                              }))
-                            }
-                          >
-                            Удалить
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() =>
-                        setNewExercise((prevState) => ({
-                          ...prevState,
-                          photoDataUrls: [],
-                        }))
-                      }
+                    <Swiper
+                      slidesPerView={1}
+                      spaceBetween={8}
+                      className="w-full"
                     >
-                      Удалить все фото
-                    </Button>
+                      {newExercise.photoDataUrls.map((photoDataUrl, index) => (
+                        <SwiperSlide key={photoDataUrl}>
+                          <div className="space-y-1">
+                            <p className="text-xs text-muted-foreground">
+                              Фото {index + 1} из{" "}
+                              {newExercise.photoDataUrls.length}
+                            </p>
+                            <img
+                              src={photoDataUrl}
+                              alt={`Фото упражнения ${newExercise.name || ""} #${index + 1}`}
+                              className="h-40 w-full rounded-md border object-cover"
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="w-full"
+                              onClick={() =>
+                                setNewExercise((prevState) => ({
+                                  ...prevState,
+                                  photoDataUrls: prevState.photoDataUrls.filter(
+                                    (_, photoIndex) => photoIndex !== index,
+                                  ),
+                                }))
+                              }
+                            >
+                              Удалить
+                            </Button>
+                          </div>
+                        </SwiperSlide>
+                      ))}
+                    </Swiper>
                   </div>
                 ) : null}
               </div>
@@ -371,7 +418,7 @@ export const CreateExercise = ({
                 <label htmlFor="category" className="text-sm font-medium">
                   Категория
                 </label>
-                <div className="min-w-0 w-full max-w-full overflow-x-auto overflow-y-hidden overscroll-x-contain pb-1">
+                <div className="min-w-0 w-full max-w-full overflow-x-auto overflow-y-hidden overscroll-x-contain pb-2">
                   <div className="flex w-max min-w-full flex-nowrap gap-2">
                     {allExercises.map((category) => (
                       <Button
@@ -405,7 +452,7 @@ export const CreateExercise = ({
                 >
                   Иконка
                 </span>
-                <div className="min-w-0 w-full max-w-full overflow-x-auto overflow-y-hidden overscroll-x-contain pb-1">
+                <div className="min-w-0 w-full max-w-full overflow-x-auto overflow-y-hidden overscroll-x-contain pb-2">
                   <div
                     className="flex w-max min-w-full flex-nowrap gap-2"
                     role="listbox"

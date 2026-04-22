@@ -1,6 +1,8 @@
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { ChartColumnBig } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
 import {
   findCatalogExerciseByName,
   useExerciseStore,
@@ -123,22 +125,28 @@ export const StatisticCard = ({
               ) : (
                 <div className="space-y-3 rounded-md border bg-card p-4 text-sm text-card-foreground">
                   {exerciseInfo?.photoDataUrls.length ? (
-                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <Swiper slidesPerView={1} spaceBetween={8} className="w-full">
                       {exerciseInfo.photoDataUrls.map((photoDataUrl, index) => (
-                        <button
-                          key={photoDataUrl}
-                          type="button"
-                          className="focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring rounded-md"
-                          onClick={() => setFullscreenPhotoSrc(photoDataUrl)}
-                        >
-                          <img
-                            src={photoDataUrl}
-                            alt={`Фото упражнения ${exerciseName} #${index + 1}`}
-                            className="h-36 w-full rounded-md border object-cover"
-                          />
-                        </button>
+                        <SwiperSlide key={photoDataUrl}>
+                          <div className="space-y-1">
+                            <p className="text-xs text-muted-foreground">
+                              Фото {index + 1} из {exerciseInfo.photoDataUrls.length}
+                            </p>
+                            <button
+                              type="button"
+                              className="focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring rounded-md w-full"
+                              onClick={() => setFullscreenPhotoSrc(photoDataUrl)}
+                            >
+                              <img
+                                src={photoDataUrl}
+                                alt={`Фото упражнения ${exerciseName} #${index + 1}`}
+                                className="h-44 w-full rounded-md border object-cover"
+                              />
+                            </button>
+                          </div>
+                        </SwiperSlide>
                       ))}
-                    </div>
+                    </Swiper>
                   ) : null}
                   {exerciseInfo?.description.trim() ? (
                     <p className="whitespace-pre-wrap wrap-break-word">
