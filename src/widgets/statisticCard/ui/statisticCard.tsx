@@ -160,12 +160,17 @@ export const StatisticCard = ({
         open={Boolean(fullscreenPhotoSrc)}
         onOpenChange={handleFullscreenOpenChange}
       >
-        <DialogContent className="max-h-[95vh] max-w-[95vw] border-none bg-transparent p-0 shadow-none">
+        <DialogContent
+          showCloseButton={false}
+          className="top-0! left-0! h-dvh! w-dvw! max-w-none! translate-x-0! translate-y-0! flex items-center justify-center border-none bg-black/85 p-4 shadow-none"
+          onClick={() => setFullscreenPhotoSrc(null)}
+        >
           {fullscreenPhotoSrc ? (
             <img
               src={fullscreenPhotoSrc}
               alt={`Фото упражнения ${exerciseName} полноэкранно`}
               className="max-h-[95vh] w-auto max-w-[95vw] rounded-md object-contain"
+              onClick={(event) => event.stopPropagation()}
             />
           ) : null}
         </DialogContent>
