@@ -8,10 +8,7 @@ import {
   useExerciseStore,
 } from "@/entities/exercise";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
-import {
-  Dialog,
-  DialogContent,
-} from "@/shared/ui/shadCNComponents/ui/dialog";
+import { Dialog, DialogContent } from "@/shared/ui/shadCNComponents/ui/dialog";
 import { readAllTrainingDaysFromStorage } from "@/shared/lib/analyticsStorage";
 import { calculateTonnageForExercise } from "../lib/calculateTonnage";
 import { TonnageChart } from "./TonnageChart";
@@ -103,7 +100,7 @@ export const StatisticCard = ({
             </DialogTrigger>
           )}
           <DialogContent className="sm:max-w-lg h-[80dvh]">
-            <div className="space-y-3 mt-6">
+            <div className="space-y-3 mt-6 overflow-y-auto">
               <div className="grid grid-cols-2 gap-2 rounded-md border bg-muted p-1">
                 <Button
                   type="button"
@@ -125,17 +122,24 @@ export const StatisticCard = ({
               ) : (
                 <div className="space-y-3 rounded-md border bg-card p-4 text-sm text-card-foreground">
                   {exerciseInfo?.photoDataUrls.length ? (
-                    <Swiper slidesPerView={1} spaceBetween={8} className="w-full">
+                    <Swiper
+                      slidesPerView={1}
+                      spaceBetween={8}
+                      className="w-full"
+                    >
                       {exerciseInfo.photoDataUrls.map((photoDataUrl, index) => (
                         <SwiperSlide key={photoDataUrl}>
                           <div className="space-y-1">
                             <p className="text-xs text-muted-foreground">
-                              Фото {index + 1} из {exerciseInfo.photoDataUrls.length}
+                              Фото {index + 1} из{" "}
+                              {exerciseInfo.photoDataUrls.length}
                             </p>
                             <button
                               type="button"
                               className="focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring rounded-md w-full"
-                              onClick={() => setFullscreenPhotoSrc(photoDataUrl)}
+                              onClick={() =>
+                                setFullscreenPhotoSrc(photoDataUrl)
+                              }
                             >
                               <img
                                 src={photoDataUrl}
