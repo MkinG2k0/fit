@@ -20,7 +20,6 @@ import { StatisticCard } from "@/widgets/statisticCard";
 import { useUserStore } from "@/entities/user";
 import { formatKcalOneDecimal } from "../calories";
 import { useWorkoutCaloriesUiEnabled } from "../lib/useWorkoutCaloriesUiEnabled";
-import { ExerciseCardLastSessionHint } from "./ExerciseCardLastSessionHint";
 
 interface ExerciseCardProps {
   exercise: Exercise;
@@ -31,9 +30,6 @@ const DRAG_CLICK_SUPPRESS_DELAY_MS = 120;
 
 export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
   const showCaloriesUi = useWorkoutCaloriesUiEnabled();
-  const exerciseCardShowLastSessionResult = useUserStore(
-    (s) => s.exerciseCardShowLastSessionResult ?? false,
-  );
   const exerciseCardShowKcalInHeader = useUserStore(
     (s) => s.exerciseCardShowKcalInHeader ?? false,
   );
@@ -158,9 +154,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
   }, [exercise.sets]);
 
   const showKcalInHeader =
-    showCaloriesUi &&
-    exerciseCardShowKcalInHeader &&
-    totalKcal > 0;
+    showCaloriesUi && exerciseCardShowKcalInHeader && totalKcal > 0;
   const showVolumeInHeader = exerciseCardShowTotalVolumeInHeader;
 
   return (
@@ -239,16 +233,16 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
                 <span className="text-base font-bold text-primary font-numeric">
                   {totalLifted.value}
                 </span>
-                <span className="text-xs font-semibold">{totalLifted.unit}</span>
+                <span className="text-xs font-semibold">
+                  {totalLifted.unit}
+                </span>
               </div>
             ) : null}
             <div className="p-4">
               {isEditable ? <ChevronUp /> : <ChevronDown />}
             </div>
           </div>
-          {exerciseCardShowLastSessionResult && !isEditable ? (
-            <ExerciseCardLastSessionHint exerciseName={exercise.name} />
-          ) : null}
+
           <AnimatePresence>
             {isEditable && (
               <motion.div

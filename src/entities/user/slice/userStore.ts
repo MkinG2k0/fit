@@ -4,10 +4,7 @@ import type { WorkoutCalorieProfileOnboardingStatus } from "../model/workoutCalo
 import { isWorkoutCalorieProfileComplete } from "../lib/isWorkoutCalorieProfileComplete";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { zustandAppStorage } from "@/shared/lib/storageAdapter";
-import {
-  DEFAULT_RING_GOALS,
-  type RingGoalsSettings,
-} from "../model/ringGoals";
+import { DEFAULT_RING_GOALS, type RingGoalsSettings } from "../model/ringGoals";
 
 const DEFAULT_SET_DURATION_FALLBACK_SEC = 60;
 const MIN_DEFAULT_SET_DURATION_SEC = 30;
@@ -67,9 +64,7 @@ export const useUserStore = create<UserState & ActionsState>()(
       personalData: {},
       ringGoals: DEFAULT_RING_GOALS,
       workoutCaloriesEnabled: false,
-      defaultSetDurationSec: clampDefaultSetDurationSec(
-        DEFAULT_SET_DURATION_FALLBACK_SEC,
-      ),
+      defaultSetDurationSec: 60,
       workoutCalorieProfileOnboarding: "pending",
       exerciseCardShowLastSessionResult: false,
       exerciseCardShowKcalInHeader: false,
@@ -92,10 +87,11 @@ export const useUserStore = create<UserState & ActionsState>()(
           };
           return {
             personalData,
-            workoutCalorieProfileOnboarding:
-              isWorkoutCalorieProfileComplete(personalData)
-                ? "done"
-                : state.workoutCalorieProfileOnboarding,
+            workoutCalorieProfileOnboarding: isWorkoutCalorieProfileComplete(
+              personalData,
+            )
+              ? "done"
+              : state.workoutCalorieProfileOnboarding,
           };
         }),
 
@@ -197,7 +193,6 @@ export const useUserStore = create<UserState & ActionsState>()(
               : current.workoutListShowDaySummary,
         };
       },
-      
     },
   ),
 );
@@ -207,4 +202,3 @@ export {
   MAX_DEFAULT_SET_DURATION_SEC,
   DEFAULT_SET_DURATION_FALLBACK_SEC,
 };
-
