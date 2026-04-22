@@ -28,6 +28,9 @@ export const StatisticCard = ({
   showTrigger = true,
 }: StatisticCardProps) => {
   const [internalDialogOpen, setInternalDialogOpen] = useState(false);
+  const [fullscreenPhotoSrc, setFullscreenPhotoSrc] = useState<string | null>(
+    null,
+  );
   const [chartData, setChartData] = useState<
     ReturnType<typeof calculateTonnageForExercise>
   >([]);
@@ -50,8 +53,15 @@ export const StatisticCard = ({
   useEffect(() => {
     if (!dialogOpen) {
       setActiveTab("stats");
+      setFullscreenPhotoSrc(null);
     }
   }, [dialogOpen]);
+
+  const handleFullscreenOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      setFullscreenPhotoSrc(null);
+    }
+  };
 
   useEffect(() => {
     let isDisposed = false;
@@ -80,63 +90,86 @@ export const StatisticCard = ({
   }, [dialogOpen, exerciseName]);
 
   return (
-    <Dialog open={dialogOpen} onOpenChange={handleDialogOpenChange}>
-      <form>
-        {showTrigger && (
-          <DialogTrigger asChild>
-            <Button variant="outline" size="icon">
-              <ChartColumnBig />
-            </Button>
-          </DialogTrigger>
-        )}
-        <DialogContent className="sm:max-w-lg h-[80dvh]">
-          <div className="space-y-3 mt-6">
-            <div className="grid grid-cols-2 gap-2 rounded-md border bg-muted p-1">
-              <Button
-                type="button"
-                variant={activeTab === "stats" ? "default" : "ghost"}
-                onClick={() => setActiveTab("stats")}
-              >
-                Статистика
+    <>
+      <Dialog open={dialogOpen} onOpenChange={handleDialogOpenChange}>
+        <form>
+          {showTrigger && (
+            <DialogTrigger asChild>
+              <Button variant="outline" size="icon">
+                <ChartColumnBig />
               </Button>
-              <Button
-                type="button"
-                variant={activeTab === "info" ? "default" : "ghost"}
-                onClick={() => setActiveTab("info")}
-              >
-                Инфо
-              </Button>
-            </div>
-            {activeTab === "stats" ? (
-              <TonnageChart exerciseName={exerciseName} data={chartData} />
-            ) : (
-              <div className="space-y-3 rounded-md border bg-card p-4 text-sm text-card-foreground">
-                {exerciseInfo?.photoDataUrls.length ? (
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    {exerciseInfo.photoDataUrls.map((photoDataUrl, index) => (
-                      <img
-                        key={photoDataUrl}
-                        src={photoDataUrl}
-                        alt={`Фото упражнения ${exerciseName} #${index + 1}`}
-                        className="h-36 w-full rounded-md border object-cover"
-                      />
-                    ))}
-                  </div>
-                ) : null}
-                {exerciseInfo?.description.trim() ? (
-                  <p className="whitespace-pre-wrap wrap-break-word">
-                    {exerciseInfo.description}
-                  </p>
-                ) : (
-                  <p className="text-muted-foreground">
-                    Описание пока не добавлено для этого упражнения.
-                  </p>
-                )}
+            </DialogTrigger>
+          )}
+          <DialogContent className="sm:max-w-lg h-[80dvh]">
+            <div className="space-y-3 mt-6">
+              <div className="grid grid-cols-2 gap-2 rounded-md border bg-muted p-1">
+                <Button
+                  type="button"
+                  variant={activeTab === "stats" ? "default" : "ghost"}
+                  onClick={() => setActiveTab("stats")}
+                >
+                  Статистика
+                </Button>
+                <Button
+                  type="button"
+                  variant={activeTab === "info" ? "default" : "ghost"}
+                  onClick={() => setActiveTab("info")}
+                >
+                  Инфо
+                </Button>
               </div>
-            )}
-          </div>
+              {activeTab === "stats" ? (
+                <TonnageChart exerciseName={exerciseName} data={chartData} />
+              ) : (
+                <div className="space-y-3 rounded-md border bg-card p-4 text-sm text-card-foreground">
+                  {exerciseInfo?.photoDataUrls.length ? (
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                      {exerciseInfo.photoDataUrls.map((photoDataUrl, index) => (
+                        <button
+                          key={photoDataUrl}
+                          type="button"
+                          className="focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring rounded-md"
+                          onClick={() => setFullscreenPhotoSrc(photoDataUrl)}
+                        >
+                          <img
+                            src={photoDataUrl}
+                            alt={`Фото упражнения ${exerciseName} #${index + 1}`}
+                            className="h-36 w-full rounded-md border object-cover"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+                  {exerciseInfo?.description.trim() ? (
+                    <p className="whitespace-pre-wrap wrap-break-word">
+                      {exerciseInfo.description}
+                    </p>
+                  ) : (
+                    <p className="text-muted-foreground">
+                      Описание пока не добавлено для этого упражнения.
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </form>
+      </Dialog>
+
+      <Dialog
+        open={Boolean(fullscreenPhotoSrc)}
+        onOpenChange={handleFullscreenOpenChange}
+      >
+        <DialogContent className="max-h-[95vh] max-w-[95vw] border-none bg-transparent p-0 shadow-none">
+          {fullscreenPhotoSrc ? (
+            <img
+              src={fullscreenPhotoSrc}
+              alt={`Фото упражнения ${exerciseName} полноэкранно`}
+              className="max-h-[95vh] w-auto max-w-[95vw] rounded-md object-contain"
+            />
+          ) : null}
         </DialogContent>
-      </form>
-    </Dialog>
+      </Dialog>
+    </>
   );
 };

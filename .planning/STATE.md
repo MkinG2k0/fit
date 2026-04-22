@@ -5,7 +5,7 @@ milestone_name: milestone
 status: executing
 stopped_at: Phase 1 UI-SPEC approved
 last_updated: "2026-04-22T12:00:00.000Z"
-last_activity: "2026-04-22 - Completed quick task 260422-pg7: поддержка нескольких фото упражнения"
+last_activity: "2026-04-22 - Completed quick task 260422-pmd: fullscreen просмотр фото упражнения"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -28,7 +28,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-14)
 Phase: 1 of 5 (Quick Logging Core & Local Persistence)
 Plan: 0 of 0 in current phase
 Status: Ready to execute
-Last activity: 2026-04-22 - Completed quick task 260422-pg7: поддержка нескольких фото упражнения
+Last activity: 2026-04-22 - Completed quick task 260422-pmd: fullscreen просмотр фото упражнения
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -90,6 +90,7 @@ None yet.
 | 260422-p4a | описание упражнения при создании + табы Статистика/Инфо в модалке | 2026-04-22 | — | [260422-p4a-exercise-description-tabs](./quick/260422-p4a-exercise-description-tabs/) |
 | 260422-pdm | добавление фото упражнения + просмотр в табе Инфо | 2026-04-22 | — | [260422-pdm-exercise-photo-info-tab](./quick/260422-pdm-exercise-photo-info-tab/) |
 | 260422-pg7 | поддержка нескольких фото для упражнения | 2026-04-22 | — | [260422-pg7-exercise-multi-photo-support](./quick/260422-pg7-exercise-multi-photo-support/) |
+| 260422-pmd | fullscreen открытие фото упражнения по клику | 2026-04-22 | — | [260422-pmd-fullscreen-exercise-photo](./quick/260422-pmd-fullscreen-exercise-photo/) |
 
 ## Session Continuity
 
