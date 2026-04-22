@@ -1,14 +1,14 @@
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { ChartColumnBig } from "lucide-react";
 import { useEffect, useState } from "react";
-import { findCatalogExerciseByName, useExerciseStore } from "@/entities/exercise";
+import {
+  findCatalogExerciseByName,
+  useExerciseStore,
+} from "@/entities/exercise";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
 } from "@/shared/ui/shadCNComponents/ui/dialog";
 import { readAllTrainingDaysFromStorage } from "@/shared/lib/analyticsStorage";
 import { calculateTonnageForExercise } from "../lib/calculateTonnage";
@@ -33,7 +33,10 @@ export const StatisticCard = ({
   >([]);
   const [activeTab, setActiveTab] = useState<"stats" | "info">("stats");
   const catalogExercises = useExerciseStore((state) => state.exercises);
-  const exerciseInfo = findCatalogExerciseByName(catalogExercises, exerciseName);
+  const exerciseInfo = findCatalogExerciseByName(
+    catalogExercises,
+    exerciseName,
+  );
   const isControlled = typeof open === "boolean";
   const dialogOpen = isControlled ? open : internalDialogOpen;
 
@@ -63,7 +66,9 @@ export const StatisticCard = ({
 
       const allTrainingDays = await readAllTrainingDaysFromStorage();
       if (!isDisposed) {
-        setChartData(calculateTonnageForExercise(allTrainingDays, exerciseName));
+        setChartData(
+          calculateTonnageForExercise(allTrainingDays, exerciseName),
+        );
       }
     };
 
@@ -84,14 +89,8 @@ export const StatisticCard = ({
             </Button>
           </DialogTrigger>
         )}
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Статистика упражнения</DialogTitle>
-            <DialogDescription>
-              Просмотр статистики и описания упражнения {exerciseName}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3">
+        <DialogContent className="sm:max-w-lg h-[80dvh]">
+          <div className="space-y-3 mt-6">
             <div className="grid grid-cols-2 gap-2 rounded-md border bg-muted p-1">
               <Button
                 type="button"
@@ -111,7 +110,14 @@ export const StatisticCard = ({
             {activeTab === "stats" ? (
               <TonnageChart exerciseName={exerciseName} data={chartData} />
             ) : (
-              <div className="rounded-md border bg-card p-4 text-sm text-card-foreground">
+              <div className="space-y-3 rounded-md border bg-card p-4 text-sm text-card-foreground">
+                {exerciseInfo?.photoDataUrl.trim() ? (
+                  <img
+                    src={exerciseInfo.photoDataUrl}
+                    alt={`Фото упражнения ${exerciseName}`}
+                    className="h-48 w-full rounded-md border object-cover"
+                  />
+                ) : null}
                 {exerciseInfo?.description.trim() ? (
                   <p className="whitespace-pre-wrap wrap-break-word">
                     {exerciseInfo.description}

@@ -12,6 +12,7 @@ interface ExerciseItemProps {
   name: string;
   iconId: ExerciseIconId;
   description: string;
+  photoDataUrl: string;
   checkable: "checkbox" | "radio" | false;
   deletable: boolean;
   /** Показывать корзину в строке списка (удаление из экрана редактирования — отдельно). */
@@ -24,6 +25,7 @@ interface ExerciseItemProps {
     category: string;
     iconId: ExerciseIconId;
     description: string;
+    photoDataUrl: string;
   }) => void;
   category: string;
 }
@@ -32,6 +34,7 @@ export const ExerciseItem = ({
   name,
   iconId,
   description,
+  photoDataUrl,
   checkable,
   deletable,
   allowListDelete = true,
@@ -48,7 +51,7 @@ export const ExerciseItem = ({
 
   const handleEditClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    onEdit?.({ name, category, iconId, description });
+    onEdit?.({ name, category, iconId, description, photoDataUrl });
   };
 
   return (

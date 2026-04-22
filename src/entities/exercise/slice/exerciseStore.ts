@@ -18,6 +18,7 @@ interface ExerciseStore {
     category: string;
     iconId: ExerciseIconId;
     description: string;
+    photoDataUrl: string;
   }) => void;
   createCategory: (categoryName: string) => void;
   renameCategory: (oldCategoryName: string, newCategoryName: string) => void;
@@ -35,6 +36,7 @@ interface ExerciseStore {
     category: string;
     iconId: ExerciseIconId;
     description: string;
+    photoDataUrl: string;
   }) => void;
   deleteTrainingPreset: (presetName: string) => void;
 }
@@ -56,6 +58,7 @@ export const useExerciseStore = create<ExerciseStore>()(
                       name: newExercise.name,
                       iconId: newExercise.iconId,
                       description: newExercise.description.trim(),
+                      photoDataUrl: newExercise.photoDataUrl.trim(),
                     },
                   ],
                 }
@@ -161,11 +164,13 @@ export const useExerciseStore = create<ExerciseStore>()(
         category,
         iconId,
         description,
+        photoDataUrl,
       }) =>
         set((state) => {
           const normalizedName = name.trim();
           const normalizedCategory = category.trim();
           const normalizedDescription = description.trim();
+          const normalizedPhotoDataUrl = photoDataUrl.trim();
           if (!normalizedName || !normalizedCategory) {
             return state;
           }
@@ -217,6 +222,7 @@ export const useExerciseStore = create<ExerciseStore>()(
                       name: normalizedName,
                       iconId,
                       description: normalizedDescription,
+                      photoDataUrl: normalizedPhotoDataUrl,
                     },
                   ],
                 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { type ChangeEvent, useEffect, useState } from "react";
 import {
   DEFAULT_EXERCISE_ICON_ID,
   EXERCISE_ICON_PICKER_IDS,
@@ -20,6 +20,8 @@ import { DeleteDialog } from "@/features/fullExerciseList/ui/DeleteDialog";
 import type { CatalogExerciseEditSource, NewExercise } from "../model/types";
 import { ExerciseIconOption } from "./ExerciseIconOption";
 
+const MAX_PHOTO_SIZE_BYTES = 2 * 1024 * 1024;
+
 interface CreateExerciseProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -38,8 +40,10 @@ export const CreateExercise = ({
     name: "",
     iconId: DEFAULT_EXERCISE_ICON_ID,
     description: "",
+    photoDataUrl: "",
   });
   const [error, setError] = useState<string>("");
+  const [photoError, setPhotoError] = useState<string>("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const createExercise = useExerciseStore((state) => state.createExercise);
   const updateExercise = useExerciseStore((state) => state.updateExercise);
@@ -59,6 +63,7 @@ export const CreateExercise = ({
         name: editingExercise.name,
         iconId: editingExercise.iconId,
         description: editingExercise.description,
+        photoDataUrl: editingExercise.photoDataUrl,
       });
     } else {
       setNewExercise({
@@ -66,9 +71,11 @@ export const CreateExercise = ({
         name: "",
         iconId: defaultIconIdForCategory(defaultCategory ?? ""),
         description: "",
+        photoDataUrl: "",
       });
     }
     setError("");
+    setPhotoError("");
   }, [defaultCategory, editingExercise, open]);
 
   const handleClose = () => {
@@ -78,8 +85,10 @@ export const CreateExercise = ({
       name: "",
       iconId: DEFAULT_EXERCISE_ICON_ID,
       description: "",
+      photoDataUrl: "",
     });
     setError("");
+    setPhotoError("");
   };
 
   const handleIconSelect = (iconId: ExerciseIconId) => {
@@ -116,6 +125,7 @@ export const CreateExercise = ({
         category: newExercise.category,
         iconId: newExercise.iconId,
         description: newExercise.description,
+        photoDataUrl: newExercise.photoDataUrl,
       });
       handleClose();
       return;
@@ -136,8 +146,43 @@ export const CreateExercise = ({
       ...newExercise,
       name: trimmedName,
       description: newExercise.description.trim(),
+      photoDataUrl: newExercise.photoDataUrl.trim(),
     });
     handleClose();
+  };
+
+  const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      setPhotoError("Можно загрузить только изображение.");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > MAX_PHOTO_SIZE_BYTES) {
+      setPhotoError("Фото должно быть меньше 2 МБ.");
+      event.target.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result =
+        typeof reader.result === "string" ? reader.result.trim() : "";
+      setNewExercise((prevState) => ({
+        ...prevState,
+        photoDataUrl: result,
+      }));
+      setPhotoError("");
+    };
+    reader.onerror = () => {
+      setPhotoError("Не удалось прочитать файл. Попробуйте другое фото.");
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleDeleteClick = () => {
@@ -168,8 +213,8 @@ export const CreateExercise = ({
               </DialogTitle>
               <DialogDescription>
                 {isEditing
-                  ? "Измените категорию, иконку, название и описание упражнения"
-                  : "Выберите категорию, иконку, название и описание нового упражнения"}
+                  ? "Измените категорию, иконку, название, описание и фото упражнения"
+                  : "Выберите категорию, иконку, название, описание и фото нового упражнения"}
               </DialogDescription>
             </DialogHeader>
             <div className="min-w-0 space-y-2">
@@ -209,6 +254,41 @@ export const CreateExercise = ({
                   }
                   className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs ring-offset-background placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                 />
+              </div>
+              <div className="min-w-0 space-y-2">
+                <label htmlFor="exercise-photo" className="text-sm font-medium">
+                  Фото упражнения
+                </label>
+                <Input
+                  id="exercise-photo"
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoChange}
+                />
+                {photoError ? (
+                  <p className="text-sm text-red-500">{photoError}</p>
+                ) : null}
+                {newExercise.photoDataUrl ? (
+                  <div className="space-y-2">
+                    <img
+                      src={newExercise.photoDataUrl}
+                      alt={`Фото упражнения ${newExercise.name || ""}`}
+                      className="h-36 w-full rounded-md border object-cover"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() =>
+                        setNewExercise((prevState) => ({
+                          ...prevState,
+                          photoDataUrl: "",
+                        }))
+                      }
+                    >
+                      Удалить фото
+                    </Button>
+                  </div>
+                ) : null}
               </div>
 
               <div className="min-w-0 space-y-2">
