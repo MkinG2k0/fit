@@ -39,7 +39,7 @@ export const AnalyticsHeroCard = ({
 
   return (
     <AnalyticsCard>
-      <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div className="mb-3 flex flex-col gap-3  sm:justify-between">
         <AnalyticsSectionTitle
           className="mb-0 min-w-0"
           subtitle="Общий тоннаж за период"
@@ -58,18 +58,21 @@ export const AnalyticsHeroCard = ({
               {deltaLabel}
             </p>
           </div>
-          <div className=" rounded-lg border border-border bg-muted/60 px-4 py-3 sm:w-auto">
+          <div>
+            <AnalyticsPeriodSegmentedControl
+              value={period}
+              onChange={onPeriodChange}
+            />
+          </div>
+          {/* <div className=" rounded-lg border border-border bg-muted/60 px-4 py-3 sm:w-auto">
             <p className="text-xs text-muted-foreground">PR</p>
             <p className="mt-1 text-3xl font-bold text-primary">
               {summary.weight.maxWeight.toFixed(0)}
               <span className="ml-1 text-base font-semibold">кг</span>
             </p>
-          </div>
+          </div> */}
         </div>
-        <AnalyticsPeriodSegmentedControl
-          value={period}
-          onChange={onPeriodChange}
-        />
+
         <AnalyticsMainProgressChart trends={analytics.trends} />
       </div>
     </AnalyticsCard>
