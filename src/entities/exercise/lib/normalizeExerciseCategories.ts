@@ -47,7 +47,7 @@ const normalizeCatalogEntry = (
         builtinIcons.get(builtinExerciseIconKey(category, name)) ??
         defaultIconIdForCategory(category),
       description: "",
-      photoDataUrl: "",
+      photoDataUrls: [],
     };
   }
 
@@ -55,17 +55,25 @@ const normalizeCatalogEntry = (
     const name = String((raw as { name: unknown }).name);
     const iconRaw = (raw as { iconId?: unknown }).iconId;
     const descriptionRaw = (raw as { description?: unknown }).description;
-    const photoDataUrlRaw = (raw as { photoDataUrl?: unknown }).photoDataUrl;
+    const photoDataUrlsRaw = (raw as { photoDataUrls?: unknown }).photoDataUrls;
+    const photoDataUrlLegacyRaw = (raw as { photoDataUrl?: unknown }).photoDataUrl;
     const description =
       typeof descriptionRaw === "string" ? descriptionRaw.trim() : "";
-    const photoDataUrl =
-      typeof photoDataUrlRaw === "string" ? photoDataUrlRaw.trim() : "";
+    const photoDataUrls = Array.isArray(photoDataUrlsRaw)
+      ? photoDataUrlsRaw
+          .filter((value): value is string => typeof value === "string")
+          .map((value) => value.trim())
+          .filter((value) => value.length > 0)
+      : typeof photoDataUrlLegacyRaw === "string" &&
+          photoDataUrlLegacyRaw.trim().length > 0
+        ? [photoDataUrlLegacyRaw.trim()]
+        : [];
     const fromBuiltin = builtinIcons.get(
       builtinExerciseIconKey(category, name),
     );
 
     if (fromBuiltin !== undefined) {
-      return { name, iconId: fromBuiltin, description, photoDataUrl };
+      return { name, iconId: fromBuiltin, description, photoDataUrls };
     }
 
     const iconId =
@@ -73,14 +81,14 @@ const normalizeCatalogEntry = (
         ? defaultIconIdForCategory(category)
         : normalizeExerciseIconId(iconRaw);
 
-    return { name, iconId, description, photoDataUrl };
+    return { name, iconId, description, photoDataUrls };
   }
 
   return {
     name: "",
     iconId: defaultIconIdForCategory(category),
     description: "",
-    photoDataUrl: "",
+    photoDataUrls: [],
   };
 };
 

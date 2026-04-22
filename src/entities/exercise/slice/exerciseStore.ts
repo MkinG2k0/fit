@@ -18,7 +18,7 @@ interface ExerciseStore {
     category: string;
     iconId: ExerciseIconId;
     description: string;
-    photoDataUrl: string;
+    photoDataUrls: string[];
   }) => void;
   createCategory: (categoryName: string) => void;
   renameCategory: (oldCategoryName: string, newCategoryName: string) => void;
@@ -36,7 +36,7 @@ interface ExerciseStore {
     category: string;
     iconId: ExerciseIconId;
     description: string;
-    photoDataUrl: string;
+    photoDataUrls: string[];
   }) => void;
   deleteTrainingPreset: (presetName: string) => void;
 }
@@ -58,7 +58,9 @@ export const useExerciseStore = create<ExerciseStore>()(
                       name: newExercise.name,
                       iconId: newExercise.iconId,
                       description: newExercise.description.trim(),
-                      photoDataUrl: newExercise.photoDataUrl.trim(),
+                      photoDataUrls: newExercise.photoDataUrls
+                        .map((photoDataUrl) => photoDataUrl.trim())
+                        .filter((photoDataUrl) => photoDataUrl.length > 0),
                     },
                   ],
                 }
@@ -164,13 +166,15 @@ export const useExerciseStore = create<ExerciseStore>()(
         category,
         iconId,
         description,
-        photoDataUrl,
+        photoDataUrls,
       }) =>
         set((state) => {
           const normalizedName = name.trim();
           const normalizedCategory = category.trim();
           const normalizedDescription = description.trim();
-          const normalizedPhotoDataUrl = photoDataUrl.trim();
+          const normalizedPhotoDataUrls = photoDataUrls
+            .map((photoDataUrl) => photoDataUrl.trim())
+            .filter((photoDataUrl) => photoDataUrl.length > 0);
           if (!normalizedName || !normalizedCategory) {
             return state;
           }
@@ -222,7 +226,7 @@ export const useExerciseStore = create<ExerciseStore>()(
                       name: normalizedName,
                       iconId,
                       description: normalizedDescription,
-                      photoDataUrl: normalizedPhotoDataUrl,
+                      photoDataUrls: normalizedPhotoDataUrls,
                     },
                   ],
                 }

@@ -111,12 +111,17 @@ export const StatisticCard = ({
               <TonnageChart exerciseName={exerciseName} data={chartData} />
             ) : (
               <div className="space-y-3 rounded-md border bg-card p-4 text-sm text-card-foreground">
-                {exerciseInfo?.photoDataUrl.trim() ? (
-                  <img
-                    src={exerciseInfo.photoDataUrl}
-                    alt={`Фото упражнения ${exerciseName}`}
-                    className="h-48 w-full rounded-md border object-cover"
-                  />
+                {exerciseInfo?.photoDataUrls.length ? (
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {exerciseInfo.photoDataUrls.map((photoDataUrl, index) => (
+                      <img
+                        key={photoDataUrl}
+                        src={photoDataUrl}
+                        alt={`Фото упражнения ${exerciseName} #${index + 1}`}
+                        className="h-36 w-full rounded-md border object-cover"
+                      />
+                    ))}
+                  </div>
                 ) : null}
                 {exerciseInfo?.description.trim() ? (
                   <p className="whitespace-pre-wrap wrap-break-word">

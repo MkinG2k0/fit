@@ -21,6 +21,7 @@ import type { CatalogExerciseEditSource, NewExercise } from "../model/types";
 import { ExerciseIconOption } from "./ExerciseIconOption";
 
 const MAX_PHOTO_SIZE_BYTES = 2 * 1024 * 1024;
+const MAX_PHOTOS_COUNT = 8;
 
 interface CreateExerciseProps {
   open: boolean;
@@ -40,7 +41,7 @@ export const CreateExercise = ({
     name: "",
     iconId: DEFAULT_EXERCISE_ICON_ID,
     description: "",
-    photoDataUrl: "",
+    photoDataUrls: [],
   });
   const [error, setError] = useState<string>("");
   const [photoError, setPhotoError] = useState<string>("");
@@ -63,7 +64,7 @@ export const CreateExercise = ({
         name: editingExercise.name,
         iconId: editingExercise.iconId,
         description: editingExercise.description,
-        photoDataUrl: editingExercise.photoDataUrl,
+        photoDataUrls: editingExercise.photoDataUrls,
       });
     } else {
       setNewExercise({
@@ -71,7 +72,7 @@ export const CreateExercise = ({
         name: "",
         iconId: defaultIconIdForCategory(defaultCategory ?? ""),
         description: "",
-        photoDataUrl: "",
+        photoDataUrls: [],
       });
     }
     setError("");
@@ -85,7 +86,7 @@ export const CreateExercise = ({
       name: "",
       iconId: DEFAULT_EXERCISE_ICON_ID,
       description: "",
-      photoDataUrl: "",
+      photoDataUrls: [],
     });
     setError("");
     setPhotoError("");
@@ -125,7 +126,7 @@ export const CreateExercise = ({
         category: newExercise.category,
         iconId: newExercise.iconId,
         description: newExercise.description,
-        photoDataUrl: newExercise.photoDataUrl,
+        photoDataUrls: newExercise.photoDataUrls,
       });
       handleClose();
       return;
@@ -146,43 +147,64 @@ export const CreateExercise = ({
       ...newExercise,
       name: trimmedName,
       description: newExercise.description.trim(),
-      photoDataUrl: newExercise.photoDataUrl.trim(),
+      photoDataUrls: newExercise.photoDataUrls
+        .map((photoDataUrl) => photoDataUrl.trim())
+        .filter((photoDataUrl) => photoDataUrl.length > 0),
     });
     handleClose();
   };
 
-  const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) {
+  const readFileAsDataUrl = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = typeof reader.result === "string" ? reader.result : "";
+        resolve(result.trim());
+      };
+      reader.onerror = () => reject(new Error("read-error"));
+      reader.readAsDataURL(file);
+    });
+
+  const handlePhotoChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? []);
+    if (files.length === 0) {
       return;
     }
 
-    if (!file.type.startsWith("image/")) {
-      setPhotoError("Можно загрузить только изображение.");
+    const invalidType = files.some((file) => !file.type.startsWith("image/"));
+    if (invalidType) {
+      setPhotoError("Можно загрузить только изображения.");
       event.target.value = "";
       return;
     }
 
-    if (file.size > MAX_PHOTO_SIZE_BYTES) {
-      setPhotoError("Фото должно быть меньше 2 МБ.");
+    const tooLarge = files.some((file) => file.size > MAX_PHOTO_SIZE_BYTES);
+    if (tooLarge) {
+      setPhotoError("Каждое фото должно быть меньше 2 МБ.");
       event.target.value = "";
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result =
-        typeof reader.result === "string" ? reader.result.trim() : "";
-      setNewExercise((prevState) => ({
-        ...prevState,
-        photoDataUrl: result,
-      }));
+    try {
+      const loadedDataUrls = await Promise.all(
+        files.map((file) => readFileAsDataUrl(file)),
+      );
+      setNewExercise((prevState) => {
+        const mergedPhotoDataUrls = [
+          ...prevState.photoDataUrls,
+          ...loadedDataUrls,
+        ].slice(0, MAX_PHOTOS_COUNT);
+        return {
+          ...prevState,
+          photoDataUrls: mergedPhotoDataUrls,
+        };
+      });
       setPhotoError("");
-    };
-    reader.onerror = () => {
-      setPhotoError("Не удалось прочитать файл. Попробуйте другое фото.");
-    };
-    reader.readAsDataURL(file);
+    } catch {
+      setPhotoError("Не удалось прочитать одно из фото. Попробуйте снова.");
+    } finally {
+      event.target.value = "";
+    }
   };
 
   const handleDeleteClick = () => {
@@ -263,29 +285,57 @@ export const CreateExercise = ({
                   id="exercise-photo"
                   type="file"
                   accept="image/*"
+                  multiple
                   onChange={handlePhotoChange}
                 />
                 {photoError ? (
                   <p className="text-sm text-red-500">{photoError}</p>
                 ) : null}
-                {newExercise.photoDataUrl ? (
+                <p className="text-xs text-muted-foreground">
+                  До {MAX_PHOTOS_COUNT} фото, каждое до 2 МБ.
+                </p>
+                {newExercise.photoDataUrls.length > 0 ? (
                   <div className="space-y-2">
-                    <img
-                      src={newExercise.photoDataUrl}
-                      alt={`Фото упражнения ${newExercise.name || ""}`}
-                      className="h-36 w-full rounded-md border object-cover"
-                    />
+                    <div className="grid grid-cols-2 gap-2">
+                      {newExercise.photoDataUrls.map((photoDataUrl, index) => (
+                        <div
+                          key={`${photoDataUrl.slice(0, 32)}-${index}`}
+                          className="space-y-1"
+                        >
+                          <img
+                            src={photoDataUrl}
+                            alt={`Фото упражнения ${newExercise.name || ""} #${index + 1}`}
+                            className="h-28 w-full rounded-md border object-cover"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="w-full"
+                            onClick={() =>
+                              setNewExercise((prevState) => ({
+                                ...prevState,
+                                photoDataUrls: prevState.photoDataUrls.filter(
+                                  (_, photoIndex) => photoIndex !== index,
+                                ),
+                              }))
+                            }
+                          >
+                            Удалить
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
                     <Button
                       type="button"
                       variant="outline"
                       onClick={() =>
                         setNewExercise((prevState) => ({
                           ...prevState,
-                          photoDataUrl: "",
+                          photoDataUrls: [],
                         }))
                       }
                     >
-                      Удалить фото
+                      Удалить все фото
                     </Button>
                   </div>
                 ) : null}

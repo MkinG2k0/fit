@@ -7,8 +7,8 @@ const catalogExercise = (
   name: string,
   iconId: ExerciseIconId,
   description = "",
-  photoDataUrl = "",
-): CatalogExercise => ({ name, iconId, description, photoDataUrl });
+  photoDataUrls: string[] = [],
+): CatalogExercise => ({ name, iconId, description, photoDataUrls });
 
 export const allExercises = [
   {

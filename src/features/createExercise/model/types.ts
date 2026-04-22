@@ -5,7 +5,7 @@ export interface NewExercise {
   name: string;
   iconId: ExerciseIconId;
   description: string;
-  photoDataUrl: string;
+  photoDataUrls: string[];
 }
 
 /** Исходное упражнение в каталоге при открытии диалога редактирования. */
@@ -14,5 +14,5 @@ export interface CatalogExerciseEditSource {
   category: string;
   iconId: ExerciseIconId;
   description: string;
-  photoDataUrl: string;
+  photoDataUrls: string[];
 }
