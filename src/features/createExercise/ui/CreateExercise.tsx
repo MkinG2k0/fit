@@ -37,6 +37,7 @@ export const CreateExercise = ({
     category: "",
     name: "",
     iconId: DEFAULT_EXERCISE_ICON_ID,
+    description: "",
   });
   const [error, setError] = useState<string>("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -57,12 +58,14 @@ export const CreateExercise = ({
         category: editingExercise.category,
         name: editingExercise.name,
         iconId: editingExercise.iconId,
+        description: editingExercise.description,
       });
     } else {
       setNewExercise({
         category: defaultCategory ?? "",
         name: "",
         iconId: defaultIconIdForCategory(defaultCategory ?? ""),
+        description: "",
       });
     }
     setError("");
@@ -74,6 +77,7 @@ export const CreateExercise = ({
       category: "",
       name: "",
       iconId: DEFAULT_EXERCISE_ICON_ID,
+      description: "",
     });
     setError("");
   };
@@ -111,6 +115,7 @@ export const CreateExercise = ({
         name: trimmedName,
         category: newExercise.category,
         iconId: newExercise.iconId,
+        description: newExercise.description,
       });
       handleClose();
       return;
@@ -130,6 +135,7 @@ export const CreateExercise = ({
     createExercise({
       ...newExercise,
       name: trimmedName,
+      description: newExercise.description.trim(),
     });
     handleClose();
   };
@@ -162,8 +168,8 @@ export const CreateExercise = ({
               </DialogTitle>
               <DialogDescription>
                 {isEditing
-                  ? "Измените категорию, иконку или название упражнения"
-                  : "Выберите категорию, иконку и название нового упражнения"}
+                  ? "Измените категорию, иконку, название и описание упражнения"
+                  : "Выберите категорию, иконку, название и описание нового упражнения"}
               </DialogDescription>
             </DialogHeader>
             <div className="min-w-0 space-y-2">
@@ -183,6 +189,28 @@ export const CreateExercise = ({
             </div>
 
             <div className="min-w-0 space-y-4">
+              <div className="min-w-0 space-y-2">
+                <label
+                  htmlFor="exercise-description"
+                  className="text-sm font-medium"
+                >
+                  Описание выполнения
+                </label>
+                <textarea
+                  id="exercise-description"
+                  rows={4}
+                  placeholder="Например: Лопатки сведены, ноги на полу, опускать штангу к середине груди"
+                  value={newExercise.description}
+                  onChange={(e) =>
+                    setNewExercise({
+                      ...newExercise,
+                      description: e.target.value,
+                    })
+                  }
+                  className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs ring-offset-background placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                />
+              </div>
+
               <div className="min-w-0 space-y-2">
                 <label htmlFor="category" className="text-sm font-medium">
                   Категория

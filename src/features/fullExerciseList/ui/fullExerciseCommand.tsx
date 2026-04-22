@@ -28,6 +28,7 @@ interface BaseProps {
     name: string;
     category: string;
     iconId: ExerciseIconId;
+    description: string;
   }) => void;
   onEditPreset?: (preset: TrainingPreset) => void;
 }
@@ -143,6 +144,7 @@ export const FullExerciseCommand = ({
     name: string;
     category: string;
     iconId: ExerciseIconId;
+    description: string;
   }) => {
     onEditExercise?.(payload);
   };
@@ -232,6 +234,7 @@ export const FullExerciseCommand = ({
                             key={`${group.category}-${entry.name}`}
                             name={entry.name}
                             iconId={entry.iconId}
+                            description={entry.description}
                             category={group.category}
                             checkable={checkable}
                             deletable={deletable}

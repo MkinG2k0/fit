@@ -11,6 +11,7 @@ import { RadioGroupItem } from "../../../shared/ui/shadCNComponents/ui/radio-gro
 interface ExerciseItemProps {
   name: string;
   iconId: ExerciseIconId;
+  description: string;
   checkable: "checkbox" | "radio" | false;
   deletable: boolean;
   /** Показывать корзину в строке списка (удаление из экрана редактирования — отдельно). */
@@ -22,6 +23,7 @@ interface ExerciseItemProps {
     name: string;
     category: string;
     iconId: ExerciseIconId;
+    description: string;
   }) => void;
   category: string;
 }
@@ -29,6 +31,7 @@ interface ExerciseItemProps {
 export const ExerciseItem = ({
   name,
   iconId,
+  description,
   checkable,
   deletable,
   allowListDelete = true,
@@ -45,7 +48,7 @@ export const ExerciseItem = ({
 
   const handleEditClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    onEdit?.({ name, category, iconId });
+    onEdit?.({ name, category, iconId, description });
   };
 
   return (

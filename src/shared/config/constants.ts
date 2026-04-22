@@ -6,7 +6,8 @@ const DEFAULT_PRESET_COLOR = { r: 255, g: 165, b: 0, a: 0.5 };
 const catalogExercise = (
   name: string,
   iconId: ExerciseIconId,
-): CatalogExercise => ({ name, iconId });
+  description = "",
+): CatalogExercise => ({ name, iconId, description });
 
 export const allExercises = [
   {

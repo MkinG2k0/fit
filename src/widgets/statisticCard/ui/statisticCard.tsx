@@ -1,6 +1,7 @@
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { ChartColumnBig } from "lucide-react";
 import { useEffect, useState } from "react";
+import { findCatalogExerciseByName, useExerciseStore } from "@/entities/exercise";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
   Dialog,
@@ -30,6 +31,9 @@ export const StatisticCard = ({
   const [chartData, setChartData] = useState<
     ReturnType<typeof calculateTonnageForExercise>
   >([]);
+  const [activeTab, setActiveTab] = useState<"stats" | "info">("stats");
+  const catalogExercises = useExerciseStore((state) => state.exercises);
+  const exerciseInfo = findCatalogExerciseByName(catalogExercises, exerciseName);
   const isControlled = typeof open === "boolean";
   const dialogOpen = isControlled ? open : internalDialogOpen;
 
@@ -39,6 +43,12 @@ export const StatisticCard = ({
     }
     onOpenChange?.(nextOpen);
   };
+
+  useEffect(() => {
+    if (!dialogOpen) {
+      setActiveTab("stats");
+    }
+  }, [dialogOpen]);
 
   useEffect(() => {
     let isDisposed = false;
@@ -78,10 +88,42 @@ export const StatisticCard = ({
           <DialogHeader>
             <DialogTitle>Статистика упражнения</DialogTitle>
             <DialogDescription>
-              Просмотр динамики тоннажа для упражнения {exerciseName}
+              Просмотр статистики и описания упражнения {exerciseName}
             </DialogDescription>
           </DialogHeader>
-          <TonnageChart exerciseName={exerciseName} data={chartData} />
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-2 rounded-md border bg-muted p-1">
+              <Button
+                type="button"
+                variant={activeTab === "stats" ? "default" : "ghost"}
+                onClick={() => setActiveTab("stats")}
+              >
+                Статистика
+              </Button>
+              <Button
+                type="button"
+                variant={activeTab === "info" ? "default" : "ghost"}
+                onClick={() => setActiveTab("info")}
+              >
+                Инфо
+              </Button>
+            </div>
+            {activeTab === "stats" ? (
+              <TonnageChart exerciseName={exerciseName} data={chartData} />
+            ) : (
+              <div className="rounded-md border bg-card p-4 text-sm text-card-foreground">
+                {exerciseInfo?.description.trim() ? (
+                  <p className="whitespace-pre-wrap wrap-break-word">
+                    {exerciseInfo.description}
+                  </p>
+                ) : (
+                  <p className="text-muted-foreground">
+                    Описание пока не добавлено для этого упражнения.
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
         </DialogContent>
       </form>
     </Dialog>

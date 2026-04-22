@@ -46,18 +46,22 @@ const normalizeCatalogEntry = (
       iconId:
         builtinIcons.get(builtinExerciseIconKey(category, name)) ??
         defaultIconIdForCategory(category),
+      description: "",
     };
   }
 
   if (raw && typeof raw === "object" && "name" in raw) {
     const name = String((raw as { name: unknown }).name);
     const iconRaw = (raw as { iconId?: unknown }).iconId;
+    const descriptionRaw = (raw as { description?: unknown }).description;
+    const description =
+      typeof descriptionRaw === "string" ? descriptionRaw.trim() : "";
     const fromBuiltin = builtinIcons.get(
       builtinExerciseIconKey(category, name),
     );
 
     if (fromBuiltin !== undefined) {
-      return { name, iconId: fromBuiltin };
+      return { name, iconId: fromBuiltin, description };
     }
 
     const iconId =
@@ -65,10 +69,10 @@ const normalizeCatalogEntry = (
         ? defaultIconIdForCategory(category)
         : normalizeExerciseIconId(iconRaw);
 
-    return { name, iconId };
+    return { name, iconId, description };
   }
 
-  return { name: "", iconId: defaultIconIdForCategory(category) };
+  return { name: "", iconId: defaultIconIdForCategory(category), description: "" };
 };
 
 export const normalizeExerciseCategories = (

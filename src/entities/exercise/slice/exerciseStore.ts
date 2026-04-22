@@ -17,6 +17,7 @@ interface ExerciseStore {
     name: string;
     category: string;
     iconId: ExerciseIconId;
+    description: string;
   }) => void;
   createCategory: (categoryName: string) => void;
   renameCategory: (oldCategoryName: string, newCategoryName: string) => void;
@@ -33,6 +34,7 @@ interface ExerciseStore {
     name: string;
     category: string;
     iconId: ExerciseIconId;
+    description: string;
   }) => void;
   deleteTrainingPreset: (presetName: string) => void;
 }
@@ -53,6 +55,7 @@ export const useExerciseStore = create<ExerciseStore>()(
                     {
                       name: newExercise.name,
                       iconId: newExercise.iconId,
+                      description: newExercise.description.trim(),
                     },
                   ],
                 }
@@ -157,10 +160,12 @@ export const useExerciseStore = create<ExerciseStore>()(
         name,
         category,
         iconId,
+        description,
       }) =>
         set((state) => {
           const normalizedName = name.trim();
           const normalizedCategory = category.trim();
+          const normalizedDescription = description.trim();
           if (!normalizedName || !normalizedCategory) {
             return state;
           }
@@ -208,7 +213,11 @@ export const useExerciseStore = create<ExerciseStore>()(
                   ...group,
                   exercises: [
                     ...group.exercises,
-                    { name: normalizedName, iconId },
+                    {
+                      name: normalizedName,
+                      iconId,
+                      description: normalizedDescription,
+                    },
                   ],
                 }
               : group,

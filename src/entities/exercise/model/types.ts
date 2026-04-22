@@ -35,6 +35,7 @@ export interface Exercise {
 export interface CatalogExercise {
   name: string;
   iconId: ExerciseIconId;
+  description: string;
 }
 
 export interface ExerciseCategory {
