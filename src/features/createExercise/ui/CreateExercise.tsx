@@ -26,6 +26,37 @@ import { ExerciseIconOption } from "./ExerciseIconOption";
 const MAX_PHOTO_SIZE_BYTES = 10 * 1024 * 1024;
 const MAX_PHOTOS_COUNT = 8;
 
+const buildResetExerciseState = (): NewExercise => ({
+  category: "",
+  name: "",
+  iconId: DEFAULT_EXERCISE_ICON_ID,
+  description: "",
+  photoDataUrls: [],
+});
+
+const buildInitialExerciseState = (
+  defaultCategory: string | undefined,
+  editingExercise: CatalogExerciseEditSource | undefined,
+): NewExercise => {
+  if (editingExercise) {
+    return {
+      category: editingExercise.category,
+      name: editingExercise.name,
+      iconId: editingExercise.iconId,
+      description: editingExercise.description,
+      photoDataUrls: editingExercise.photoDataUrls,
+    };
+  }
+
+  return {
+    category: defaultCategory ?? "",
+    name: "",
+    iconId: defaultIconIdForCategory(defaultCategory ?? ""),
+    description: "",
+    photoDataUrls: [],
+  };
+};
+
 interface CreateExerciseProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -39,13 +70,7 @@ export const CreateExercise = ({
   defaultCategory,
   editingExercise,
 }: CreateExerciseProps) => {
-  const [newExercise, setNewExercise] = useState<NewExercise>({
-    category: "",
-    name: "",
-    iconId: DEFAULT_EXERCISE_ICON_ID,
-    description: "",
-    photoDataUrls: [],
-  });
+  const [newExercise, setNewExercise] = useState<NewExercise>(buildResetExerciseState);
   const [error, setError] = useState<string>("");
   const [photoError, setPhotoError] = useState<string>("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -61,36 +86,14 @@ export const CreateExercise = ({
       return;
     }
 
-    if (editingExercise) {
-      setNewExercise({
-        category: editingExercise.category,
-        name: editingExercise.name,
-        iconId: editingExercise.iconId,
-        description: editingExercise.description,
-        photoDataUrls: editingExercise.photoDataUrls,
-      });
-    } else {
-      setNewExercise({
-        category: defaultCategory ?? "",
-        name: "",
-        iconId: defaultIconIdForCategory(defaultCategory ?? ""),
-        description: "",
-        photoDataUrls: [],
-      });
-    }
+    setNewExercise(buildInitialExerciseState(defaultCategory, editingExercise));
     setError("");
     setPhotoError("");
   }, [defaultCategory, editingExercise, open]);
 
   const handleClose = () => {
     onOpenChange(false);
-    setNewExercise({
-      category: "",
-      name: "",
-      iconId: DEFAULT_EXERCISE_ICON_ID,
-      description: "",
-      photoDataUrls: [],
-    });
+    setNewExercise(buildResetExerciseState());
     setError("");
     setPhotoError("");
   };
