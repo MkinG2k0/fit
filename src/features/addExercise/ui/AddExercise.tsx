@@ -112,7 +112,7 @@ export const AddExercise = () => {
         </DrawerTrigger>
         <DrawerContent className="grid h-dvh grid-rows-[auto_1fr_auto] overflow-hidden">
           <div className="shrink-0">
-            <DrawerHeader className="p-2">
+            <DrawerHeader className="p-0 mb-2">
               <DrawerTitle
                 className={"text-2xl w-full flex justify-between items-center"}
               >
@@ -134,7 +134,7 @@ export const AddExercise = () => {
               <DrawerDescription></DrawerDescription>
             </DrawerHeader>
           </div>
-          <div className="flex-1 min-h-0 overflow-hidden px-2">
+          <div className="flex-1 min-h-0 overflow-hidden ">
             <FullExerciseCommand
               selectedExerciseCheckboxes={selectedExerciseCheckboxes}
               selectedPresetCheckboxes={selectedPresetCheckboxes}
@@ -144,7 +144,7 @@ export const AddExercise = () => {
             />
           </div>
 
-          <DrawerFooter className="w-full shrink-0 p-2">
+          <DrawerFooter className="w-full shrink-0 p-0 mt-2">
             <Button
               disabled={
                 selectedExerciseCheckboxes.length === 0 &&
