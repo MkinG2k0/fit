@@ -45,6 +45,19 @@
                 android:resource="@xml/random_number_widget_info" />
         </receiver>
 
+        <receiver
+            android:name=".MuscleBalanceWidget"
+            android:exported="true"
+            android:label="@string/widget_muscle_balance_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.fit.myapp.MUSCLE_BALANCE_WIDGET_REFRESH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_muscle_balance_info" />
+        </receiver>
+
     </application>
 
     <!-- Permissions -->
