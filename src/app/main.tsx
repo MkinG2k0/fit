@@ -8,6 +8,7 @@ import { ThemeProvider } from "./providers/theme";
 import { WorkoutHealthPermissionInit } from "./providers/WorkoutHealthPermissionInit";
 import { WorkoutCaloriesRecalculationInit } from "./providers/WorkoutCaloriesRecalculationInit";
 import { OnboardingNavigation } from "./providers/OnboardingNavigation";
+import { AndroidBackNavigation } from "./providers/AndroidBackNavigation";
 import { AppContent } from "./AppContent.tsx";
 
 initCapacitorEdgeToEdgeChrome();
@@ -23,6 +24,7 @@ void (async () => {
         <WorkoutHealthPermissionInit />
         <WorkoutCaloriesRecalculationInit />
         <OnboardingNavigation />
+        <AndroidBackNavigation />
         <AppContent />
       </BrowserRouter>
     </ThemeProvider>,
