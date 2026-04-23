@@ -138,10 +138,9 @@ public class MuscleBalanceWidget extends AppWidgetProvider {
             android.util.Log.e("MuscleBalanceWidget", "update error", e);
         }
 
-        Intent intent = new Intent(ctx, MuscleBalanceWidget.class);
-        intent.setAction(ACTION_REFRESH);
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
-        PendingIntent pi = PendingIntent.getBroadcast(ctx, 10_000 + widgetId, intent,
+        Intent launch = new Intent(ctx, MainActivity.class);
+        launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pi = PendingIntent.getActivity(ctx, 30_000 + widgetId, launch,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         views.setOnClickPendingIntent(R.id.widget_root, pi);
 

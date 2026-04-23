@@ -148,10 +148,9 @@ public class ActivityWidget extends AppWidgetProvider {
             views.setTextViewText(R.id.tv_this_week, "нет данных");
         }
 
-        Intent intent = new Intent(ctx, ActivityWidget.class);
-        intent.setAction(ACTION_REFRESH);
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
-        PendingIntent pi = PendingIntent.getBroadcast(ctx, widgetId, intent,
+        Intent launch = new Intent(ctx, MainActivity.class);
+        launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pi = PendingIntent.getActivity(ctx, widgetId, launch,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         views.setOnClickPendingIntent(R.id.widget_root, pi);
 
