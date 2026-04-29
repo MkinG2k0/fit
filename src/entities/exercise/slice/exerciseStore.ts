@@ -13,6 +13,10 @@ dayjs.locale("ru");
 interface ExerciseStore {
   exercises: ExerciseCategory[];
   trainingPreset: TrainingPreset[];
+  syncDefaultExercises: () => {
+    replacedExerciseNames: string[];
+    addedExerciseNames: string[];
+  };
   createExercise: (newExercise: {
     name: string;
     category: string;
@@ -46,6 +50,88 @@ export const useExerciseStore = create<ExerciseStore>()(
     (set) => ({
       exercises: allExercises,
       trainingPreset,
+      syncDefaultExercises: () => {
+        const report = {
+          replacedExerciseNames: [] as string[],
+          addedExerciseNames: [] as string[],
+        };
+
+        set((state) => {
+          const mergedByCategory = new Map<
+            string,
+            { category: string; exercises: ExerciseCategory["exercises"] }
+          >();
+          const existingByName = new Map<
+            string,
+            {
+              categoryName: string;
+              exerciseIndex: number;
+            }
+          >();
+
+          for (const category of state.exercises) {
+            mergedByCategory.set(category.category, {
+              category: category.category,
+              exercises: [...category.exercises],
+            });
+
+            category.exercises.forEach((exercise, exerciseIndex) => {
+              existingByName.set(exercise.name.trim().toLowerCase(), {
+                categoryName: category.category,
+                exerciseIndex,
+              });
+            });
+          }
+
+          for (const defaultCategory of allExercises) {
+            if (!mergedByCategory.has(defaultCategory.category)) {
+              mergedByCategory.set(defaultCategory.category, {
+                category: defaultCategory.category,
+                exercises: [],
+              });
+            }
+
+            const targetCategory = mergedByCategory.get(defaultCategory.category);
+
+            if (!targetCategory) {
+              continue;
+            }
+
+            for (const defaultExercise of defaultCategory.exercises) {
+              const exerciseNameKey = defaultExercise.name.trim().toLowerCase();
+              const existingExerciseMeta = existingByName.get(exerciseNameKey);
+
+              if (existingExerciseMeta) {
+                const existingCategory = mergedByCategory.get(
+                  existingExerciseMeta.categoryName,
+                );
+
+                if (!existingCategory) {
+                  continue;
+                }
+
+                existingCategory.exercises[existingExerciseMeta.exerciseIndex] = {
+                  ...defaultExercise,
+                };
+                report.replacedExerciseNames.push(defaultExercise.name);
+              } else {
+                targetCategory.exercises.push({ ...defaultExercise });
+                report.addedExerciseNames.push(defaultExercise.name);
+                existingByName.set(exerciseNameKey, {
+                  categoryName: targetCategory.category,
+                  exerciseIndex: targetCategory.exercises.length - 1,
+                });
+              }
+            }
+          }
+
+          return {
+            exercises: Array.from(mergedByCategory.values()),
+          };
+        });
+
+        return report;
+      },
       createExercise: (newExercise) =>
         set((state) => {
           const newExerciseArray = state.exercises.map((exerciseGroup) =>

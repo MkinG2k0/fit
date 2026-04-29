@@ -2,6 +2,7 @@ import { ThemeSettingsCard } from "@/features/themeSwitcher";
 import { SettingsTransferCard } from "@/features/appSettingsTransfer";
 import { ProfileRingGoalsSettingsCard } from "@/features/profileRingGoalsSettings";
 import {
+  DefaultExercisesSettingsCard,
   ExerciseCardDisplaySettingsCard,
   WorkoutCaloriesSettingsCard,
   WorkoutSummaryDisplaySettingsCard,
@@ -30,6 +31,8 @@ export const SettingsPage = () => {
       <WorkoutSummaryDisplaySettingsCard />
 
       <ExerciseCardDisplaySettingsCard />
+
+      <DefaultExercisesSettingsCard />
 
       <Card className="gap-3 py-4">
         <CardHeader className="px-4">
