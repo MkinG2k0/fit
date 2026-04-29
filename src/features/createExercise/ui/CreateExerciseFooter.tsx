@@ -1,5 +1,4 @@
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
-import { DialogFooter } from "@/shared/ui/shadCNComponents/ui/dialog";
 
 interface CreateExerciseFooterProps {
   isEditing: boolean;
@@ -19,20 +18,20 @@ export const CreateExerciseFooter = ({
   onDelete,
 }: CreateExerciseFooterProps) => {
   return (
-    <DialogFooter className="min-w-0">
-      <Button variant="outline" onClick={onCancel}>
+    <div className="flex min-w-0 flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+      <Button variant="outline" className="flex-auto" onClick={onCancel}>
         Отмена
       </Button>
 
-      <Button onClick={onSave} disabled={saveDisabled}>
+      <Button onClick={onSave} className="flex-auto" disabled={saveDisabled}>
         {isEditing ? "Сохранить" : "Создать"}
       </Button>
 
       {canDelete && (
-        <Button variant="destructive" className="w-full" onClick={onDelete}>
+        <Button variant="destructive" className="flex-auto" onClick={onDelete}>
           Удалить упражнение
         </Button>
       )}
-    </DialogFooter>
+    </div>
   );
 };

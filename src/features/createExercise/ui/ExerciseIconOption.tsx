@@ -36,7 +36,7 @@ export const ExerciseIconOption = ({
       tabIndex={0}
       aria-label={`Иконка ${iconId}`}
       className={cn(
-        "flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-lg border outline-none transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+        "flex h-14 w-14 shrink-0 cursor-pointer items-center justify-center rounded-lg border outline-none transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
         isSelected
           ? "border-primary bg-primary/15 text-muted-foreground shadow-xs"
           : "border-border bg-background text-muted-foreground hover:bg-accent hover:text-accent-foreground",

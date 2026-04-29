@@ -7,3 +7,6 @@ export { SettingsPage } from "./SettingsPage";
 export { BodyMetricsPage } from "./BodyMetricsPage";
 export { ActivityPage } from "./ActivityPage";
 export { OnboardingPage } from "./OnboardingPage";
+export { BulkCreateExercisesPage } from "./BulkCreateExercisesPage";
+export { CreateExercisePage } from "./CreateExercisePage";
+export { CreatePresetPage } from "./CreatePresetPage";

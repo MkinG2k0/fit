@@ -27,6 +27,21 @@ const ActivityPage = lazy(() =>
 const OnboardingPage = lazy(() =>
   import("@/pages/OnboardingPage").then((m) => ({ default: m.OnboardingPage })),
 );
+const BulkCreateExercisesPage = lazy(() =>
+  import("@/pages/BulkCreateExercisesPage").then((m) => ({
+    default: m.BulkCreateExercisesPage,
+  })),
+);
+const CreateExercisePage = lazy(() =>
+  import("@/pages/CreateExercisePage").then((m) => ({
+    default: m.CreateExercisePage,
+  })),
+);
+const CreatePresetPage = lazy(() =>
+  import("@/pages/CreatePresetPage").then((m) => ({
+    default: m.CreatePresetPage,
+  })),
+);
 
 export const AppRoutes = () => {
   return (
@@ -45,6 +60,46 @@ export const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <ExercisePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/exercises/bulk-create"
+        element={
+          <ProtectedRoute>
+            <BulkCreateExercisesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/exercises/create"
+        element={
+          <ProtectedRoute>
+            <CreateExercisePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/exercises/edit"
+        element={
+          <ProtectedRoute>
+            <CreateExercisePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/presets/create"
+        element={
+          <ProtectedRoute>
+            <CreatePresetPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/presets/edit"
+        element={
+          <ProtectedRoute>
+            <CreatePresetPage />
           </ProtectedRoute>
         }
       />

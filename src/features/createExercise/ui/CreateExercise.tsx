@@ -6,16 +6,11 @@ import {
   useExerciseStore,
   type ExerciseIconId,
 } from "@/entities/exercise";
-import {
-  Dialog,
-  DialogContent,
-} from "@/shared/ui/shadCNComponents/ui/dialog";
 import { DeleteDialog } from "@/features/fullExerciseList/ui/DeleteDialog";
 import type { CatalogExerciseEditSource, NewExercise } from "../model/types";
 import { CreateExerciseCategorySection } from "./CreateExerciseCategorySection";
 import { CreateExerciseDescriptionField } from "./CreateExerciseDescriptionField";
 import { CreateExerciseFooter } from "./CreateExerciseFooter";
-import { CreateExerciseHeader } from "./CreateExerciseHeader";
 import { CreateExerciseIconSection } from "./CreateExerciseIconSection";
 import { CreateExerciseNameField } from "./CreateExerciseNameField";
 import { CreateExercisePhotosSection } from "./CreateExercisePhotosSection";
@@ -55,8 +50,7 @@ const buildInitialExerciseState = (
 };
 
 interface CreateExerciseProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onCancel?: () => void;
   defaultCategory?: string;
   editingExercise?: CatalogExerciseEditSource;
 }
@@ -69,12 +63,13 @@ interface PhotoCandidate {
 }
 
 export const CreateExercise = ({
-  open,
-  onOpenChange,
+  onCancel,
   defaultCategory,
   editingExercise,
 }: CreateExerciseProps) => {
-  const [newExercise, setNewExercise] = useState<NewExercise>(buildResetExerciseState);
+  const [newExercise, setNewExercise] = useState<NewExercise>(
+    buildResetExerciseState,
+  );
   const [error, setError] = useState<string>("");
   const [photoError, setPhotoError] = useState<string>("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -85,18 +80,13 @@ export const CreateExercise = ({
   const isEditing = Boolean(editingExercise);
 
   useEffect(() => {
-    if (!open) {
-      setDeleteDialogOpen(false);
-      return;
-    }
-
     setNewExercise(buildInitialExerciseState(defaultCategory, editingExercise));
     setError("");
     setPhotoError("");
-  }, [defaultCategory, editingExercise, open]);
+  }, [defaultCategory, editingExercise]);
 
   const handleClose = () => {
-    onOpenChange(false);
+    onCancel?.();
     setNewExercise(buildResetExerciseState());
     setError("");
     setPhotoError("");
@@ -374,51 +364,48 @@ export const CreateExercise = ({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-h-[90dvh] min-w-0 overflow-x-hidden">
-          <div className="flex min-h-0 min-w-0 w-full flex-col gap-4">
-            <CreateExerciseHeader isEditing={isEditing} />
-            <CreateExerciseNameField
-              name={newExercise.name}
-              error={error}
-              onNameChange={handleNameChange}
-            />
-            <div className="min-w-0 space-y-4">
-              <CreateExerciseDescriptionField
-                description={newExercise.description}
-                onDescriptionChange={handleDescriptionChange}
-              />
-              <CreateExercisePhotosSection
-                photoDataUrls={newExercise.photoDataUrls}
-                exerciseName={newExercise.name}
-                photoError={photoError}
-                maxPhotosCount={MAX_PHOTOS_COUNT}
-                onTakePhoto={handlePickPhotos}
-                onPickFromGallery={handlePickFromGallery}
-                onRemovePhoto={handlePhotoRemove}
-              />
-              <CreateExerciseCategorySection
-                categories={allExercises}
-                selectedCategory={newExercise.category}
-                onSelectCategory={handleCategorySelect}
-              />
-              <CreateExerciseIconSection
-                selectedIconId={newExercise.iconId}
-                onSelectIcon={handleIconSelect}
-              />
-            </div>
+      <div className="flex h-full min-h-0 min-w-0 w-full flex-col">
+        <CreateExerciseNameField
+          name={newExercise.name}
+          error={error}
+          onNameChange={handleNameChange}
+        />
+        <div className="mt-4 min-h-0 min-w-0 flex-1 space-y-4 overflow-y-auto">
+          <CreateExerciseDescriptionField
+            description={newExercise.description}
+            onDescriptionChange={handleDescriptionChange}
+          />
+          <CreateExercisePhotosSection
+            photoDataUrls={newExercise.photoDataUrls}
+            exerciseName={newExercise.name}
+            photoError={photoError}
+            maxPhotosCount={MAX_PHOTOS_COUNT}
+            onTakePhoto={handlePickPhotos}
+            onPickFromGallery={handlePickFromGallery}
+            onRemovePhoto={handlePhotoRemove}
+          />
+          <CreateExerciseCategorySection
+            categories={allExercises}
+            selectedCategory={newExercise.category}
+            onSelectCategory={handleCategorySelect}
+          />
+          <CreateExerciseIconSection
+            selectedIconId={newExercise.iconId}
+            onSelectIcon={handleIconSelect}
+          />
+        </div>
 
-            <CreateExerciseFooter
-              isEditing={isEditing}
-              canDelete={Boolean(isEditing && editingExercise)}
-              saveDisabled={!newExercise.category || !newExercise.name.trim()}
-              onCancel={handleClose}
-              onSave={handleSave}
-              onDelete={handleDeleteClick}
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
+        <div className="mt-4">
+          <CreateExerciseFooter
+          isEditing={isEditing}
+          canDelete={Boolean(isEditing && editingExercise)}
+          saveDisabled={!newExercise.category || !newExercise.name.trim()}
+          onCancel={handleClose}
+          onSave={handleSave}
+          onDelete={handleDeleteClick}
+          />
+        </div>
+      </div>
 
       {editingExercise && (
         <DeleteDialog

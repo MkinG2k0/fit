@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Dumbbell, FolderPlus, Zap } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { FixedBottomBar } from "@shared/ui";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
@@ -8,45 +9,28 @@ import {
   PopoverTrigger,
 } from "@/shared/ui/shadCNComponents/ui/popover";
 import type { TrainingPreset } from "@/entities/exercise";
-import {
-  CreateExercise,
-  type CatalogExerciseEditSource,
-} from "@/features/createExercise";
+import { type CatalogExerciseEditSource } from "@/features/createExercise";
 import { CreateCategory } from "@/features/createCategory";
-import { CreatePreset } from "@/features/createPreset";
 import { FullExerciseCommand } from "@/features/fullExerciseList/ui/fullExerciseCommand";
 
 export const AllExercises = () => {
+  const navigate = useNavigate();
   const [openAddPopover, setOpenAddPopover] = useState(false);
-  const [openExerciseModal, setOpenExerciseModal] = useState(false);
   const [openCategoryModal, setOpenCategoryModal] = useState(false);
-  const [openPresetModal, setOpenPresetModal] = useState(false);
-  const [editingPreset, setEditingPreset] = useState<
-    TrainingPreset | undefined
-  >(undefined);
-  const [editingExercise, setEditingExercise] = useState<
-    CatalogExerciseEditSource | undefined
-  >(undefined);
-  const [preselectedCategory, setPreselectedCategory] = useState<
-    string | undefined
-  >(undefined);
 
   const handleOpenExerciseModal = () => {
     setOpenAddPopover(false);
-    setPreselectedCategory(undefined);
-    setEditingExercise(undefined);
-    setOpenExerciseModal(true);
+    navigate("/exercises/create");
   };
 
   const handleOpenExerciseEditModal = (payload: CatalogExerciseEditSource) => {
-    setEditingExercise(payload);
-    setOpenExerciseModal(true);
+    navigate(
+      `/exercises/edit?category=${encodeURIComponent(payload.category)}&name=${encodeURIComponent(payload.name)}`,
+    );
   };
 
   const handleOpenExerciseModalByCategory = (categoryName: string) => {
-    setEditingExercise(undefined);
-    setPreselectedCategory(categoryName);
-    setOpenExerciseModal(true);
+    navigate(`/exercises/create?category=${encodeURIComponent(categoryName)}`);
   };
 
   const handleOpenCategoryModal = () => {
@@ -56,29 +40,12 @@ export const AllExercises = () => {
 
   const handleOpenPresetModal = () => {
     setOpenAddPopover(false);
-    setEditingPreset(undefined);
-    setOpenPresetModal(true);
+    navigate("/presets/create");
   };
 
   const handleOpenPresetEditModal = (preset: TrainingPreset) => {
     setOpenAddPopover(false);
-    setEditingPreset(preset);
-    setOpenPresetModal(true);
-  };
-
-  const handlePresetModalOpenChange = (open: boolean) => {
-    setOpenPresetModal(open);
-    if (!open) {
-      setEditingPreset(undefined);
-    }
-  };
-
-  const handleExerciseModalOpenChange = (open: boolean) => {
-    setOpenExerciseModal(open);
-    if (!open) {
-      setEditingExercise(undefined);
-      setPreselectedCategory(undefined);
-    }
+    navigate(`/presets/edit?name=${encodeURIComponent(preset.presetName)}`);
   };
 
   return (
@@ -131,31 +98,9 @@ export const AllExercises = () => {
           </Popover>
         </FixedBottomBar>
       </div>
-
-      {/* Модальное окно добавления упражнения */}
-      <CreateExercise
-        key={
-          editingExercise
-            ? `${editingExercise.category}-${editingExercise.name}`
-            : "create-exercise"
-        }
-        open={openExerciseModal}
-        onOpenChange={handleExerciseModalOpenChange}
-        defaultCategory={preselectedCategory}
-        editingExercise={editingExercise}
-      />
-
       <CreateCategory
         open={openCategoryModal}
         onOpenChange={setOpenCategoryModal}
-      />
-
-      {/* Модальное окно добавления пресета */}
-      <CreatePreset
-        key={editingPreset?.presetName ?? "create-preset"}
-        open={openPresetModal}
-        onOpenChange={handlePresetModalOpenChange}
-        editingPreset={editingPreset}
       />
     </div>
   );

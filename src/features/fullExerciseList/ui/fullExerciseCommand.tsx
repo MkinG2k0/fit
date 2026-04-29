@@ -23,6 +23,7 @@ interface BaseProps {
   checkable?: "checkbox" | "radio" | false;
   deletable?: boolean;
   variant?: "exercises" | "presets" | "all";
+  autoExpandCategory?: string;
   onCreateExerciseInCategory?: (categoryName: string) => void;
   onEditExercise?: (payload: {
     name: string;
@@ -36,6 +37,7 @@ interface BaseProps {
 
 interface RadioProps extends BaseProps {
   checkable?: "radio";
+  autoExpandCategory?: string;
   exerciseSelectHandler: (value: string) => void;
   presetSelectHandler?: never;
   selectedExerciseCheckboxes: string;
@@ -44,6 +46,7 @@ interface RadioProps extends BaseProps {
 
 interface CheckableProps extends BaseProps {
   checkable?: "checkbox";
+  autoExpandCategory?: string;
   exerciseSelectHandler: (value: string) => void;
   presetSelectHandler: (value: string) => void;
   selectedExerciseCheckboxes: string[];
@@ -52,6 +55,7 @@ interface CheckableProps extends BaseProps {
 
 interface NonCheckableProps extends BaseProps {
   checkable?: false;
+  autoExpandCategory?: string;
   exerciseSelectHandler?: never;
   presetSelectHandler?: never;
   selectedExerciseCheckboxes?: never;
@@ -71,6 +75,7 @@ export const FullExerciseCommand = ({
   checkable = false,
   deletable = false,
   variant = "all",
+  autoExpandCategory,
   onCreateExerciseInCategory,
   onEditExercise,
   onEditPreset,
@@ -117,6 +122,17 @@ export const FullExerciseCommand = ({
       return nextState;
     });
   }, [allExercises]);
+
+  useEffect(() => {
+    if (!autoExpandCategory) {
+      return;
+    }
+
+    setExpandedCategories((prevState) => ({
+      ...prevState,
+      [autoExpandCategory]: true,
+    }));
+  }, [autoExpandCategory]);
 
   const handleDeleteConfirm = () => {
     if (deleteDialog.type === "exercise" && deleteDialog.category) {

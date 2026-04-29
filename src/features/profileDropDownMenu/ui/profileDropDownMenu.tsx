@@ -2,6 +2,7 @@ import {
   Activity,
   ChartColumnBig,
   Cog,
+  House,
   Menu,
   Ruler,
   ScrollText,
@@ -35,6 +36,15 @@ export const ProfileDropDownMenu = () => {
       </PopoverTrigger>
       <PopoverContent className="w-full relative right-5">
         <div className="flex flex-col gap-2">
+          <Button
+            variant="ghost"
+            className="justify-start"
+            onClick={() => handleNavigate("/")}
+          >
+            <House />
+            <div>Главная</div>
+          </Button>
+          <Separator />
           <Button
             variant="ghost"
             className="justify-start"

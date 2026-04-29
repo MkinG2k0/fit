@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
   Drawer,
@@ -10,9 +10,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/shared/ui/shadCNComponents/ui/drawer";
-import { CreateExercise } from "@/features/createExercise";
 import { CreateCategory } from "@/features/createCategory";
-import { CreatePreset } from "@/features/createPreset";
 import { useCalendarStore } from "@/entities/calendarDay";
 import { useExerciseStore } from "@/entities/exercise";
 import { FullExerciseCommand } from "@/features/fullExerciseList";
@@ -25,14 +23,10 @@ const DRAWER_QUERY_PARAM = "add-exercise";
 const DRAWER_QUERY_VALUE = "1";
 
 export const AddExercise = () => {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [openAddPopover, setOpenAddPopover] = useState(false);
-  const [openExerciseModal, setOpenExerciseModal] = useState(false);
   const [openCategoryModal, setOpenCategoryModal] = useState(false);
-  const [openPresetModal, setOpenPresetModal] = useState(false);
-  const [presetInitialExercises, setPresetInitialExercises] = useState<
-    string[]
-  >([]);
   const isDrawerOpen =
     searchParams.get(DRAWER_QUERY_PARAM) === DRAWER_QUERY_VALUE;
 
@@ -89,13 +83,25 @@ export const AddExercise = () => {
   };
 
   const handleOpenPresetModal = () => {
-    setPresetInitialExercises([]);
-    setOpenPresetModal(true);
+    handleDrawerOpenChange(false);
+    navigate("/presets/create");
   };
 
   const handleOpenPresetFromCurrentWorkoutModal = () => {
-    setPresetInitialExercises(currentWorkoutPresetExercises);
-    setOpenPresetModal(true);
+    handleDrawerOpenChange(false);
+    navigate("/presets/create", {
+      state: { initialExercises: currentWorkoutPresetExercises },
+    });
+  };
+
+  const handleOpenBulkCreatePage = () => {
+    handleDrawerOpenChange(false);
+    navigate("/exercises/bulk-create");
+  };
+
+  const handleOpenCreateExercisePage = () => {
+    handleDrawerOpenChange(false);
+    navigate("/exercises/create");
   };
 
   return (
@@ -120,9 +126,10 @@ export const AddExercise = () => {
                 <CreateButtons
                   openAddPopover={openAddPopover}
                   onOpenAddPopoverChange={setOpenAddPopover}
-                  onOpenExerciseModal={() => setOpenExerciseModal(true)}
+                  onOpenExerciseModal={handleOpenCreateExercisePage}
                   onOpenCategoryModal={() => setOpenCategoryModal(true)}
                   onOpenPresetModal={handleOpenPresetModal}
+                  onOpenBulkCreatePage={handleOpenBulkCreatePage}
                   onOpenPresetFromCurrentWorkoutModal={
                     handleOpenPresetFromCurrentWorkoutModal
                   }
@@ -164,18 +171,9 @@ export const AddExercise = () => {
         </DrawerContent>
       </Drawer>
 
-      <CreateExercise
-        open={openExerciseModal}
-        onOpenChange={setOpenExerciseModal}
-      />
       <CreateCategory
         open={openCategoryModal}
         onOpenChange={setOpenCategoryModal}
-      />
-      <CreatePreset
-        open={openPresetModal}
-        onOpenChange={setOpenPresetModal}
-        initialExercises={presetInitialExercises}
       />
     </>
   );

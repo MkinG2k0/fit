@@ -3,14 +3,6 @@ import { type ChangeEvent, useEffect, useState } from "react";
 import { type RgbaColor, RgbaColorPicker } from "react-colorful";
 import { type TrainingPreset, useExerciseStore } from "@/entities/exercise";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/ui/shadCNComponents/ui/dialog";
 import { Input } from "@/shared/ui/shadCNComponents/ui/input";
 import {
   Popover,
@@ -20,8 +12,7 @@ import {
 import type { NewPreset } from "../model/types";
 
 interface CreatePresetProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onCancel?: () => void;
   editingPreset?: TrainingPreset;
   initialExercises?: string[];
 }
@@ -48,8 +39,7 @@ const createInitialPreset = (
 };
 
 export const CreatePreset = ({
-  open,
-  onOpenChange,
+  onCancel,
   editingPreset,
   initialExercises = [],
 }: CreatePresetProps) => {
@@ -85,21 +75,17 @@ export const CreatePreset = ({
   }, [allExercises]);
 
   useEffect(() => {
-    if (!open) {
-      return;
-    }
-
     setNewPreset(createInitialPreset(editingPreset, initialExercises));
     setError("");
     setExerciseSearch("");
-  }, [open, editingPreset, initialExercises]);
+  }, [editingPreset, initialExercises]);
 
   const handleColorPicker = (newColor: RgbaColor) => {
     setNewPreset({ ...newPreset, presetColor: newColor });
   };
 
   const handleClose = () => {
-    onOpenChange(false);
+    onCancel?.();
     setNewPreset(createInitialPreset(editingPreset, initialExercises));
     setError("");
     setExerciseSearch("");
@@ -187,138 +173,126 @@ export const CreatePreset = ({
     .filter((group) => !isSearchActive || group.exercises.length > 0);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} >
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
-            {isEditMode ? "Редактировать пресет тренировки" : "Добавить пресет тренировки"}
-          </DialogTitle>
-          <DialogDescription>
-            {isEditMode
-              ? "Измените название, цвет и состав упражнений в пресете"
-              : "Введите название и выберите упражнения для нового пресета"}
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-4 py-4 overflow-hidden">
-          <label htmlFor="preset-name" className="text-sm font-medium">
-            Название пресета
-          </label>
-          <div className={"flex justify-between gap-2 w-full items-center"}>
-            <div className="space-y-2 w-[90%]">
-              <Input
-                id="preset-name"
-                placeholder="Например: Грудь и трицепс"
-                value={newPreset.presetName}
-                onChange={(e) => {
-                  setNewPreset({ ...newPreset, presetName: e.target.value });
-                  if (error) setError("");
-                }}
-              />
-            </div>
-            <Popover>
-              <PopoverTrigger asChild className={"items-center justify-center"}>
-                <Button
-                  style={{
-                    backgroundColor: `rgba(${newPreset.presetColor.r},${newPreset.presetColor.g},${newPreset.presetColor.b},${
-                      newPreset.presetColor.a === 1
-                        ? 0.8
-                        : newPreset.presetColor.a
-                    })`,
-                  }}
-                  variant="outline"
-                >
-                  <Pipette />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-full border-2 border-black rounded-md p-2">
-                <RgbaColorPicker
-                  color={newPreset.presetColor}
-                  onChange={handleColorPicker}
-                />
-              </PopoverContent>
-            </Popover>
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="flex min-h-0 flex-1 flex-col space-y-4 overflow-hidden">
+        <label htmlFor="preset-name" className="text-sm font-medium">
+          Название пресета
+        </label>
+        <div className={"flex justify-between gap-2 w-full items-center"}>
+          <div className="space-y-2 w-[90%]">
+            <Input
+              id="preset-name"
+              placeholder="Например: Грудь и трицепс"
+              value={newPreset.presetName}
+              onChange={(e) => {
+                setNewPreset({ ...newPreset, presetName: e.target.value });
+                if (error) setError("");
+              }}
+            />
           </div>
-          {error && (
-            <p className="text-sm text-red-500 pt-0 pl-2 mt-[-15px] mb-0">
-              {error}
-            </p>
-          )}
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Выберите упражнения</label>
-            <div className="h-80 overflow-y-auto border rounded-md p-2">
-              <Input
-                placeholder="Поиск упражнения или категории"
-                value={exerciseSearch}
-                onChange={handleExerciseSearchChange}
-                className="mb-2"
+          <Popover>
+            <PopoverTrigger asChild className={"items-center justify-center"}>
+              <Button
+                style={{
+                  backgroundColor: `rgba(${newPreset.presetColor.r},${newPreset.presetColor.g},${newPreset.presetColor.b},${
+                    newPreset.presetColor.a === 1
+                      ? 0.8
+                      : newPreset.presetColor.a
+                  })`,
+                }}
+                variant="outline"
+              >
+                <Pipette />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full rounded-md border p-2">
+              <RgbaColorPicker
+                color={newPreset.presetColor}
+                onChange={handleColorPicker}
               />
+            </PopoverContent>
+          </Popover>
+        </div>
+        {error && (
+          <p className="text-sm text-destructive pt-0 pl-2 mt-[-15px] mb-0">
+            {error}
+          </p>
+        )}
 
-              {filteredExerciseGroups.length === 0 && (
-                <p className="px-2 py-4 text-sm text-muted-foreground">
-                  Ничего не найдено
-                </p>
-              )}
+        <div className="flex min-h-0 flex-1 flex-col space-y-2">
+          <label className="text-sm font-medium">Выберите упражнения</label>
+          <div className="min-h-0 flex-1 overflow-y-auto rounded-md border p-2">
+            <Input
+              placeholder="Поиск упражнения или категории"
+              value={exerciseSearch}
+              onChange={handleExerciseSearchChange}
+              className="mb-2"
+            />
 
-              {filteredExerciseGroups.map((group) => (
-                <div key={group.category} className="mb-4">
-                  <button
-                    type="button"
-                    data-category={group.category}
-                    className="flex w-full items-center gap-1 text-left text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                    onClick={handleCategoryClick}
-                  >
-                    {(expandedCategories[group.category] ?? false) ||
-                    isSearchActive ? (
-                      <ChevronDown className="h-3.5 w-3.5" />
-                    ) : (
-                      <ChevronRight className="h-3.5 w-3.5" />
-                    )}
-                    <span>{group.category}</span>
-                  </button>
-                  {((expandedCategories[group.category] ?? false) ||
-                    isSearchActive) && (
-                    <div className="mt-2 space-y-1">
-                      {group.exercises.map((exercise) => (
-                        <label
-                          key={exercise.name}
-                          className="flex items-center space-x-2 cursor-pointer"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={newPreset.exercises.includes(exercise.name)}
-                            onChange={(e) =>
-                              handleExerciseToggle(
-                                exercise.name,
-                                e.target.checked,
-                              )
-                            }
-                          />
-                          <span className="text-sm truncate">{exercise.name}</span>
-                        </label>
-                      ))}
-                    </div>
+            {filteredExerciseGroups.length === 0 && (
+              <p className="px-2 py-4 text-sm text-muted-foreground">
+                Ничего не найдено
+              </p>
+            )}
+
+            {filteredExerciseGroups.map((group) => (
+              <div key={group.category} className="mb-4">
+                <button
+                  type="button"
+                  data-category={group.category}
+                  className="flex w-full items-center gap-1 text-left text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                  onClick={handleCategoryClick}
+                >
+                  {(expandedCategories[group.category] ?? false) ||
+                  isSearchActive ? (
+                    <ChevronDown className="h-3.5 w-3.5" />
+                  ) : (
+                    <ChevronRight className="h-3.5 w-3.5" />
                   )}
-                </div>
-              ))}
-
-            </div>
+                  <span>{group.category}</span>
+                </button>
+                {((expandedCategories[group.category] ?? false) ||
+                  isSearchActive) && (
+                  <div className="mt-2 space-y-1">
+                    {group.exercises.map((exercise) => (
+                      <label
+                        key={exercise.name}
+                        className="flex items-center space-x-2 cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={newPreset.exercises.includes(exercise.name)}
+                          onChange={(e) =>
+                            handleExerciseToggle(
+                              exercise.name,
+                              e.target.checked,
+                            )
+                          }
+                        />
+                        <span className="text-sm truncate">
+                          {exercise.name}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
+      </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={handleClose}>
-            Отмена
-          </Button>
-          <Button
-            onClick={handleCreate}
-            disabled={!newPreset.presetName || newPreset.exercises.length === 0}
-          >
-            {isEditMode ? "Сохранить" : "Создать"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      <div className="mt-4 flex min-w-0 flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <Button variant="outline" onClick={handleClose}>
+          Отмена
+        </Button>
+        <Button
+          onClick={handleCreate}
+          disabled={!newPreset.presetName || newPreset.exercises.length === 0}
+        >
+          {isEditMode ? "Сохранить" : "Создать"}
+        </Button>
+      </div>
+    </div>
   );
 };

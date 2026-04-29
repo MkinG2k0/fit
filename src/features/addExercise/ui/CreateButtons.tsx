@@ -1,4 +1,4 @@
-import { Dumbbell, FolderPlus, Sparkles, Zap } from "lucide-react";
+import { Dumbbell, FolderPlus, ListPlus, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
   Popover,
@@ -12,6 +12,7 @@ interface CreateButtonsProps {
   onOpenExerciseModal: () => void;
   onOpenCategoryModal: () => void;
   onOpenPresetModal: () => void;
+  onOpenBulkCreatePage: () => void;
   onOpenPresetFromCurrentWorkoutModal: () => void;
   isCreateFromCurrentWorkoutDisabled: boolean;
 }
@@ -22,6 +23,7 @@ export const CreateButtons = ({
   onOpenExerciseModal,
   onOpenCategoryModal,
   onOpenPresetModal,
+  onOpenBulkCreatePage,
   onOpenPresetFromCurrentWorkoutModal,
   isCreateFromCurrentWorkoutDisabled,
 }: CreateButtonsProps) => {
@@ -38,6 +40,11 @@ export const CreateButtons = ({
   const handleOpenPresetModal = () => {
     onOpenAddPopoverChange(false);
     onOpenPresetModal();
+  };
+
+  const handleOpenBulkCreatePage = () => {
+    onOpenAddPopoverChange(false);
+    onOpenBulkCreatePage();
   };
 
   const handleOpenPresetFromCurrentWorkoutModal = () => {
@@ -75,6 +82,14 @@ export const CreateButtons = ({
           >
             <Zap className="mr-2 h-5 w-5" />
             Тренировку
+          </Button>
+          <Button
+            variant="ghost"
+            className="justify-start py-3 text-lg"
+            onClick={handleOpenBulkCreatePage}
+          >
+            <ListPlus className="mr-2 h-5 w-5" />
+            Массовое создание упражнений
           </Button>
           <Button
             variant="ghost"
