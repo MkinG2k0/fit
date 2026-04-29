@@ -1,4 +1,4 @@
-# Requirements: MagFitDiary
+# Requirements: Fit
 
 **Defined:** 2026-04-14
 **Core Value:** A beginner can log each workout quickly and clearly, and see measurable progress in weight and reps without friction.
@@ -61,44 +61,46 @@ Deferred to future release. Tracked but not in current roadmap.
 
 Explicitly excluded. Documented to prevent scope creep.
 
-| Feature | Reason |
-|---------|--------|
-| Social feed / likes / subscriptions | Does not improve core quick-log value in v1 |
-| Advanced metrics by default (RPE/RIR/readiness) | Increases complexity for beginner audience |
-| Native mobile apps | Web-first release is prioritized |
-| AI-generated training plans in v1 | High complexity and low confidence for first release |
+| Feature                                         | Reason                                               |
+| ----------------------------------------------- | ---------------------------------------------------- |
+| Social feed / likes / subscriptions             | Does not improve core quick-log value in v1          |
+| Advanced metrics by default (RPE/RIR/readiness) | Increases complexity for beginner audience           |
+| Native mobile apps                              | Web-first release is prioritized                     |
+| AI-generated training plans in v1               | High complexity and low confidence for first release |
 
 ## Traceability
 
 Which phases cover which requirements. Updated during roadmap creation.
 
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| LOG-01 | Phase 1 | Pending |
-| LOG-02 | Phase 1 | Pending |
-| LOG-03 | Phase 1 | Pending |
-| LOG-04 | Phase 1 | Pending |
-| CAT-01 | Phase 2 | Pending |
-| CAT-02 | Phase 2 | Pending |
-| CAT-03 | Phase 2 | Pending |
-| CAT-04 | Phase 2 | Pending |
-| PROG-01 | Phase 4 | Pending |
-| PROG-02 | Phase 4 | Pending |
-| PROG-03 | Phase 4 | Pending |
-| PROG-04 | Phase 4 | Pending |
-| HIST-01 | Phase 3 | Pending |
-| HIST-02 | Phase 3 | Pending |
-| HIST-03 | Phase 3 | Pending |
-| DATA-01 | Phase 1 | Pending |
-| DATA-02 | Phase 5 | Pending |
-| DATA-03 | Phase 5 | Pending |
-| DATA-04 | Phase 5 | Pending |
+| Requirement | Phase   | Status  |
+| ----------- | ------- | ------- |
+| LOG-01      | Phase 1 | Pending |
+| LOG-02      | Phase 1 | Pending |
+| LOG-03      | Phase 1 | Pending |
+| LOG-04      | Phase 1 | Pending |
+| CAT-01      | Phase 2 | Pending |
+| CAT-02      | Phase 2 | Pending |
+| CAT-03      | Phase 2 | Pending |
+| CAT-04      | Phase 2 | Pending |
+| PROG-01     | Phase 4 | Pending |
+| PROG-02     | Phase 4 | Pending |
+| PROG-03     | Phase 4 | Pending |
+| PROG-04     | Phase 4 | Pending |
+| HIST-01     | Phase 3 | Pending |
+| HIST-02     | Phase 3 | Pending |
+| HIST-03     | Phase 3 | Pending |
+| DATA-01     | Phase 1 | Pending |
+| DATA-02     | Phase 5 | Pending |
+| DATA-03     | Phase 5 | Pending |
+| DATA-04     | Phase 5 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 19 total
 - Mapped to phases: 19
 - Unmapped: 0 ✓
 
 ---
-*Requirements defined: 2026-04-14*
-*Last updated: 2026-04-14 after roadmap mapping*
+
+_Requirements defined: 2026-04-14_
+_Last updated: 2026-04-14 after roadmap mapping_

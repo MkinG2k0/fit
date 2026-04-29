@@ -35,7 +35,7 @@ export const parseAppSettingsBundleJson = (
   if (parsed.kind !== APP_SETTINGS_BUNDLE_KIND) {
     return {
       ok: false,
-      errorMessage: "Неизвестный тип файла. Нужен экспорт настроек MagFitDiary.",
+      errorMessage: "Неизвестный тип файла. Нужен экспорт настроек Fit.",
     };
   }
 

@@ -27,7 +27,7 @@ export const sendPushNotification = async () => {
           registration.active?.postMessage({
             type: "SHOW_NOTIFICATION",
             title: "Таймер завершен!",
-            body: "Ваш таймер MagFitDiary завершился. Время для следующего упражнения!",
+            body: "Ваш таймер Fit завершился. Время для следующего упражнения!",
             url: "/timer",
           });
         }
@@ -37,4 +37,3 @@ export const sendPushNotification = async () => {
     }
   }
 };
-

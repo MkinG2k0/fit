@@ -1,8 +1,8 @@
-# MagFitDiary
+# Fit
 
 ## What This Is
 
-MagFitDiary is a workout tracking web app focused on fast logging for beginners in the gym. The main use case is to quickly record exercises and sets with weight and reps, then review progress over time. The current version works locally in the browser, with account-based sync planned for later.
+Fit is a workout tracking web app focused on fast logging for beginners in the gym. The main use case is to quickly record exercises and sets with weight and reps, then review progress over time. The current version works locally in the browser, with account-based sync planned for later.
 
 ## Core Value
 
@@ -42,19 +42,20 @@ This is a brownfield frontend project with existing React + TypeScript + Zustand
 
 ## Key Decisions
 
-| Decision | Rationale | Outcome |
-|----------|-----------|---------|
-| Prioritize "quick log" as primary flow | User explicitly selected fast recording as most important journey | — Pending |
-| Track set data with weight + reps only in v1 | Keeps input fast and beginner-friendly | — Pending |
-| Include progress charts in v1 | User wants visible progress by weight/reps | — Pending |
-| Keep v1 local-only (no auth required yet) | Reduces scope and ships value faster | — Pending |
-| Ship web first, mobile app later | Matches current usage expectation and existing stack | — Pending |
+| Decision                                     | Rationale                                                         | Outcome   |
+| -------------------------------------------- | ----------------------------------------------------------------- | --------- |
+| Prioritize "quick log" as primary flow       | User explicitly selected fast recording as most important journey | — Pending |
+| Track set data with weight + reps only in v1 | Keeps input fast and beginner-friendly                            | — Pending |
+| Include progress charts in v1                | User wants visible progress by weight/reps                        | — Pending |
+| Keep v1 local-only (no auth required yet)    | Reduces scope and ships value faster                              | — Pending |
+| Ship web first, mobile app later             | Matches current usage expectation and existing stack              | — Pending |
 
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
 
 **After each phase transition** (via `/gsd-transition`):
+
 1. Requirements invalidated? -> Move to Out of Scope with reason
 2. Requirements validated? -> Move to Validated with phase reference
 3. New requirements emerged? -> Add to Active
@@ -62,10 +63,12 @@ This document evolves at phase transitions and milestone boundaries.
 5. "What This Is" still accurate? -> Update if drifted
 
 **After each milestone** (via `/gsd-complete-milestone`):
+
 1. Full review of all sections
 2. Core Value check -> still the right priority?
 3. Audit Out of Scope -> reasons still valid?
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-14 after initialization*
+
+_Last updated: 2026-04-14 after initialization_
