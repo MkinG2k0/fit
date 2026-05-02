@@ -9,10 +9,10 @@ interface PresetPageLocationState {
 }
 
 const findEditingPreset = (
-  presetName: string,
+  presetId: string,
   presets: TrainingPreset[],
 ): TrainingPreset | undefined =>
-  presets.find((preset) => preset.presetName === presetName);
+  presets.find((preset) => preset.id === presetId);
 
 export const CreatePresetPage = () => {
   const navigate = useNavigate();
@@ -20,16 +20,16 @@ export const CreatePresetPage = () => {
   const [searchParams] = useSearchParams();
   const presets = useExerciseStore((state) => state.trainingPreset);
 
-  const editName = searchParams.get("name")?.trim() ?? "";
-  const isEditMode = Boolean(editName);
+  const editId = searchParams.get("id")?.trim() ?? "";
+  const isEditMode = Boolean(editId);
   const state = location.state as PresetPageLocationState | null;
 
   const editingPreset = useMemo(() => {
     if (!isEditMode) {
       return undefined;
     }
-    return findEditingPreset(editName, presets);
-  }, [editName, isEditMode, presets]);
+    return findEditingPreset(editId, presets);
+  }, [editId, isEditMode, presets]);
 
   const initialExercises = useMemo(
     () =>

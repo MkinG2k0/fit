@@ -1,24 +1,4 @@
-import { localStorageDriver } from "./localStorageDriver";
 import { preferencesDriver } from "./preferencesDriver";
-import type { StorageBackendMode } from "./types";
-
-const DEFAULT_STORAGE_MODE: StorageBackendMode = "preferences";
-
-const resolveStorageMode = (): StorageBackendMode => {
-  const rawMode = import.meta.env.VITE_STORAGE_BACKEND_MODE;
-  if (
-    rawMode === "preferences" ||
-    rawMode === "local" ||
-    rawMode === "dual"
-  ) {
-    return rawMode;
-  }
-  return DEFAULT_STORAGE_MODE;
-};
-
-const getStorageMode = (): StorageBackendMode => resolveStorageMode();
-
-const uniqueKeys = (keys: string[]) => [...new Set(keys)];
 
 const safeDriverKeys = async (
   getter: () => Promise<string[]>,
@@ -48,86 +28,23 @@ const safeRemove = async (remover: () => Promise<void>) => {
 
 export const appStorage = {
   getString: async (key: string): Promise<string | null> => {
-    const mode = getStorageMode();
-
-    if (mode === "local") {
-      return localStorageDriver.getItem(key);
-    }
-
-    if (mode === "preferences") {
-      try {
-        return await preferencesDriver.getItem(key);
-      } catch {
-        return null;
-      }
-    }
-
     try {
-      const fromPreferences = await preferencesDriver.getItem(key);
-      if (fromPreferences !== null) {
-        return fromPreferences;
-      }
+      return await preferencesDriver.getItem(key);
     } catch {
-      // noop
+      return null;
     }
-
-    const fromLocalStorage = await localStorageDriver.getItem(key);
-    if (fromLocalStorage !== null) {
-      await safeSet(() =>
-        preferencesDriver.setItem(key, fromLocalStorage),
-      );
-    }
-
-    return fromLocalStorage;
   },
 
   setString: async (key: string, value: string) => {
-    const mode = getStorageMode();
-
-    if (mode === "local") {
-      await safeSet(() => localStorageDriver.setItem(key, value));
-      return;
-    }
-
     await safeSet(() => preferencesDriver.setItem(key, value));
-
-    if (mode === "dual") {
-      await safeSet(() => localStorageDriver.setItem(key, value));
-    }
   },
 
   remove: async (key: string) => {
-    const mode = getStorageMode();
-
-    if (mode === "local") {
-      await safeRemove(() => localStorageDriver.removeItem(key));
-      return;
-    }
-
     await safeRemove(() => preferencesDriver.removeItem(key));
-
-    if (mode === "dual") {
-      await safeRemove(() => localStorageDriver.removeItem(key));
-    }
   },
 
   keys: async (): Promise<string[]> => {
-    const mode = getStorageMode();
-
-    if (mode === "local") {
-      return safeDriverKeys(() => localStorageDriver.keys());
-    }
-
-    if (mode === "preferences") {
-      return safeDriverKeys(() => preferencesDriver.keys());
-    }
-
-    const [preferenceKeys, localKeys] = await Promise.all([
-      safeDriverKeys(() => preferencesDriver.keys()),
-      safeDriverKeys(() => localStorageDriver.keys()),
-    ]);
-
-    return uniqueKeys([...preferenceKeys, ...localKeys]);
+    return safeDriverKeys(() => preferencesDriver.keys());
   },
 
   getJson: async <T>(key: string): Promise<T | null> => {

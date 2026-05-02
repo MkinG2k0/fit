@@ -12,10 +12,10 @@ export const useAnalyticsFilters = (initialState = DEFAULT_ANALYTICS_FILTERS) =>
     }));
   };
 
-  const handleExerciseNameChange = (exerciseName: string) => {
+  const handleExerciseIdChange = (exerciseId: string) => {
     setFilters((prevState) => ({
       ...prevState,
-      exerciseName,
+      exerciseId,
     }));
   };
 
@@ -33,7 +33,7 @@ export const useAnalyticsFilters = (initialState = DEFAULT_ANALYTICS_FILTERS) =>
   return {
     filters,
     handlePeriodChange,
-    handleExerciseNameChange,
+    handleExerciseIdChange,
     handleCategoryChange,
     resetFilters,
   };

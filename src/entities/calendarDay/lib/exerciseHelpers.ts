@@ -14,10 +14,12 @@ export interface GenerateExerciseOptions {
 
 export const generateExercise = (
   name: string,
-  group: string,
+  _group: string,
   presetName?: string,
   presetColor?: RgbaColor,
   iconId?: ExerciseIconId,
+  catalogExerciseId?: string,
+  categoryId?: string,
   options?: GenerateExerciseOptions,
 ): Exercise => {
   const sets: ExerciseSet[] =
@@ -28,8 +30,9 @@ export const generateExercise = (
   return {
     sets,
     id: createRandomUuid(),
-    category: group,
     name: name,
+    ...(catalogExerciseId ? { catalogExerciseId } : {}),
+    ...(categoryId ? { categoryId } : {}),
     presetColor: presetColor,
     presetName: presetName,
     ...(iconId !== undefined ? { iconId } : {}),

@@ -54,11 +54,18 @@ export interface LastExerciseSession {
 
 const pickExerciseOnDay = (
   exercises: Exercise[],
-  normalizedTarget: string,
+  normalizedTargetName: string,
+  targetCatalogExerciseId?: string,
 ): Exercise | null => {
-  const matches = exercises.filter(
-    (item) => normalizeExerciseName(item.name) === normalizedTarget,
-  );
+  const matchesById = targetCatalogExerciseId
+    ? exercises.filter((item) => item.catalogExerciseId === targetCatalogExerciseId)
+    : [];
+  const matches =
+    matchesById.length > 0
+      ? matchesById
+      : exercises.filter(
+          (item) => normalizeExerciseName(item.name) === normalizedTargetName,
+        );
   if (matches.length === 0) {
     return null;
   }
@@ -122,9 +129,10 @@ const toLastSessionOrSkip = (
 export const findLastExerciseSession = async (
   exerciseName: string,
   beforeDate: dayjs.Dayjs,
+  catalogExerciseId?: string,
 ): Promise<LastExerciseSession | null> => {
-  const normalizedTarget = normalizeExerciseName(exerciseName);
-  if (!normalizedTarget) {
+  const normalizedTargetName = normalizeExerciseName(exerciseName);
+  if (!normalizedTargetName && !catalogExerciseId) {
     return null;
   }
 
@@ -148,7 +156,11 @@ export const findLastExerciseSession = async (
       continue;
     }
 
-    const exercise = pickExerciseOnDay(rawDay.exercises, normalizedTarget);
+    const exercise = pickExerciseOnDay(
+      rawDay.exercises,
+      normalizedTargetName,
+      catalogExerciseId,
+    );
     if (!exercise) {
       continue;
     }

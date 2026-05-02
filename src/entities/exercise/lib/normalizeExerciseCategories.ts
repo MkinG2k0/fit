@@ -4,6 +4,7 @@ import {
   normalizeExerciseIconId,
   type ExerciseIconId,
 } from "../model/exerciseIcons";
+import { buildCatalogExerciseId, buildCategoryId } from "./exerciseIds";
 import type { CatalogExercise, ExerciseCategory } from "../model/types";
 
 const BUILTIN_ICON_KEY_SEPARATOR = "\u0000";
@@ -42,6 +43,7 @@ const normalizeCatalogEntry = (
     const name = raw;
 
     return {
+      id: buildCatalogExerciseId(category, name),
       name,
       iconId:
         builtinIcons.get(builtinExerciseIconKey(category, name)) ??
@@ -73,7 +75,17 @@ const normalizeCatalogEntry = (
     );
 
     if (fromBuiltin !== undefined) {
-      return { name, iconId: fromBuiltin, description, photoDataUrls };
+      return {
+        id:
+          typeof (raw as { id?: unknown }).id === "string" &&
+          (raw as { id: string }).id.trim().length > 0
+            ? (raw as { id: string }).id
+            : buildCatalogExerciseId(category, name),
+        name,
+        iconId: fromBuiltin,
+        description,
+        photoDataUrls,
+      };
     }
 
     const iconId =
@@ -81,10 +93,21 @@ const normalizeCatalogEntry = (
         ? defaultIconIdForCategory(category)
         : normalizeExerciseIconId(iconRaw);
 
-    return { name, iconId, description, photoDataUrls };
+    return {
+      id:
+        typeof (raw as { id?: unknown }).id === "string" &&
+        (raw as { id: string }).id.trim().length > 0
+          ? (raw as { id: string }).id
+          : buildCatalogExerciseId(category, name),
+      name,
+      iconId,
+      description,
+      photoDataUrls,
+    };
   }
 
   return {
+    id: buildCatalogExerciseId(category, ""),
     name: "",
     iconId: defaultIconIdForCategory(category),
     description: "",
@@ -103,14 +126,19 @@ export const normalizeExerciseCategories = (
 
   return categories.map((group) => {
     if (!group || typeof group !== "object" || !("category" in group)) {
-      return { category: "", exercises: [] };
+      return { id: "", category: "", exercises: [] };
     }
 
     const category = String((group as { category: unknown }).category);
+    const categoryIdRaw = (group as { id?: unknown }).id;
     const rawExercises = (group as { exercises?: unknown }).exercises;
     const exercisesList = Array.isArray(rawExercises) ? rawExercises : [];
 
     return {
+      id:
+        typeof categoryIdRaw === "string" && categoryIdRaw.trim().length > 0
+          ? categoryIdRaw
+          : buildCategoryId(category),
       category,
       exercises: exercisesList.map((entry) =>
         normalizeCatalogEntry(entry, category, builtinIcons),

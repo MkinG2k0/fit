@@ -24,9 +24,7 @@ export const AllExercises = () => {
   };
 
   const handleOpenExerciseEditModal = (payload: CatalogExerciseEditSource) => {
-    navigate(
-      `/exercises/edit?category=${encodeURIComponent(payload.category)}&name=${encodeURIComponent(payload.name)}`,
-    );
+    navigate(`/exercises/edit?id=${encodeURIComponent(payload.id)}`);
   };
 
   const handleOpenExerciseModalByCategory = (categoryName: string) => {
@@ -45,7 +43,7 @@ export const AllExercises = () => {
 
   const handleOpenPresetEditModal = (preset: TrainingPreset) => {
     setOpenAddPopover(false);
-    navigate(`/presets/edit?name=${encodeURIComponent(preset.presetName)}`);
+    navigate(`/presets/edit?id=${encodeURIComponent(preset.id!)}`);
   };
 
   return (

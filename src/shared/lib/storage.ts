@@ -6,7 +6,7 @@ import {
   registerWorkoutMonthKey,
 } from "./storageAdapter";
 
-/** Ключи месяцев тренировочного журнала в localStorage (`MM-YYYY`). */
+/** Ключи месяцев тренировочного журнала в app storage (`MM-YYYY`). */
 export const MONTH_YEAR_STORAGE_KEY_REGEX = /^(0[1-9]|1[0-2])-\d{4}$/;
 
 const monthYearRegex = MONTH_YEAR_STORAGE_KEY_REGEX;

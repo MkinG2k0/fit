@@ -12,13 +12,17 @@ export interface TonnageData {
 export const calculateTonnageForExercise = (
   exerciseObj: Record<string, CalendarDay>,
   exerciseName: string,
+  catalogExerciseId?: string,
 ): TonnageData[] => {
   const normalizedSessions = normalizeTrainingSessions(exerciseObj, {
     period: "90d",
-    exerciseName: "",
+    exerciseId: "",
     category: "",
   });
 
-  return calculateExerciseTonnageTrend(normalizedSessions, exerciseName);
+  return calculateExerciseTonnageTrend(
+    normalizedSessions,
+    catalogExerciseId ?? exerciseName,
+  );
 };
 

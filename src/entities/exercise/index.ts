@@ -15,9 +15,7 @@ export {
   defaultIconIdForCategory,
   normalizeExerciseIconId,
 } from "./model/exerciseIcons";
-export {
-  categoryContainsExerciseName,
-  findCatalogExerciseByName,
-} from "./lib/catalogLookup";
+export { findCatalogExerciseById, findExerciseCategoryById } from "./lib/catalogLookup";
+export { buildCatalogExerciseId, buildCategoryId, buildPresetId } from "./lib/exerciseIds";
 export { normalizeExerciseCategories } from "./lib/normalizeExerciseCategories";
 export { useExerciseStore } from "./slice/exerciseStore";

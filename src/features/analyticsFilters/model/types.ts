@@ -7,7 +7,7 @@ export interface AnalyticsPeriodOption {
 
 export const DEFAULT_ANALYTICS_FILTERS: AnalyticsFilters = {
   period: "30d",
-  exerciseName: "",
+  exerciseId: "",
   category: "",
 };
 

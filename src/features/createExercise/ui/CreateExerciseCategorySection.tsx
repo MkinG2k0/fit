@@ -21,7 +21,7 @@ export const CreateExerciseCategorySection = ({
         <div className="flex w-max min-w-full flex-nowrap gap-2">
           {categories.map((category) => (
             <Button
-              key={category.category}
+              key={category.id}
               type="button"
               variant={selectedCategory === category.category ? "default" : "outline"}
               className="shrink-0 whitespace-nowrap"

@@ -2,7 +2,7 @@ import { ListChecks, Pencil, Trash2 } from "lucide-react";
 import { Checkbox } from "@/shared/ui/shadCNComponents/ui/checkbox";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { CommandItem } from "@/shared/ui/shadCNComponents/ui/command";
-import type { TrainingPreset } from "@/entities/exercise";
+import { type TrainingPreset, useExerciseStore } from "@/entities/exercise";
 
 interface PresetItemProps {
   preset: TrainingPreset;
@@ -10,7 +10,7 @@ interface PresetItemProps {
   deletable: boolean;
   selected: boolean;
   onSelect?: (value: string) => void;
-  onDelete: (name: string) => void;
+  onDelete: (id: string, name: string) => void;
   onEdit?: (preset: TrainingPreset) => void;
 }
 
@@ -23,9 +23,22 @@ export const PresetItem = ({
   onDelete,
   onEdit,
 }: PresetItemProps) => {
+  const exerciseCatalog = useExerciseStore((state) => state.exercises);
+  const exercisePreview = preset.exercises
+    .map((exerciseRef) => {
+      for (const group of exerciseCatalog) {
+        const entry = group.exercises.find((exercise) => exercise.id === exerciseRef);
+        if (entry) {
+          return entry.name;
+        }
+      }
+      return "Неизвестное упражнение";
+    })
+    .join(" • ");
+
   const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    onDelete(preset.presetName);
+    onDelete(preset.id!, preset.presetName);
   };
 
   const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -35,7 +48,8 @@ export const PresetItem = ({
 
   return (
     <CommandItem
-      value={preset.presetName}
+      value={preset.id!}
+      keywords={[preset.presetName, exercisePreview]}
       className="flex flex-col items-start py-3"
       onSelect={onSelect}
     >
@@ -46,7 +60,7 @@ export const PresetItem = ({
         </div>
         <div className="flex items-center gap-2">
           {checkable && (
-            <Checkbox value={preset.presetName} checked={selected} />
+            <Checkbox value={preset.id!} checked={selected} />
           )}
           {deletable && (
             <>
@@ -73,7 +87,7 @@ export const PresetItem = ({
         </div>
       </div>
       <div className="text-sm text-muted-foreground">
-        {preset.exercises.join(" • ")}
+        {exercisePreview}
       </div>
     </CommandItem>
   );

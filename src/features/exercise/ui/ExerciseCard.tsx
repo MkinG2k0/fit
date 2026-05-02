@@ -4,8 +4,8 @@ import { useState, useEffect, useMemo, useRef, type MouseEvent } from "react";
 import { ChartColumnBig, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { useCalendarStore } from "@/entities/calendarDay";
 import {
-  categoryContainsExerciseName,
-  findCatalogExerciseByName,
+  findCatalogExerciseById,
+  findExerciseCategoryById,
   type Exercise,
   useExerciseStore,
 } from "@/entities/exercise";
@@ -116,21 +116,34 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
   };
 
   // ⚙️ 3. Обработка изменения названия упражнения
-  const inputChangeHandler = (name: string) => {
-    const category = allExercises.find((group) =>
-      categoryContainsExerciseName(group, name),
-    )?.category;
-    const catalogEntry = findCatalogExerciseByName(allExercises, name);
-    if (category && catalogEntry) {
-      setExerciseName(
-        { name, group: category, iconId: catalogEntry.iconId },
-        exercise,
-      );
-      setModalVisibility(false);
+  const inputChangeHandler = (catalogExerciseId: string) => {
+    const catalogEntry = findCatalogExerciseById(allExercises, catalogExerciseId);
+    const categoryGroup = allExercises.find((group) =>
+      group.exercises.some((entry) => entry.id === catalogExerciseId),
+    );
+    const category = categoryGroup?.category;
+    const categoryId = categoryGroup?.id;
+    if (!catalogEntry || !category || !categoryId) {
+      return;
     }
+    setExerciseName(
+      {
+        name: catalogEntry.name,
+        group: category,
+        categoryId,
+        iconId: catalogEntry.iconId,
+        catalogExerciseId: catalogEntry.id,
+      },
+      exercise,
+    );
+    setModalVisibility(false);
   };
 
   const exerciseColor = `rgba(${exercise.presetColor?.r},${exercise.presetColor?.g},${exercise.presetColor?.b},${exercise.presetColor?.a}`;
+  const resolvedCategoryName =
+    (exercise.categoryId
+      ? findExerciseCategoryById(allExercises, exercise.categoryId)?.category
+      : undefined) ?? exercise.category;
 
   const totalLiftedKg = useMemo(() => {
     return exercise.sets.reduce((sum, set) => {
@@ -186,7 +199,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
             <div className="flex min-w-0 flex-1 flex-row items-center ">
               <div className={cn("flex items-center justify-center p-2")}>
                 <ExerciseCategoryIcon
-                  category={exercise.category}
+                  category={resolvedCategoryName}
                   iconId={exercise.iconId}
                   className="size-11 shrink-0"
                 />
@@ -276,6 +289,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
       />
       <StatisticCard
         exerciseName={exercise.name}
+        catalogExerciseId={exercise.catalogExerciseId}
         open={isStatisticOpen}
         onOpenChange={setIsStatisticOpen}
         showTrigger={false}

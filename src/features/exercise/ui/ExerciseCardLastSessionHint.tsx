@@ -2,12 +2,14 @@ import { useLastExerciseSession } from "../lib/useLastExerciseSession";
 
 interface ExerciseCardLastSessionHintProps {
   exerciseName: string;
+  catalogExerciseId?: string;
 }
 
 export const ExerciseCardLastSessionHint = ({
   exerciseName,
+  catalogExerciseId,
 }: ExerciseCardLastSessionHintProps) => {
-  const lastSession = useLastExerciseSession(exerciseName);
+  const lastSession = useLastExerciseSession(exerciseName, catalogExerciseId);
 
   if (!lastSession) {
     return null;

@@ -39,7 +39,6 @@ export const AddExercise = () => {
     days[selectedDate.format("DD-MM-YYYY")]?.exercises ?? [];
   const currentWorkoutPresetExercises = mapCurrentWorkoutToPresetExercises(
     currentWorkoutExercises,
-    allExercises,
   );
 
   const {

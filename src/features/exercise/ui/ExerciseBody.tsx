@@ -27,7 +27,10 @@ export const ExerciseBody = ({
   exercise,
   onDeleteRequested,
 }: ExerciseBodyProps) => {
-  const lastSession = useLastExerciseSession(exercise.name);
+  const lastSession = useLastExerciseSession(
+    exercise.name,
+    exercise.catalogExerciseId,
+  );
   const showCaloriesUi = useWorkoutCaloriesUiEnabled();
 
   const onChangeHandler = useCalendarStore((store) => store.setExerciseValues);
@@ -145,7 +148,10 @@ export const ExerciseBody = ({
         })}
       </AnimatePresence>
       <div className={"flex gap-3 items-center justify-between"}>
-        <StatisticCard exerciseName={exercise.name} />
+        <StatisticCard
+          exerciseName={exercise.name}
+          catalogExerciseId={exercise.catalogExerciseId}
+        />
         <CustomButton classes={"flex-1"} buttonHandler={handleAddSet}>
           Добавить подход
         </CustomButton>

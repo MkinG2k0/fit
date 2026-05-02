@@ -40,7 +40,8 @@ const parseExercise = (value: unknown): Exercise | null => {
   const id = toSafeString(value.id);
   const name = toSafeString(value.name);
   const category = toSafeString(value.category);
-  if (id.length === 0 || name.length === 0 || category.length === 0) {
+  const categoryId = toSafeString(value.categoryId);
+  if (id.length === 0 || name.length === 0) {
     return null;
   }
 
@@ -54,7 +55,8 @@ const parseExercise = (value: unknown): Exercise | null => {
   return {
     id,
     name,
-    category,
+    ...(category.length > 0 ? { category } : {}),
+    ...(categoryId.length > 0 ? { categoryId } : {}),
     sets,
     presetName:
       typeof value.presetName === "string" ? value.presetName : undefined,

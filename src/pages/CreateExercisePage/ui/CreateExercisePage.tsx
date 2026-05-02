@@ -8,24 +8,23 @@ import {
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 
 const findEditingExercise = (
-  category: string,
-  name: string,
+  exerciseId: string,
   exercises: ReturnType<typeof useExerciseStore.getState>["exercises"],
 ): CatalogExerciseEditSource | undefined => {
-  const exerciseGroup = exercises.find((group) => group.category === category);
-  const exercise = exerciseGroup?.exercises.find(
-    (entry) => entry.name === name,
-  );
-  if (!exercise || !exerciseGroup) {
-    return undefined;
+  for (const group of exercises) {
+    const exercise = group.exercises.find((entry) => entry.id === exerciseId);
+    if (exercise) {
+      return {
+        id: exercise.id,
+        category: group.category,
+        name: exercise.name,
+        iconId: exercise.iconId,
+        description: exercise.description,
+        photoDataUrls: exercise.photoDataUrls,
+      };
+    }
   }
-  return {
-    category: exerciseGroup.category,
-    name: exercise.name,
-    iconId: exercise.iconId,
-    description: exercise.description,
-    photoDataUrls: exercise.photoDataUrls,
-  };
+  return undefined;
 };
 
 export const CreateExercisePage = () => {
@@ -33,17 +32,34 @@ export const CreateExercisePage = () => {
   const [searchParams] = useSearchParams();
   const exercises = useExerciseStore((state) => state.exercises);
 
+  const editId = searchParams.get("id")?.trim() ?? "";
   const editCategory = searchParams.get("category")?.trim() ?? "";
   const editName = searchParams.get("name")?.trim() ?? "";
   const defaultCategory = searchParams.get("category")?.trim() ?? undefined;
-  const isEditMode = Boolean(editCategory && editName);
+  const isEditMode = Boolean(editId || (editCategory && editName));
 
   const editingExercise = useMemo(() => {
     if (!isEditMode) {
       return undefined;
     }
-    return findEditingExercise(editCategory, editName, exercises);
-  }, [editCategory, editName, exercises, isEditMode]);
+    if (editId) {
+      return findEditingExercise(editId, exercises);
+    }
+    for (const group of exercises) {
+      const exercise = group.exercises.find((entry) => entry.name === editName);
+      if (exercise && group.category === editCategory) {
+        return {
+          id: exercise.id,
+          category: group.category,
+          name: exercise.name,
+          iconId: exercise.iconId,
+          description: exercise.description,
+          photoDataUrls: exercise.photoDataUrls,
+        };
+      }
+    }
+    return undefined;
+  }, [editCategory, editId, editName, exercises, isEditMode]);
 
   return (
     <div className="mx-auto flex h-full min-h-0 w-full max-w-3xl flex-col gap-4 p-4">

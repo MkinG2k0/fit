@@ -7,6 +7,7 @@ import {
 
 export const useLastExerciseSession = (
   exerciseName: string,
+  catalogExerciseId?: string,
 ): LastExerciseSession | null => {
   const selectedDate = useCalendarStore((store) => store.selectedDate);
   const [session, setSession] = useState<LastExerciseSession | null>(null);
@@ -15,7 +16,11 @@ export const useLastExerciseSession = (
     let isDisposed = false;
 
     const loadSession = async () => {
-      const result = await findLastExerciseSession(exerciseName, selectedDate);
+      const result = await findLastExerciseSession(
+        exerciseName,
+        selectedDate,
+        catalogExerciseId,
+      );
       if (!isDisposed) {
         setSession(result);
       }
@@ -26,7 +31,7 @@ export const useLastExerciseSession = (
     return () => {
       isDisposed = true;
     };
-  }, [exerciseName, selectedDate]);
+  }, [catalogExerciseId, exerciseName, selectedDate]);
 
   return session;
 };

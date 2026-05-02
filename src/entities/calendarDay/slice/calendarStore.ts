@@ -34,6 +34,8 @@ interface CalendarStore {
     presetName?: string,
     presetColor?: RgbaColor,
     iconId?: ExerciseIconId,
+    catalogExerciseId?: string,
+    categoryId?: string,
   ) => void;
   setExerciseName: (
     exerciseParams: ExerciseOption | null,
@@ -79,7 +81,15 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
     set(() => ({ days }));
   },
 
-  addExercise: (name, group, presetName?, presetColor?, iconId?) =>
+  addExercise: (
+    name,
+    group,
+    presetName?,
+    presetColor?,
+    iconId?,
+    catalogExerciseId?,
+    categoryId?,
+  ) =>
     set((state) => {
       const { dateKey, oldExercises } = getDateKeyAndOldExercises(
         state.selectedDate,
@@ -89,9 +99,18 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
         useUserStore.getState().workoutCaloriesEnabled ?? false;
       const newExercises = [
         ...oldExercises,
-        generateExercise(name, group, presetName, presetColor, iconId, {
+        generateExercise(
+          name,
+          group,
+          presetName,
+          presetColor,
+          iconId,
+          catalogExerciseId,
+          categoryId,
+          {
           singleEmptySet: !workoutCaloriesEnabled,
-        }),
+          },
+        ),
       ];
       const newDays = replaceExercises(
         state.selectedDate,
@@ -113,9 +132,14 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
         return {
           ...ex,
           name: exerciseParams!.name,
-          category: exerciseParams!.group as string,
+          ...(exerciseParams?.categoryId
+            ? { categoryId: exerciseParams.categoryId }
+            : {}),
           ...(exerciseParams?.iconId !== undefined
             ? { iconId: exerciseParams.iconId }
+            : {}),
+          ...(exerciseParams?.catalogExerciseId
+            ? { catalogExerciseId: exerciseParams.catalogExerciseId }
             : {}),
         };
       });

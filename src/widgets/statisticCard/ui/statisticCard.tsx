@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import {
-  findCatalogExerciseByName,
+  findCatalogExerciseById,
   useExerciseStore,
 } from "@/entities/exercise";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
@@ -15,6 +15,7 @@ import { TonnageChart } from "./TonnageChart";
 
 interface StatisticCardProps {
   exerciseName: string;
+  catalogExerciseId?: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   showTrigger?: boolean;
@@ -22,6 +23,7 @@ interface StatisticCardProps {
 
 export const StatisticCard = ({
   exerciseName,
+  catalogExerciseId,
   open,
   onOpenChange,
   showTrigger = true,
@@ -35,10 +37,9 @@ export const StatisticCard = ({
   >([]);
   const [activeTab, setActiveTab] = useState<"stats" | "info">("stats");
   const catalogExercises = useExerciseStore((state) => state.exercises);
-  const exerciseInfo = findCatalogExerciseByName(
-    catalogExercises,
-    exerciseName,
-  );
+  const exerciseInfo = catalogExerciseId
+    ? findCatalogExerciseById(catalogExercises, catalogExerciseId)
+    : undefined;
   const isControlled = typeof open === "boolean";
   const dialogOpen = isControlled ? open : internalDialogOpen;
 
@@ -76,7 +77,11 @@ export const StatisticCard = ({
       const allTrainingDays = await readAllTrainingDaysFromStorage();
       if (!isDisposed) {
         setChartData(
-          calculateTonnageForExercise(allTrainingDays, exerciseName),
+          calculateTonnageForExercise(
+            allTrainingDays,
+            exerciseName,
+            catalogExerciseId,
+          ),
         );
       }
     };
@@ -86,7 +91,7 @@ export const StatisticCard = ({
     return () => {
       isDisposed = true;
     };
-  }, [dialogOpen, exerciseName]);
+  }, [catalogExerciseId, dialogOpen, exerciseName]);
 
   return (
     <>

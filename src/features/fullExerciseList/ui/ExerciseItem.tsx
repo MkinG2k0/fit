@@ -1,4 +1,4 @@
-import type { MouseEvent } from "react";
+import { memo, type MouseEvent } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import type { ExerciseIconId } from "@/entities/exercise";
 import { cn } from "@/shared/lib";
@@ -9,6 +9,7 @@ import { CommandItem } from "@/shared/ui/shadCNComponents/ui/command";
 import { RadioGroupItem } from "../../../shared/ui/shadCNComponents/ui/radio-group.tsx";
 
 interface ExerciseItemProps {
+  id: string;
   name: string;
   iconId: ExerciseIconId;
   description: string;
@@ -19,8 +20,9 @@ interface ExerciseItemProps {
   allowListDelete?: boolean;
   selected: boolean;
   onSelect?: (value: string) => void;
-  onDelete: (name: string, category: string) => void;
+  onDelete: (id: string, name: string) => void;
   onEdit?: (payload: {
+    id: string;
     name: string;
     category: string;
     iconId: ExerciseIconId;
@@ -30,7 +32,8 @@ interface ExerciseItemProps {
   category: string;
 }
 
-export const ExerciseItem = ({
+export const ExerciseItem = memo(({
+  id,
   name,
   iconId,
   description,
@@ -46,17 +49,18 @@ export const ExerciseItem = ({
 }: ExerciseItemProps) => {
   const handleDeleteClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    onDelete(name, category);
+    onDelete(id, name);
   };
 
   const handleEditClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    onEdit?.({ name, category, iconId, description, photoDataUrls });
+    onEdit?.({ id, name, category, iconId, description, photoDataUrls });
   };
 
   return (
     <CommandItem
-      value={name}
+      value={id}
+      keywords={[name, category, description]}
       className="text-base flex w-full justify-between"
       onSelect={onSelect}
     >
@@ -73,10 +77,10 @@ export const ExerciseItem = ({
       </div>
       <div className="flex shrink-0 items-center gap-2">
         {checkable === "radio" && (
-          <RadioGroupItem checked={selected} value={name} id={name} />
+          <RadioGroupItem checked={selected} value={id} id={id} />
         )}
         {checkable === "checkbox" && (
-          <Checkbox value={name} checked={selected} />
+          <Checkbox value={id} checked={selected} />
         )}
         {deletable && (
           <>
@@ -105,4 +109,4 @@ export const ExerciseItem = ({
       </div>
     </CommandItem>
   );
-};
+});

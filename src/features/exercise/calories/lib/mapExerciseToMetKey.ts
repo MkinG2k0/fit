@@ -7,13 +7,14 @@ const normalize = (s: string): string => s.trim().toLowerCase();
  */
 export const mapExerciseToMetKey = (exercise: Exercise): string => {
   const name = normalize(exercise.name);
-  const category = normalize(exercise.category);
+  const category = normalize(exercise.category ?? exercise.categoryId ?? "");
   const hay = `${name} ${category}`;
 
   if (
     hay.includes("присед") ||
     hay.includes("squat") ||
-    hay.includes("hack")
+    hay.includes("hack") ||
+    hay.includes("nogi")
   ) {
     return "squats";
   }
@@ -21,7 +22,8 @@ export const mapExerciseToMetKey = (exercise: Exercise): string => {
     hay.includes("жим ног") ||
     hay.includes("leg press") ||
     hay.includes("гакк") ||
-    hay.includes("platform")
+    hay.includes("platform") ||
+    hay.includes("nogi")
   ) {
     return "leg_press";
   }

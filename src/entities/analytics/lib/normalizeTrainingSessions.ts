@@ -1,4 +1,5 @@
 import type { CalendarDay } from "@/entities/calendarDay";
+import { allExercises } from "@/shared/config/constants";
 import type {
   AnalyticsFilters,
   ExerciseSessionStat,
@@ -27,18 +28,26 @@ const calculateExerciseSessionStat = (
 };
 
 const isExerciseMatched = (
-  exerciseName: string,
-  category: string,
+  exerciseId: string,
+  categoryId: string,
   filters: AnalyticsFilters,
 ) => {
   const matchesExercise =
-    filters.exerciseName.length === 0 ||
-    exerciseName.toLowerCase().includes(filters.exerciseName.toLowerCase());
-  const matchesCategory =
-    filters.category.length === 0 ||
-    category.toLowerCase().includes(filters.category.toLowerCase());
+    filters.exerciseId.length === 0 || exerciseId === filters.exerciseId;
+  const matchesCategory = filters.category.length === 0 || categoryId === filters.category;
 
   return matchesExercise && matchesCategory;
+};
+
+const categoryNameById = new Map(
+  allExercises.map((group) => [group.id, group.category] as const),
+);
+
+const resolveExerciseCategoryName = (categoryId?: string, legacyCategory?: string) => {
+  if (categoryId) {
+    return categoryNameById.get(categoryId) ?? legacyCategory ?? "";
+  }
+  return legacyCategory ?? "";
 };
 
 export const normalizeTrainingSessions = (
@@ -49,13 +58,17 @@ export const normalizeTrainingSessions = (
     .map(([dateKey, day]) => {
       const normalizedExercises = day.exercises
         .filter((exercise) =>
-          isExerciseMatched(exercise.name, exercise.category, filters),
+          isExerciseMatched(
+            exercise.catalogExerciseId ?? exercise.id,
+            exercise.categoryId ?? "",
+            filters,
+          ),
         )
         .map((exercise) =>
           calculateExerciseSessionStat(
-            exercise.id,
+            exercise.catalogExerciseId ?? exercise.id,
             exercise.name,
-            exercise.category,
+            resolveExerciseCategoryName(exercise.categoryId, exercise.category),
             exercise.sets,
           ),
         )

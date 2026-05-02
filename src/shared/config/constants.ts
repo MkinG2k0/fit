@@ -1,5 +1,13 @@
 import type { ExerciseIconId } from "@/entities/exercise/model/exerciseIcons";
-import type { CatalogExercise } from "@/entities/exercise/model/types";
+import type {
+  CatalogExercise,
+  ExerciseCategory,
+} from "@/entities/exercise/model/types";
+import {
+  buildCategoryId,
+  buildCatalogExerciseId,
+  buildPresetId,
+} from "@/entities/exercise/lib/exerciseIds";
 
 const DEFAULT_PRESET_COLOR = { r: 255, g: 165, b: 0, a: 0.5 };
 
@@ -8,9 +16,15 @@ const catalogExercise = (
   iconId: ExerciseIconId,
   description = "",
   photoDataUrls: string[] = [],
-): CatalogExercise => ({ name, iconId, description, photoDataUrls });
+): CatalogExercise => ({
+  id: "",
+  name,
+  iconId,
+  description,
+  photoDataUrls,
+});
 
-export const allExercises = [
+const rawAllExercises: Omit<ExerciseCategory, "id">[] = [
   {
     category: "Ноги",
     exercises: [
@@ -343,95 +357,118 @@ export const allExercises = [
   },
 ];
 
+export const allExercises: ExerciseCategory[] = rawAllExercises.map((group) => ({
+  id: buildCategoryId(group.category),
+  category: group.category,
+  exercises: group.exercises.map((exercise) => ({
+    ...exercise,
+    id: buildCatalogExerciseId(group.category, exercise.name),
+  })),
+}));
+
 export const trainingPreset = [
   {
+    id: buildPresetId("Грудь и бицепс"),
     presetName: "Грудь и бицепс",
     exercises: [
-      "Жим лежа",
-      "Жим гантелей на наклонной скамье",
-      "Подъём гантелей на бицепс",
-      "Молотки",
+      buildCatalogExerciseId("Грудь", "Жим лежа"),
+      buildCatalogExerciseId("Грудь", "Жим гантелей на наклонной скамье"),
+      buildCatalogExerciseId("Руки", "Подъём гантелей на бицепс"),
+      buildCatalogExerciseId("Руки", "Молотки"),
     ],
     presetColor: DEFAULT_PRESET_COLOR,
   },
   {
+    id: buildPresetId("Спина и трицепс"),
     presetName: "Спина и трицепс",
     exercises: [
-      "Подтягивания",
-      "Тяга верхнего блока",
-      "Тяга штанги в наклоне",
-      "Разгибания на блоке",
+      buildCatalogExerciseId("Спина", "Подтягивания"),
+      buildCatalogExerciseId("Спина", "Тяга верхнего блока средний хват"),
+      buildCatalogExerciseId("Спина", "Тяга штанги в наклоне"),
+      buildCatalogExerciseId("Руки", "Разгибания на блоке"),
     ],
     presetColor: DEFAULT_PRESET_COLOR,
   },
   {
+    id: buildPresetId("Ноги и плечи"),
     presetName: "Ноги и плечи",
     exercises: [
-      "Приседания",
-      "Жим ногами",
-      "Выпады",
-      "Армейский жим",
-      "Махи в сторону",
+      buildCatalogExerciseId("Ноги", "Приседания"),
+      buildCatalogExerciseId("Ноги", "Жим ногами"),
+      buildCatalogExerciseId("Ноги", "Выпады"),
+      buildCatalogExerciseId("Плечи", "Армейский жим"),
+      buildCatalogExerciseId("Плечи", "Махи в сторону"),
     ],
     presetColor: DEFAULT_PRESET_COLOR,
   },
   {
+    id: buildPresetId("Фулбоди для новичка"),
     presetName: "Фулбоди для новичка",
     exercises: [
-      "Приседания",
-      "Жим лежа",
-      "Тяга верхнего блока",
-      "Планка",
-      "Велотренажер",
+      buildCatalogExerciseId("Ноги", "Приседания"),
+      buildCatalogExerciseId("Грудь", "Жим лежа"),
+      buildCatalogExerciseId("Спина", "Тяга верхнего блока средний хват"),
+      buildCatalogExerciseId("Пресс", "Планка"),
+      buildCatalogExerciseId("Кардио", "Велотренажер"),
     ],
     presetColor: DEFAULT_PRESET_COLOR,
   },
   {
+    id: buildPresetId("Кардио и кор"),
     presetName: "Кардио и кор",
-    exercises: ["Бег", "Гребной тренажер", "Скручивания", "Планка"],
+    exercises: [
+      buildCatalogExerciseId("Кардио", "Бег"),
+      buildCatalogExerciseId("Кардио", "Гребной тренажер"),
+      buildCatalogExerciseId("Пресс", "Скручивания"),
+      buildCatalogExerciseId("Пресс", "Планка"),
+    ],
     presetColor: DEFAULT_PRESET_COLOR,
   },
   {
+    id: buildPresetId("Спина и бицепс"),
     presetName: "Спина и бицепс",
     exercises: [
-      "Подтягивания",
-      "Тяга горизонтального блока",
-      "Тяга гантели одной рукой",
-      "Подъём штанги на бицепс",
-      "Молотки",
+      buildCatalogExerciseId("Спина", "Подтягивания"),
+      buildCatalogExerciseId("Спина", "Тяга горизонтального блока"),
+      buildCatalogExerciseId("Спина", "Тяга гантели одной рукой"),
+      buildCatalogExerciseId("Руки", "Подъём штанги на бицепс"),
+      buildCatalogExerciseId("Руки", "Молотки"),
     ],
     presetColor: DEFAULT_PRESET_COLOR,
   },
   {
+    id: buildPresetId("Ягодицы и ноги"),
     presetName: "Ягодицы и ноги",
     exercises: [
-      "Ягодичный мост",
-      "Румынская тяга",
-      "Болгарские выпады",
-      "Жим ногами",
-      "Подъемы на носки стоя",
+      buildCatalogExerciseId("Ягодицы", "Ягодичный мост"),
+      buildCatalogExerciseId("Ягодицы", "Румынская тяга"),
+      buildCatalogExerciseId("Ноги", "Болгарские выпады"),
+      buildCatalogExerciseId("Ноги", "Жим ногами"),
+      buildCatalogExerciseId("Икры", "Подъемы на носки стоя"),
     ],
     presetColor: DEFAULT_PRESET_COLOR,
   },
   {
+    id: buildPresetId("Плечи и трицепс"),
     presetName: "Плечи и трицепс",
     exercises: [
-      "Армейский жим",
-      "Махи в сторону",
-      "Махи в наклоне",
-      "Разгибания на блоке",
-      "Французский жим",
+      buildCatalogExerciseId("Плечи", "Армейский жим"),
+      buildCatalogExerciseId("Плечи", "Махи в сторону"),
+      buildCatalogExerciseId("Плечи", "Махи в наклоне"),
+      buildCatalogExerciseId("Руки", "Разгибания на блоке"),
+      buildCatalogExerciseId("Руки", "Французский жим"),
     ],
     presetColor: DEFAULT_PRESET_COLOR,
   },
   {
+    id: buildPresetId("Легкая восстановительная"),
     presetName: "Легкая восстановительная",
     exercises: [
-      "Эллиптический тренажер",
-      "Планка",
-      "Растяжка задней поверхности бедра",
-      "Растяжка грудных мышц",
-      "Мобилизация грудного отдела",
+      buildCatalogExerciseId("Кардио", "Эллиптический тренажер"),
+      buildCatalogExerciseId("Пресс", "Планка"),
+      buildCatalogExerciseId("Мобильность", "Растяжка задней поверхности бедра"),
+      buildCatalogExerciseId("Мобильность", "Растяжка грудных мышц"),
+      buildCatalogExerciseId("Мобильность", "Мобилизация грудного отдела"),
     ],
     presetColor: DEFAULT_PRESET_COLOR,
   },

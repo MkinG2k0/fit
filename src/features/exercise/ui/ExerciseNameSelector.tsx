@@ -15,7 +15,7 @@ interface ExerciseNameSelectorProps {
   isEditable: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSelect: (name: string) => void;
+  onSelect: (catalogExerciseId: string) => void;
   allExercises: ExerciseCategory[];
 }
 
@@ -80,7 +80,9 @@ export const ExerciseNameSelector = ({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Закрыть
           </Button>
-          <Button onClick={() => onSelect(selectedExercise)}>Выбрать</Button>
+          <Button onClick={() => onSelect(selectedExercise)} disabled={!selectedExercise}>
+            Выбрать
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

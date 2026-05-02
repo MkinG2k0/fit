@@ -8,6 +8,8 @@ export { WorkoutCaloriesSettingsCard } from "./ui/WorkoutCaloriesSettingsCard";
 export { useWorkoutCaloriesRecalculationRunner } from "./calories/lib/useWorkoutCaloriesRecalculationRunner";
 
 export interface ExerciseOption {
+  catalogExerciseId?: string;
+  categoryId?: string;
   name: string;
   group: string;
   iconId?: ExerciseIconId;

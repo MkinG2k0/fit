@@ -37,16 +37,16 @@ export const calculateExerciseRows = (
 
   sortedSessions.forEach((session) => {
     session.exercises.forEach((exercise) => {
-      if (!rowsMap.has(exercise.name)) {
-        rowsMap.set(exercise.name, {
-          id: exercise.id || exercise.name,
+      if (!rowsMap.has(exercise.id)) {
+        rowsMap.set(exercise.id, {
+          id: exercise.id,
           name: exercise.name,
           sessions: 0,
           tonnage: 0,
           trendByDate: new Map<string, number>(),
         });
       }
-      const row = rowsMap.get(exercise.name);
+      const row = rowsMap.get(exercise.id);
       if (!row) {
         return;
       }

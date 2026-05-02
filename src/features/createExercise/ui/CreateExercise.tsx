@@ -119,10 +119,7 @@ export const CreateExercise = ({
         if (!sourceExercise) {
           return true;
         }
-        return !(
-          group.category === sourceExercise.category &&
-          exercise.name === sourceExercise.name
-        );
+        return exercise.id !== sourceExercise.id;
       }),
     );
 
@@ -139,8 +136,7 @@ export const CreateExercise = ({
     }
 
     return {
-      previousName: editingExercise.name,
-      previousCategory: editingExercise.category,
+      id: editingExercise.id,
       name: normalizedName,
       category: newExercise.category,
       iconId: newExercise.iconId,
@@ -325,7 +321,7 @@ export const CreateExercise = ({
     if (!editingExercise) {
       return;
     }
-    deleteExercise(editingExercise.name, editingExercise.category);
+    deleteExercise(editingExercise.id);
     setDeleteDialogOpen(false);
     handleClose();
   };

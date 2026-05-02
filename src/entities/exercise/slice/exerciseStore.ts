@@ -3,8 +3,15 @@ import "dayjs/locale/ru";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { zustandAppStorage } from "@/shared/lib/storageAdapter";
+import { createRandomUuid } from "@/shared/lib";
 import { allExercises, trainingPreset } from "@/shared/config/constants";
+import { buildCategoryId, buildPresetId } from "../lib/exerciseIds";
 import { normalizeExerciseCategories } from "../lib/normalizeExerciseCategories";
+import {
+  mergeExercisesWithDefaults,
+  reconcileTrainingPresets,
+  resolveCatalogExerciseId,
+} from "../lib/storeHydration";
 import type { ExerciseIconId } from "../model/exerciseIcons";
 import type { ExerciseCategory, TrainingPreset } from "../model/types";
 
@@ -25,24 +32,23 @@ interface ExerciseStore {
     photoDataUrls: string[];
   }) => void;
   createCategory: (categoryName: string) => void;
-  renameCategory: (oldCategoryName: string, newCategoryName: string) => void;
-  deleteCategory: (categoryName: string) => void;
+  renameCategory: (categoryId: string, newCategoryName: string) => void;
+  deleteCategory: (categoryId: string) => void;
   createTrainingPreset: (newTrainingPreset: TrainingPreset) => void;
   updateTrainingPreset: (
-    oldPresetName: string,
+    oldPresetId: string,
     updatedTrainingPreset: TrainingPreset,
   ) => void;
-  deleteExercise: (exerciseName: string, category: string) => void;
+  deleteExercise: (exerciseId: string) => void;
   updateExercise: (params: {
-    previousName: string;
-    previousCategory: string;
+    id: string;
     name: string;
     category: string;
     iconId: ExerciseIconId;
     description: string;
     photoDataUrls: string[];
   }) => void;
-  deleteTrainingPreset: (presetName: string) => void;
+  deleteTrainingPreset: (presetId: string) => void;
 }
 
 export const useExerciseStore = create<ExerciseStore>()(
@@ -57,76 +63,27 @@ export const useExerciseStore = create<ExerciseStore>()(
         };
 
         set((state) => {
-          const mergedByCategory = new Map<
-            string,
-            { category: string; exercises: ExerciseCategory["exercises"] }
-          >();
-          const existingByName = new Map<
-            string,
-            {
-              categoryName: string;
-              exerciseIndex: number;
-            }
-          >();
-
-          for (const category of state.exercises) {
-            mergedByCategory.set(category.category, {
-              category: category.category,
-              exercises: [...category.exercises],
-            });
-
-            category.exercises.forEach((exercise, exerciseIndex) => {
-              existingByName.set(exercise.name.trim().toLowerCase(), {
-                categoryName: category.category,
-                exerciseIndex,
-              });
-            });
-          }
+          const existingNames = new Set(
+            state.exercises.flatMap((category) =>
+              category.exercises.map((exercise) =>
+                exercise.name.trim().toLowerCase(),
+              ),
+            ),
+          );
 
           for (const defaultCategory of allExercises) {
-            if (!mergedByCategory.has(defaultCategory.category)) {
-              mergedByCategory.set(defaultCategory.category, {
-                category: defaultCategory.category,
-                exercises: [],
-              });
-            }
-
-            const targetCategory = mergedByCategory.get(defaultCategory.category);
-
-            if (!targetCategory) {
-              continue;
-            }
-
             for (const defaultExercise of defaultCategory.exercises) {
-              const exerciseNameKey = defaultExercise.name.trim().toLowerCase();
-              const existingExerciseMeta = existingByName.get(exerciseNameKey);
-
-              if (existingExerciseMeta) {
-                const existingCategory = mergedByCategory.get(
-                  existingExerciseMeta.categoryName,
-                );
-
-                if (!existingCategory) {
-                  continue;
-                }
-
-                existingCategory.exercises[existingExerciseMeta.exerciseIndex] = {
-                  ...defaultExercise,
-                };
+              const nameKey = defaultExercise.name.trim().toLowerCase();
+              if (existingNames.has(nameKey)) {
                 report.replacedExerciseNames.push(defaultExercise.name);
               } else {
-                targetCategory.exercises.push({ ...defaultExercise });
                 report.addedExerciseNames.push(defaultExercise.name);
-                existingByName.set(exerciseNameKey, {
-                  categoryName: targetCategory.category,
-                  exerciseIndex: targetCategory.exercises.length - 1,
-                });
               }
             }
           }
 
           return {
-            exercises: Array.from(mergedByCategory.values()),
+            exercises: mergeExercisesWithDefaults(state.exercises),
           };
         });
 
@@ -141,6 +98,7 @@ export const useExerciseStore = create<ExerciseStore>()(
                   exercises: [
                     ...exerciseGroup.exercises,
                     {
+                      id: createRandomUuid(),
                       name: newExercise.name,
                       iconId: newExercise.iconId,
                       description: newExercise.description.trim(),
@@ -175,11 +133,15 @@ export const useExerciseStore = create<ExerciseStore>()(
           return {
             exercises: [
               ...state.exercises,
-              { category: normalizedCategoryName, exercises: [] },
+              {
+                id: buildCategoryId(normalizedCategoryName),
+                category: normalizedCategoryName,
+                exercises: [],
+              },
             ],
           };
         }),
-      renameCategory: (oldCategoryName, newCategoryName) =>
+      renameCategory: (categoryId, newCategoryName) =>
         set((state) => {
           const normalizedNewCategoryName = newCategoryName.trim();
 
@@ -191,8 +153,7 @@ export const useExerciseStore = create<ExerciseStore>()(
             (exerciseGroup) =>
               exerciseGroup.category.toLowerCase() ===
                 normalizedNewCategoryName.toLowerCase() &&
-              exerciseGroup.category.toLowerCase() !==
-                oldCategoryName.toLowerCase(),
+              exerciseGroup.id !== categoryId,
           );
 
           if (isCategoryExists) {
@@ -201,53 +162,79 @@ export const useExerciseStore = create<ExerciseStore>()(
 
           return {
             exercises: state.exercises.map((exerciseGroup) =>
-              exerciseGroup.category === oldCategoryName
-                ? { ...exerciseGroup, category: normalizedNewCategoryName }
+              exerciseGroup.id === categoryId
+                ? {
+                    ...exerciseGroup,
+                    id: buildCategoryId(normalizedNewCategoryName),
+                    category: normalizedNewCategoryName,
+                  }
                 : exerciseGroup,
             ),
           };
         }),
-      deleteCategory: (categoryName) =>
+      deleteCategory: (categoryId) =>
         set((state) => {
           return {
             exercises: state.exercises.filter(
-              (exerciseGroup) => exerciseGroup.category !== categoryName,
+              (exerciseGroup) => exerciseGroup.id !== categoryId,
             ),
           };
         }),
       createTrainingPreset: (newTrainingPreset) =>
         set((state) => {
+          const exerciseIds = newTrainingPreset.exercises
+            .map((exerciseRef) =>
+              resolveCatalogExerciseId(exerciseRef, state.exercises),
+            )
+            .filter((exerciseId): exerciseId is string => Boolean(exerciseId));
           return {
-            trainingPreset: [...state.trainingPreset, newTrainingPreset],
+            trainingPreset: [
+              ...state.trainingPreset,
+              {
+                ...newTrainingPreset,
+                exercises: exerciseIds,
+                id:
+                  newTrainingPreset.id ??
+                  buildPresetId(newTrainingPreset.presetName),
+              },
+            ],
           };
         }),
-      updateTrainingPreset: (oldPresetName, updatedTrainingPreset) =>
+      updateTrainingPreset: (oldPresetId, updatedTrainingPreset) =>
         set((state) => {
+          const exerciseIds = updatedTrainingPreset.exercises
+            .map((exerciseRef) =>
+              resolveCatalogExerciseId(exerciseRef, state.exercises),
+            )
+            .filter((exerciseId): exerciseId is string => Boolean(exerciseId));
           return {
             trainingPreset: state.trainingPreset.map((preset) =>
-              preset.presetName === oldPresetName
-                ? updatedTrainingPreset
+              preset.id === oldPresetId
+                ? {
+                    ...updatedTrainingPreset,
+                    exercises: exerciseIds,
+                    id:
+                      updatedTrainingPreset.id ??
+                      buildPresetId(updatedTrainingPreset.presetName),
+                  }
                 : preset,
             ),
           };
         }),
-      deleteExercise: (exerciseName, category) =>
+      deleteExercise: (exerciseId) =>
         set((state) => {
           const updatedExercises = state.exercises.map((exerciseGroup) =>
-            exerciseGroup.category === category
-              ? {
-                  ...exerciseGroup,
-                  exercises: exerciseGroup.exercises.filter(
-                    (exercise) => exercise.name !== exerciseName,
-                  ),
-                }
-              : exerciseGroup,
+            ({
+              ...exerciseGroup,
+              exercises: exerciseGroup.exercises.filter(
+                (exercise) => exercise.id !== exerciseId,
+              ),
+            }),
           );
           return { exercises: updatedExercises };
         }),
       updateExercise: ({
-        previousName,
-        previousCategory,
+        id,
         name,
         category,
         iconId,
@@ -265,25 +252,19 @@ export const useExerciseStore = create<ExerciseStore>()(
             return state;
           }
 
-          const sourceGroup = state.exercises.find(
-            (group) => group.category === previousCategory,
-          );
-          const sourceExists = sourceGroup?.exercises.some(
-            (exercise) => exercise.name === previousName,
+          const sourceExists = state.exercises.some((group) =>
+            group.exercises.some((exercise) => exercise.id === id),
           );
           if (!sourceExists) {
             return state;
           }
-
-          const isSelf = (groupCategory: string, exerciseName: string) =>
-            groupCategory === previousCategory && exerciseName === previousName;
 
           const nameTakenElsewhere = state.exercises.some((group) =>
             group.exercises.some(
               (exercise) =>
                 exercise.name.trim().toLowerCase() ===
                   normalizedName.toLowerCase() &&
-                !isSelf(group.category, exercise.name),
+                exercise.id !== id,
             ),
           );
 
@@ -292,14 +273,10 @@ export const useExerciseStore = create<ExerciseStore>()(
           }
 
           const exercisesWithoutPrevious = state.exercises.map((group) =>
-            group.category === previousCategory
-              ? {
-                  ...group,
-                  exercises: group.exercises.filter(
-                    (exercise) => exercise.name !== previousName,
-                  ),
-                }
-              : group,
+            ({
+              ...group,
+              exercises: group.exercises.filter((exercise) => exercise.id !== id),
+            }),
           );
 
           const nextExercises = exercisesWithoutPrevious.map((group) =>
@@ -309,6 +286,7 @@ export const useExerciseStore = create<ExerciseStore>()(
                   exercises: [
                     ...group.exercises,
                     {
+                      id,
                       name: normalizedName,
                       iconId,
                       description: normalizedDescription,
@@ -319,26 +297,15 @@ export const useExerciseStore = create<ExerciseStore>()(
               : group,
           );
 
-          const nextPresets =
-            previousName === normalizedName
-              ? state.trainingPreset
-              : state.trainingPreset.map((preset) => ({
-                  ...preset,
-                  exercises: preset.exercises.map((exerciseName) =>
-                    exerciseName === previousName ? normalizedName : exerciseName,
-                  ),
-                }));
-
           return {
             exercises: nextExercises,
-            trainingPreset: nextPresets,
           };
         }),
-      deleteTrainingPreset: (presetName) =>
+      deleteTrainingPreset: (presetId) =>
         set((state) => {
           return {
             trainingPreset: state.trainingPreset.filter(
-              (preset) => preset.presetName !== presetName,
+              (preset) => preset.id !== presetId,
             ),
           };
         }),
@@ -354,10 +321,17 @@ export const useExerciseStore = create<ExerciseStore>()(
           trainingPreset:
             persisted.trainingPreset ?? currentState.trainingPreset,
         };
+        const normalizedExercises = normalizeExerciseCategories(
+          mergeExercisesWithDefaults(merged.exercises),
+        );
 
         return {
           ...merged,
-          exercises: normalizeExerciseCategories(merged.exercises),
+          exercises: normalizedExercises,
+          trainingPreset: reconcileTrainingPresets(
+            merged.trainingPreset,
+            normalizedExercises,
+          ),
         };
       },
     },

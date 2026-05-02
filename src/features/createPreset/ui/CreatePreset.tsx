@@ -107,7 +107,13 @@ export const CreatePreset = ({
       }
 
       if (editingPreset) {
-        updateTrainingPreset(editingPreset.presetName, newPreset);
+        updateTrainingPreset(
+          editingPreset.id!,
+          {
+            ...newPreset,
+            id: editingPreset.id,
+          },
+        );
       } else {
         createTrainingPreset(newPreset);
       }
@@ -256,15 +262,15 @@ export const CreatePreset = ({
                   <div className="mt-2 space-y-1">
                     {group.exercises.map((exercise) => (
                       <label
-                        key={exercise.name}
+                        key={exercise.id}
                         className="flex items-center space-x-2 cursor-pointer"
                       >
                         <input
                           type="checkbox"
-                          checked={newPreset.exercises.includes(exercise.name)}
+                          checked={newPreset.exercises.includes(exercise.id)}
                           onChange={(e) =>
                             handleExerciseToggle(
-                              exercise.name,
+                              exercise.id,
                               e.target.checked,
                             )
                           }

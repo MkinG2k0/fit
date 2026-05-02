@@ -27,12 +27,17 @@ export const calculateTrends = (sessions: TrainingSessionStat[]): TrendPoint[] =
 
 export const calculateExerciseTonnageTrend = (
   sessions: TrainingSessionStat[],
-  exerciseName: string,
+  exerciseRef: string,
 ) => {
+  const normalizedRef = exerciseRef.trim().toLowerCase();
   return sessions
     .map((session) => {
       const tonnage = session.exercises
-        .filter((exercise) => exercise.name === exerciseName)
+        .filter(
+          (exercise) =>
+            exercise.id === exerciseRef ||
+            exercise.name.trim().toLowerCase() === normalizedRef,
+        )
         .reduce((acc, exercise) => acc + exercise.tonnage, 0);
       return {
         date: session.dateKey,

@@ -1,17 +1,33 @@
 import type { CatalogExercise, ExerciseCategory } from "../model/types";
+import {
+  extractLegacyCatalogNamePart,
+  normalizeLegacyCatalogName,
+} from "./exerciseIds";
 
-export const findCatalogExerciseByName = (
+export const findCatalogExerciseById = (
   categories: ExerciseCategory[],
-  exerciseName: string,
+  exerciseId: string,
 ): CatalogExercise | undefined => {
-  const target = exerciseName.trim().toLowerCase();
+  const target = exerciseId.trim();
   if (!target) {
     return undefined;
   }
 
   for (const group of categories) {
+    const found = group.exercises.find((exercise) => exercise.id === target);
+    if (found) {
+      return found;
+    }
+  }
+
+  const legacyNamePart = extractLegacyCatalogNamePart(target);
+  if (!legacyNamePart) {
+    return undefined;
+  }
+
+  for (const group of categories) {
     const found = group.exercises.find(
-      (exercise) => exercise.name.trim().toLowerCase() === target,
+      (exercise) => normalizeLegacyCatalogName(exercise.name) === legacyNamePart,
     );
     if (found) {
       return found;
@@ -21,16 +37,13 @@ export const findCatalogExerciseByName = (
   return undefined;
 };
 
-export const categoryContainsExerciseName = (
-  group: ExerciseCategory,
-  exerciseName: string,
-): boolean => {
-  const target = exerciseName.trim().toLowerCase();
+export const findExerciseCategoryById = (
+  categories: ExerciseCategory[],
+  categoryId: string,
+): ExerciseCategory | undefined => {
+  const target = categoryId.trim();
   if (!target) {
-    return false;
+    return undefined;
   }
-
-  return group.exercises.some(
-    (exercise) => exercise.name.trim().toLowerCase() === target,
-  );
+  return categories.find((group) => group.id === target);
 };

@@ -1,17 +1,20 @@
+import { memo } from "react";
 import { ChevronDown, ChevronRight, Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 
 interface CategoryActionsProps {
+  categoryId: string;
   categoryName: string;
   isExpanded: boolean;
   deletable: boolean;
   onCreateExerciseInCategory?: (categoryName: string) => void;
-  onToggleCategory: (categoryName: string) => void;
-  onEditCategory: (categoryName: string) => void;
-  onDeleteCategory: (categoryName: string) => void;
+  onToggleCategory: (categoryId: string) => void;
+  onEditCategory: (categoryId: string, categoryName: string) => void;
+  onDeleteCategory: (categoryId: string, categoryName: string) => void;
 }
 
-export const CategoryActions = ({
+export const CategoryActions = memo(({
+  categoryId,
   categoryName,
   isExpanded,
   deletable,
@@ -21,17 +24,17 @@ export const CategoryActions = ({
   onDeleteCategory,
 }: CategoryActionsProps) => {
   const handleToggleCategory = () => {
-    onToggleCategory(categoryName);
+    onToggleCategory(categoryId);
   };
 
   const handleEditCategory = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    onEditCategory(categoryName);
+    onEditCategory(categoryId, categoryName);
   };
 
   const handleDeleteCategory = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    onDeleteCategory(categoryName);
+    onDeleteCategory(categoryId, categoryName);
   };
 
   const handleCreateExercise = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -89,4 +92,4 @@ export const CategoryActions = ({
       </div>
     </div>
   );
-};
+});

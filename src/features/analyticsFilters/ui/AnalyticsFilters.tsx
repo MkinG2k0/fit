@@ -1,7 +1,7 @@
 import { RotateCcw } from "lucide-react";
 import { useMemo } from "react";
+import { useExerciseStore } from "@/entities/exercise";
 import type { AnalyticsFilters as AnalyticsFiltersState } from "@/entities/analytics";
-import { allExercises } from "@/shared/config/constants";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { Label } from "@/shared/ui/shadCNComponents/ui/label";
 import { cn } from "@/shared/ui/lib/utils";
@@ -12,52 +12,70 @@ import {
 
 interface AnalyticsFiltersProps {
   filters: AnalyticsFiltersState;
-  onExerciseNameChange: (exerciseName: string) => void;
-  onCategoryChange: (category: string) => void;
+  onExerciseIdChange: (exerciseId: string) => void;
+  onCategoryChange: (categoryId: string) => void;
   onReset: () => void;
   className?: string;
 }
 
 export const AnalyticsFilters = ({
   filters,
-  onExerciseNameChange,
+  onExerciseIdChange,
   onCategoryChange,
   onReset,
   className,
 }: AnalyticsFiltersProps) => {
+  const exerciseCatalog = useExerciseStore((state) => state.exercises);
   const categoryOptions = useMemo<SearchableSelectOption[]>(() => {
-    return allExercises.map((category) => ({
-      value: category.category,
+    return exerciseCatalog.map((category) => ({
+      value: category.id,
       label: category.category,
     }));
-  }, []);
+  }, [exerciseCatalog]);
 
   const exercisesByCategory = useMemo(() => {
-    return allExercises.reduce<Record<string, string[]>>((acc, category) => {
-      acc[category.category] = category.exercises.map(
-        (exercise) => exercise.name,
-      );
-      return acc;
-    }, {});
-  }, []);
+    return exerciseCatalog.reduce<Record<string, SearchableSelectOption[]>>(
+      (acc, category) => {
+        acc[category.id] = category.exercises.map((exercise) => ({
+          value: exercise.id,
+          label: exercise.name,
+        }));
+        return acc;
+      },
+      {},
+    );
+  }, [exerciseCatalog]);
+
+  const allExerciseOptions = useMemo<SearchableSelectOption[]>(() => {
+    return exerciseCatalog.flatMap((category) =>
+      category.exercises.map((exercise) => ({
+        value: exercise.id,
+        label: exercise.name,
+      })),
+    );
+  }, [exerciseCatalog]);
+
+  const uniqueById = (items: SearchableSelectOption[]) => {
+    const seen = new Set<string>();
+    return items.filter((item) => {
+      if (seen.has(item.value)) {
+        return false;
+      }
+      seen.add(item.value);
+      return true;
+    });
+  };
 
   const exerciseOptions = useMemo<SearchableSelectOption[]>(() => {
     const exercises =
       filters.category.length > 0
         ? (exercisesByCategory[filters.category] ?? [])
-        : allExercises.flatMap((category) =>
-            category.exercises.map((exercise) => exercise.name),
-          );
-    const uniqueExercises = Array.from(new Set(exercises));
+        : allExerciseOptions;
+    return uniqueById(exercises);
+  }, [allExerciseOptions, exercisesByCategory, filters.category]);
 
-    return uniqueExercises.map((exercise) => ({
-      value: exercise,
-      label: exercise,
-    }));
-  }, [exercisesByCategory, filters.category]);
-
-  const handleExerciseSelect = (exerciseName: string) => {
-    onExerciseNameChange(exerciseName);
+  const handleExerciseSelect = (exerciseId: string) => {
+    onExerciseIdChange(exerciseId);
   };
 
   const handleCategorySelect = (category: string) => {
@@ -67,8 +85,8 @@ export const AnalyticsFilters = ({
     }
 
     const categoryExercises = exercisesByCategory[category] ?? [];
-    if (!categoryExercises.includes(filters.exerciseName)) {
-      onExerciseNameChange("");
+    if (!categoryExercises.some((exercise) => exercise.value === filters.exerciseId)) {
+      onExerciseIdChange("");
     }
   };
 
@@ -95,7 +113,7 @@ export const AnalyticsFilters = ({
         <div className="grid gap-2">
           <Label className="text-muted-foreground">Упражнение</Label>
           <SearchableSelect
-            value={filters.exerciseName}
+            value={filters.exerciseId}
             options={exerciseOptions}
             placeholder="Например: Жим лежа"
             searchPlaceholder="Поиск упражнения..."

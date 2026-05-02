@@ -1,5 +1,5 @@
 import {
-  findCatalogExerciseByName,
+  findCatalogExerciseById,
   type ExerciseCategory,
   type ExerciseIconId,
   type TrainingPreset,
@@ -17,38 +17,49 @@ export const submitExercises = (
     presetName?: string,
     presetColor?: RgbaColor,
     iconId?: ExerciseIconId,
+    catalogExerciseId?: string,
+    categoryId?: string,
   ) => void,
 ) => {
-  selectedExerciseCheckboxes.forEach((exerciseName) => {
-    const category = allExercises.find((group) =>
-      group.exercises.some((exercise) => exercise.name === exerciseName),
-    )?.category;
-    const catalogEntry = findCatalogExerciseByName(allExercises, exerciseName);
-    if (category && catalogEntry) {
-      addExercise(exerciseName, category, undefined, undefined, catalogEntry.iconId);
+  selectedExerciseCheckboxes.forEach((exerciseId) => {
+    const categoryGroup = allExercises.find((group) =>
+      group.exercises.some((exercise) => exercise.id === exerciseId),
+    );
+    const category = categoryGroup?.category;
+    const categoryId = categoryGroup?.id;
+    const catalogEntry = findCatalogExerciseById(allExercises, exerciseId);
+    if (category && catalogEntry && categoryId) {
+      addExercise(
+        catalogEntry.name,
+        category,
+        undefined,
+        undefined,
+        catalogEntry.iconId,
+        catalogEntry.id,
+        categoryId,
+      );
     }
   });
 
-  selectedPresetCheckboxes.forEach((selectedPresetName) => {
-    const preset = trainingPreset.find(
-      (p) => p.presetName === selectedPresetName,
-    );
+  selectedPresetCheckboxes.forEach((selectedPresetId) => {
+    const preset = trainingPreset.find((p) => p.id === selectedPresetId);
     if (preset) {
-      preset.exercises.forEach((exerciseName) => {
-        const category = allExercises.find((group) =>
-          group.exercises.some((exercise) => exercise.name === exerciseName),
-        )?.category;
-        const catalogEntry = findCatalogExerciseByName(
-          allExercises,
-          exerciseName,
+      preset.exercises.forEach((exerciseRef) => {
+        const catalogEntry = findCatalogExerciseById(allExercises, exerciseRef);
+        const categoryGroup = allExercises.find((group) =>
+          group.exercises.some((exercise) => exercise.id === catalogEntry?.id),
         );
-        if (category && catalogEntry) {
+        const category = categoryGroup?.category;
+        const categoryId = categoryGroup?.id;
+        if (category && catalogEntry && categoryId) {
           addExercise(
-            exerciseName,
+            catalogEntry.name,
             category,
             preset.presetName,
             preset.presetColor,
             catalogEntry.iconId,
+            catalogEntry.id,
+            categoryId,
           );
         }
       });

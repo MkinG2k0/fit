@@ -10,6 +10,7 @@ export interface NewExercise {
 
 /** Исходное упражнение в каталоге при открытии диалога редактирования. */
 export interface CatalogExerciseEditSource {
+  id: string;
   name: string;
   category: string;
   iconId: ExerciseIconId;

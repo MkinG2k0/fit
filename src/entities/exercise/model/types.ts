@@ -23,8 +23,10 @@ export interface ExerciseSet {
 
 export interface Exercise {
   id: string;
+  catalogExerciseId?: string;
+  categoryId?: string;
   name: string;
-  category: string;
+  category?: string;
   /** Иконка из каталога; если нет — в UI используется иконка по категории. */
   iconId?: ExerciseIconId;
   sets: ExerciseSet[];
@@ -33,6 +35,7 @@ export interface Exercise {
 }
 
 export interface CatalogExercise {
+  id: string;
   name: string;
   iconId: ExerciseIconId;
   description: string;
@@ -40,11 +43,13 @@ export interface CatalogExercise {
 }
 
 export interface ExerciseCategory {
+  id: string;
   category: string;
   exercises: CatalogExercise[];
 }
 
 export interface TrainingPreset {
+  id?: string;
   presetName: string;
   exercises: string[];
   presetColor: RgbaColor;

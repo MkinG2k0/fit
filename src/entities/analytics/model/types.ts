@@ -7,7 +7,7 @@ export interface DateRange {
 
 export interface AnalyticsFilters {
   period: AnalyticsPeriod;
-  exerciseName: string;
+  exerciseId: string;
   category: string;
 }
 
