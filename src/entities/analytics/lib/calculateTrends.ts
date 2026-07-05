@@ -25,19 +25,35 @@ export const calculateTrends = (sessions: TrainingSessionStat[]): TrendPoint[] =
   });
 };
 
+export interface ExerciseTonnageTrendRef {
+  catalogExerciseId?: string;
+  exerciseName: string;
+}
+
+const isExerciseTonnageMatch = (
+  exercise: TrainingSessionStat["exercises"][number],
+  refs: ExerciseTonnageTrendRef,
+) => {
+  const catalogExerciseId = refs.catalogExerciseId?.trim();
+  if (catalogExerciseId && exercise.id === catalogExerciseId) {
+    return true;
+  }
+
+  const normalizedName = refs.exerciseName.trim().toLowerCase();
+  return (
+    normalizedName.length > 0 &&
+    exercise.name.trim().toLowerCase() === normalizedName
+  );
+};
+
 export const calculateExerciseTonnageTrend = (
   sessions: TrainingSessionStat[],
-  exerciseRef: string,
+  refs: ExerciseTonnageTrendRef,
 ) => {
-  const normalizedRef = exerciseRef.trim().toLowerCase();
   return sessions
     .map((session) => {
       const tonnage = session.exercises
-        .filter(
-          (exercise) =>
-            exercise.id === exerciseRef ||
-            exercise.name.trim().toLowerCase() === normalizedRef,
-        )
+        .filter((exercise) => isExerciseTonnageMatch(exercise, refs))
         .reduce((acc, exercise) => acc + exercise.tonnage, 0);
       return {
         date: session.dateKey,

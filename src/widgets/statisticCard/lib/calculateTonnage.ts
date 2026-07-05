@@ -20,9 +20,9 @@ export const calculateTonnageForExercise = (
     category: "",
   });
 
-  return calculateExerciseTonnageTrend(
-    normalizedSessions,
-    catalogExerciseId ?? exerciseName,
-  );
+  return calculateExerciseTonnageTrend(normalizedSessions, {
+    catalogExerciseId,
+    exerciseName,
+  });
 };
 
