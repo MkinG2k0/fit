@@ -1,5 +1,6 @@
 import { SwiperSlide } from "swiper/react";
 import type { Exercise } from "@/entities/exercise";
+import { calcSetVolumeKg } from "@/shared/lib/calcSetVolumeKg";
 import { MIN_RING_GOAL_VALUE, useUserStore } from "@/entities/user";
 import { Day } from "@/entities/calendarDay/ui/Day";
 import { type daysArray, useCalendarStore } from "@/entities/calendarDay";
@@ -34,7 +35,7 @@ const getDayStats = (exercises: Exercise[]): DayStats => {
       total +
       exercise.sets.reduce(
         (setTotal, currentSet) =>
-          setTotal + currentSet.weight * currentSet.reps,
+          setTotal + calcSetVolumeKg(currentSet.weight, currentSet.reps),
         0,
       ),
     0,

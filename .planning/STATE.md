@@ -5,7 +5,7 @@ milestone_name: milestone
 status: executing
 stopped_at: Phase 1 UI-SPEC approved
 last_updated: "2026-04-22T12:00:00.000Z"
-last_activity: "2026-07-05 - Completed quick task 260705-vye: убери выбор цвета в пресетах"
+last_activity: "2026-07-05 - Completed quick task 260705-w7t: 0 кг для упражнений без веса в статистике"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -99,6 +99,7 @@ None yet.
 | 260705-vpp | подстановка подходов из прошлой тренировки при настройке | 2026-07-05 | 82150d8 | [260705-vpp-prefill-sets-from-last-session-when-sett](./quick/260705-vpp-prefill-sets-from-last-session-when-sett/) |
 | 260705-vt3 | баг при открытии поиска на мобилках | 2026-07-05 | 079ad4c | [260705-vt3-mobile-search-drawer-layout](./quick/260705-vt3-mobile-search-drawer-layout/) |
 | 260705-vye | убери выбор цвета в пресетах | 2026-07-05 | 5be5da6 | [260705-vye-remove-preset-color-picker](./quick/260705-vye-remove-preset-color-picker/) |
+| 260705-w7t | 0 кг для упражнений без веса (подтягивания) в объёме статистики | 2026-07-05 | — | [260705-w7t-allow-zero-kg-bodyweight-exercises-volum](./quick/260705-w7t-allow-zero-kg-bodyweight-exercises-volum/) |
 
 ## Session Continuity
 

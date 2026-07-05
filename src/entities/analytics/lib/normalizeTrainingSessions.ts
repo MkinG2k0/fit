@@ -1,5 +1,6 @@
 import type { CalendarDay } from "@/entities/calendarDay";
 import { allExercises } from "@/shared/config/constants";
+import { calcSetVolumeKg } from "@/shared/lib/calcSetVolumeKg";
 import type {
   AnalyticsFilters,
   ExerciseSessionStat,
@@ -14,7 +15,10 @@ const calculateExerciseSessionStat = (
   sets: { weight: number; reps: number }[],
 ): ExerciseSessionStat => {
   const totalReps = sets.reduce((acc, set) => acc + set.reps, 0);
-  const tonnage = sets.reduce((acc, set) => acc + set.weight * set.reps, 0);
+  const tonnage = sets.reduce(
+    (acc, set) => acc + calcSetVolumeKg(set.weight, set.reps),
+    0,
+  );
   const maxWeight = sets.reduce((acc, set) => Math.max(acc, set.weight), 0);
 
   return {

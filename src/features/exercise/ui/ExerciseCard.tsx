@@ -10,6 +10,7 @@ import {
   useExerciseStore,
 } from "@/entities/exercise";
 import { cn, formatTonnageParts } from "@shared/lib";
+import { calcSetVolumeKg } from "@/shared/lib/calcSetVolumeKg";
 import { appStorage } from "@/shared/lib/storageAdapter";
 import * as motion from "motion/react-client";
 import { ExerciseBody } from "./ExerciseBody";
@@ -146,12 +147,10 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
       : undefined) ?? exercise.category;
 
   const totalLiftedKg = useMemo(() => {
-    return exercise.sets.reduce((sum, set) => {
-      const reps = Number.isFinite(set.reps) ? set.reps : 0;
-      const weight = Number.isFinite(set.weight) ? set.weight : 0;
-
-      return sum + reps * weight;
-    }, 0);
+    return exercise.sets.reduce(
+      (sum, set) => sum + calcSetVolumeKg(set.weight, set.reps),
+      0,
+    );
   }, [exercise.sets]);
 
   const totalLifted = formatTonnageParts(totalLiftedKg);

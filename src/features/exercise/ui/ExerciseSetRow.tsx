@@ -21,6 +21,9 @@ interface ExerciseSetRowProps {
   ) => void;
 }
 
+const isSetEmpty = (setItem: ExerciseSet) =>
+  setItem.reps === 0 && setItem.weight === 0;
+
 export const ExerciseSetRow = ({
   exercise,
   set,
@@ -30,6 +33,7 @@ export const ExerciseSetRow = ({
   onInputChange,
 }: ExerciseSetRowProps) => {
   const deleteSet = useCalendarStore((s) => s.deleteSet);
+  const isEmptySet = isSetEmpty(set);
 
   const handleDelete = useCallback(() => {
     deleteSet(exercise, set);
@@ -58,9 +62,10 @@ export const ExerciseSetRow = ({
             "text-primary",
           )}
           type="number"
+          min={0}
           placeholder="Кол-во"
           name="reps"
-          value={set.reps === 0 ? "" : set.reps}
+          value={isEmptySet ? "" : set.reps}
           onChange={(e) => {
             onInputChange(e, set);
           }}
@@ -73,9 +78,10 @@ export const ExerciseSetRow = ({
             "text-primary",
           )}
           type="number"
+          min={0}
           placeholder="Кг"
           name="weight"
-          value={set.weight === 0 ? "" : set.weight}
+          value={isEmptySet ? "" : set.weight}
           onChange={(e) => {
             onInputChange(e, set);
           }}

@@ -6,6 +6,7 @@ import { useWorkoutCaloriesUiEnabled } from "@/features/exercise/lib/useWorkoutC
 import { useCalendarStore } from "@/entities/calendarDay";
 import { useUserStore } from "@/entities/user";
 import { cn } from "@shared/lib";
+import { calcSetVolumeKg } from "@/shared/lib/calcSetVolumeKg";
 import { FixedBottomBar } from "@shared/ui";
 import { WorkoutSummaryCard } from "./WorkoutSummaryCard";
 
@@ -31,8 +32,7 @@ export const ExerciseList = () => {
 
         for (const set of exercise.sets) {
           const reps = Number.isFinite(set.reps) ? set.reps : 0;
-          const weight = Number.isFinite(set.weight) ? set.weight : 0;
-          acc.totalTonnage += reps * weight;
+          acc.totalTonnage += calcSetVolumeKg(set.weight, reps);
           acc.totalReps += reps;
 
           const setKcal = set.calories?.kcal;
