@@ -1,7 +1,7 @@
 import { Trash2 } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
-import { type ChangeEvent, useCallback, useRef } from "react";
+import { type ChangeEvent, useCallback, useEffect, useRef } from "react";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { useCalendarStore } from "@/entities/calendarDay";
 import type { Exercise, ExerciseSet } from "@/entities/exercise";
@@ -9,6 +9,7 @@ import { useUserStore } from "@/entities/user";
 import { StatisticCard } from "@/widgets/statisticCard";
 import { cn } from "@/shared/lib/classMerge";
 import { CustomButton } from "@/shared/ui";
+import { getSetPrefillFromLastSession } from "@/shared/lib/findLastExerciseSession";
 import { useLastExerciseSession } from "../lib/useLastExerciseSession";
 import { useWorkoutCaloriesUiEnabled } from "../lib/useWorkoutCaloriesUiEnabled";
 import {
@@ -32,10 +33,14 @@ export const ExerciseBody = ({
     exercise.catalogExerciseId,
   );
   const showCaloriesUi = useWorkoutCaloriesUiEnabled();
+  const prefillFromLastSession = useUserStore(
+    (s) => s.exerciseCardShowLastSessionResult ?? false,
+  );
 
   const onChangeHandler = useCalendarStore((store) => store.setExerciseValues);
   const addSetToExercise = useCalendarStore((store) => store.addSetToExercise);
   const addSetGuardRef = useRef(false);
+  const firstSetPrefillAttemptedRef = useRef<string | null>(null);
 
   const inputHandler = useCallback(
     (
@@ -73,16 +78,54 @@ export const ExerciseBody = ({
         endNow,
       );
 
+      const nextSetIndex = exercise.sets.length;
+      const prefill = prefillFromLastSession
+        ? getSetPrefillFromLastSession(lastSession?.sets, nextSetIndex)
+        : null;
+
       addSetToExercise(exercise, {
-        weight: lastSet?.weight ?? 0,
-        reps: lastSet?.reps ?? 0,
+        weight: prefill?.weight ?? lastSet?.weight ?? 0,
+        reps: prefill?.reps ?? lastSet?.reps ?? 0,
         startTime: startTime.toISOString(),
         endTime: endTime.toISOString(),
       });
     } finally {
       addSetGuardRef.current = false;
     }
-  }, [addSetToExercise, exercise]);
+  }, [
+    addSetToExercise,
+    exercise,
+    lastSession?.sets,
+    prefillFromLastSession,
+  ]);
+
+  useEffect(() => {
+    if (!prefillFromLastSession || !lastSession?.sets.length) {
+      return;
+    }
+    if (firstSetPrefillAttemptedRef.current === exercise.id) {
+      return;
+    }
+
+    const firstSet = exercise.sets[0];
+    if (exercise.sets.length !== 1 || !firstSet) {
+      return;
+    }
+    if (firstSet.reps !== 0 || firstSet.weight !== 0) {
+      firstSetPrefillAttemptedRef.current = exercise.id;
+      return;
+    }
+
+    const prefill = getSetPrefillFromLastSession(lastSession.sets, 0);
+    firstSetPrefillAttemptedRef.current = exercise.id;
+    onChangeHandler(String(prefill.reps), "reps", firstSet.id, exercise);
+    onChangeHandler(String(prefill.weight), "weight", firstSet.id, exercise);
+  }, [
+    exercise,
+    lastSession?.sets,
+    onChangeHandler,
+    prefillFromLastSession,
+  ]);
 
   return (
     <div

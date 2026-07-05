@@ -45,12 +45,30 @@ const formatSetCompact = (set: ExerciseSet): string => {
   return "";
 };
 
+export interface LastExerciseSessionSetValues {
+  reps: number;
+  weight: number;
+}
+
 export interface LastExerciseSession {
   /** Дата прошлой тренировки для подписи, например «10 апр.» */
   dateLabel: string;
   /** Краткая сводка подходов, например «12×22 · 10×22» */
   setsSummary: string;
+  /** Подходы прошлой тренировки для подстановки веса и повторений. */
+  sets: LastExerciseSessionSetValues[];
 }
+
+/** Значения подхода по индексу; при нехватке подходов — последний из прошлой сессии. */
+export const getSetPrefillFromLastSession = (
+  lastSets: LastExerciseSessionSetValues[] | undefined,
+  targetIndex: number,
+): LastExerciseSessionSetValues => {
+  if (!lastSets?.length) {
+    return { reps: 0, weight: 0 };
+  }
+  return lastSets[targetIndex] ?? lastSets[lastSets.length - 1]!;
+};
 
 const pickExerciseOnDay = (
   exercises: Exercise[],
@@ -123,6 +141,10 @@ const toLastSessionOrSkip = (
   return {
     dateLabel: day.format("D MMM"),
     setsSummary: summaryParts.join(SET_DISPLAY_SEPARATOR),
+    sets: exercise.sets.map((set) => ({
+      reps: set.reps,
+      weight: set.weight,
+    })),
   };
 };
 
