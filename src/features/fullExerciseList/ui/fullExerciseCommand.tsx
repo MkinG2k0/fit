@@ -23,6 +23,7 @@ import { RenameCategoryDialog } from "./RenameCategoryDialog";
 interface BaseProps {
   checkable?: "checkbox" | "radio" | false;
   deletable?: boolean;
+  scrollBottomPadding?: boolean;
   variant?: "exercises" | "presets" | "all";
   autoExpandCategoryId?: string;
   /** @deprecated Legacy support: use autoExpandCategoryId. */
@@ -106,6 +107,7 @@ export const FullExerciseCommand = ({
   exerciseSelectHandler,
   checkable = false,
   deletable = false,
+  scrollBottomPadding = true,
   variant = "all",
   autoExpandCategoryId,
   autoExpandCategory,
@@ -381,7 +383,7 @@ export const FullExerciseCommand = ({
             </CommandGroup>
           )}
 
-          <div className="mb-28"></div>
+          {scrollBottomPadding ? <div className="mb-28" /> : null}
         </CommandList>
       </Command>
 

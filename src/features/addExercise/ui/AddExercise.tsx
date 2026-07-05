@@ -18,6 +18,7 @@ import { useExerciseSelection } from "../lib/useExerciseSelection";
 import { submitExercises } from "../lib/submitExercises";
 import { CreateButtons } from "./CreateButtons";
 import { mapCurrentWorkoutToPresetExercises } from "@/features/createPreset/lib/mapCurrentWorkoutToPresetExercises";
+import { useDrawerViewportStyle } from "../lib/useDrawerViewportStyle";
 
 const DRAWER_QUERY_PARAM = "add-exercise";
 const DRAWER_QUERY_VALUE = "1";
@@ -29,6 +30,7 @@ export const AddExercise = () => {
   const [openCategoryModal, setOpenCategoryModal] = useState(false);
   const isDrawerOpen =
     searchParams.get(DRAWER_QUERY_PARAM) === DRAWER_QUERY_VALUE;
+  const drawerViewportStyle = useDrawerViewportStyle(isDrawerOpen);
 
   const addExercise = useCalendarStore((state) => state.addExercise);
   const days = useCalendarStore((state) => state.days);
@@ -110,12 +112,25 @@ export const AddExercise = () => {
         open={isDrawerOpen}
         onOpenChange={handleDrawerOpenChange}
       >
-        <DrawerTrigger asChild>
-          <Button className="text-xl font-bold justify-center w-full p-6">
-            Добавить упражнение
-          </Button>
-        </DrawerTrigger>
-        <DrawerContent className="grid h-dvh grid-rows-[auto_1fr_auto] overflow-hidden">
+        {!isDrawerOpen ? (
+          <DrawerTrigger asChild>
+            <Button className="text-xl font-bold justify-center w-full p-6">
+              Добавить упражнение
+            </Button>
+          </DrawerTrigger>
+        ) : null}
+        <DrawerContent
+          className="flex h-dvh min-h-0 flex-col overflow-hidden"
+          style={
+            drawerViewportStyle.height
+              ? {
+                  height: drawerViewportStyle.height,
+                  top: drawerViewportStyle.top,
+                  bottom: "auto",
+                }
+              : undefined
+          }
+        >
           <div className="shrink-0">
             <DrawerHeader className="p-0 mb-2">
               <DrawerTitle
@@ -147,6 +162,7 @@ export const AddExercise = () => {
               presetSelectHandler={presetSelectHandler}
               exerciseSelectHandler={exerciseSelectHandler}
               checkable={"checkbox"}
+              scrollBottomPadding={false}
             />
           </div>
 
