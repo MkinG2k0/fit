@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Command,
+  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandList,
   CommandSeparator,
 } from "@/shared/ui/shadCNComponents/ui/command";
 import {
+  type ExerciseCategory,
   type ExerciseIconId,
   type TrainingPreset,
   useExerciseStore,
@@ -72,6 +74,31 @@ export type FullExerciseCommandProps =
   | NonCheckableProps
   | RadioProps;
 
+const matchesCatalogSearch = (query: string, parts: string[]) => {
+  const normalizedQuery = query.trim().toLowerCase();
+  if (!normalizedQuery) {
+    return true;
+  }
+
+  return parts.some((part) =>
+    part.trim().toLowerCase().includes(normalizedQuery),
+  );
+};
+
+const resolveExerciseNameById = (
+  exerciseId: string,
+  catalog: ExerciseCategory[],
+) => {
+  for (const group of catalog) {
+    const entry = group.exercises.find((exercise) => exercise.id === exerciseId);
+    if (entry) {
+      return entry.name;
+    }
+  }
+
+  return "";
+};
+
 export const FullExerciseCommand = ({
   selectedExerciseCheckboxes = [],
   selectedPresetCheckboxes = [],
@@ -118,6 +145,11 @@ export const FullExerciseCommand = ({
     Record<string, boolean>
   >({});
   const [searchValue, setSearchValue] = useState("");
+  const commandListRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    commandListRef.current?.scrollTo({ top: 0 });
+  }, [searchValue]);
 
   useEffect(() => {
     setExpandedCategories((prevState) => {
@@ -220,18 +252,66 @@ export const FullExerciseCommand = ({
   const existingCategories = allExercises.map((group) => group.category);
   const isSearchActive = searchValue.trim().length > 0;
 
+  const visibleExerciseGroups = useMemo(() => {
+    if (!isSearchActive) {
+      return allExercises;
+    }
+
+    return allExercises
+      .map((group) => ({
+        ...group,
+        exercises: group.exercises.filter((entry) =>
+          matchesCatalogSearch(searchValue, [
+            entry.name,
+            group.category,
+            entry.description,
+          ]),
+        ),
+      }))
+      .filter((group) => group.exercises.length > 0);
+  }, [allExercises, isSearchActive, searchValue]);
+
+  const visiblePresets = useMemo(() => {
+    if (!isSearchActive) {
+      return trainingPreset;
+    }
+
+    return trainingPreset.filter((preset) => {
+      const exerciseNames = preset.exercises.map((exerciseId) =>
+        resolveExerciseNameById(exerciseId, allExercises),
+      );
+
+      return matchesCatalogSearch(searchValue, [
+        preset.presetName,
+        ...exerciseNames,
+      ]);
+    });
+  }, [allExercises, isSearchActive, searchValue, trainingPreset]);
+
+  const showExerciseGroups = variant === "exercises" || variant === "all";
+  const showPresets = variant === "presets" || variant === "all";
+  const hasVisibleResults =
+    (showExerciseGroups && visibleExerciseGroups.length > 0) ||
+    (showPresets && visiblePresets.length > 0);
+
   return (
     <>
-      <Command className="h-full min-h-0 w-full">
+      <Command shouldFilter={false} className="h-full min-h-0 w-full">
         <CommandInput
           placeholder="Поиск..."
           value={searchValue}
           onValueChange={setSearchValue}
         />
-        <CommandList className="min-h-0 flex-1 overflow-y-auto overscroll-contain ">
+        <CommandList
+          ref={commandListRef}
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain "
+        >
+          {isSearchActive && !hasVisibleResults && (
+            <CommandEmpty>Ничего не найдено</CommandEmpty>
+          )}
           <RadioGroup className={"gap-0"}>
-            {(variant === "exercises" || variant === "all") &&
-              allExercises.map((group) => (
+            {showExerciseGroups &&
+              visibleExerciseGroups.map((group) => (
                 <CommandGroup
                   heading={
                     <CategoryActions
@@ -282,9 +362,9 @@ export const FullExerciseCommand = ({
                 </CommandGroup>
               ))}
           </RadioGroup>
-          {(variant === "presets" || variant === "all") && (
+          {showPresets && (!isSearchActive || visiblePresets.length > 0) && (
             <CommandGroup heading={"Пресеты"}>
-              {trainingPreset.map((preset) => (
+              {visiblePresets.map((preset) => (
                 <PresetItem
                   key={preset.id!}
                   preset={preset}

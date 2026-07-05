@@ -86,10 +86,12 @@ function CommandInput({
 
 function CommandList({
   className,
+  ref,
   ...props
 }: React.ComponentProps<typeof CommandPrimitive.List>) {
   return (
     <CommandPrimitive.List
+      ref={ref}
       data-slot="command-list"
       className={cn("w-full", className)}
       {...props}
