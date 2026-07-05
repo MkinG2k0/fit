@@ -5,7 +5,7 @@ milestone_name: milestone
 status: executing
 stopped_at: Phase 1 UI-SPEC approved
 last_updated: "2026-04-22T12:00:00.000Z"
-last_activity: "2026-07-05 - Completed quick task 260705-vmo: пропала статистика"
+last_activity: "2026-07-05 - Completed quick task 260705-vpp: prefill sets from last session"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -96,6 +96,7 @@ None yet.
 | 260422-q3a | отрефакторить компонент CreateExercise | 2026-04-22 | 2160da8 | [260422-q3a-createexercise](./quick/260422-q3a-createexercise/) |
 | 260422-pbk | Android back в Capacitor как browser history | 2026-04-22 | — | [260422-pbk-capacitor-android-back-history](./quick/260422-pbk-capacitor-android-back-history/) |
 | 260705-vmo | пропала статистика | 2026-07-05 | f497555 | [260705-vmo-missing-statistics-chart](./quick/260705-vmo-missing-statistics-chart/) |
+| 260705-vpp | подстановка подходов из прошлой тренировки при настройке | 2026-07-05 | 82150d8 | [260705-vpp-prefill-sets-from-last-session-when-sett](./quick/260705-vpp-prefill-sets-from-last-session-when-sett/) |
 
 ## Session Continuity
 
