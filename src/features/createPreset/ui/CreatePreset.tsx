@@ -1,14 +1,9 @@
-import { ChevronDown, ChevronRight, Pipette } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { type ChangeEvent, useEffect, useState } from "react";
-import { type RgbaColor, RgbaColorPicker } from "react-colorful";
+import { type RgbaColor } from "react-colorful";
 import { type TrainingPreset, useExerciseStore } from "@/entities/exercise";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { Input } from "@/shared/ui/shadCNComponents/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/shared/ui/shadCNComponents/ui/popover.tsx";
 import type { NewPreset } from "../model/types";
 
 interface CreatePresetProps {
@@ -79,10 +74,6 @@ export const CreatePreset = ({
     setError("");
     setExerciseSearch("");
   }, [editingPreset, initialExercises]);
-
-  const handleColorPicker = (newColor: RgbaColor) => {
-    setNewPreset({ ...newPreset, presetColor: newColor });
-  };
 
   const handleClose = () => {
     onCancel?.();
@@ -184,41 +175,15 @@ export const CreatePreset = ({
         <label htmlFor="preset-name" className="text-sm font-medium">
           Название пресета
         </label>
-        <div className={"flex justify-between gap-2 w-full items-center"}>
-          <div className="space-y-2 w-[90%]">
-            <Input
-              id="preset-name"
-              placeholder="Например: Грудь и трицепс"
-              value={newPreset.presetName}
-              onChange={(e) => {
-                setNewPreset({ ...newPreset, presetName: e.target.value });
-                if (error) setError("");
-              }}
-            />
-          </div>
-          <Popover>
-            <PopoverTrigger asChild className={"items-center justify-center"}>
-              <Button
-                style={{
-                  backgroundColor: `rgba(${newPreset.presetColor.r},${newPreset.presetColor.g},${newPreset.presetColor.b},${
-                    newPreset.presetColor.a === 1
-                      ? 0.8
-                      : newPreset.presetColor.a
-                  })`,
-                }}
-                variant="outline"
-              >
-                <Pipette />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-full rounded-md border p-2">
-              <RgbaColorPicker
-                color={newPreset.presetColor}
-                onChange={handleColorPicker}
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
+        <Input
+          id="preset-name"
+          placeholder="Например: Грудь и трицепс"
+          value={newPreset.presetName}
+          onChange={(e) => {
+            setNewPreset({ ...newPreset, presetName: e.target.value });
+            if (error) setError("");
+          }}
+        />
         {error && (
           <p className="text-sm text-destructive pt-0 pl-2 mt-[-15px] mb-0">
             {error}
