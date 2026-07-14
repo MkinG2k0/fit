@@ -5,7 +5,10 @@ import {
   defaultIconIdForCategory,
   useExerciseStore,
   type ExerciseIconId,
+  type TargetExerciseMeta,
 } from "@/entities/exercise";
+import { useCalendarStore } from "@/entities/calendarDay";
+import { remapWorkoutJournalCatalogId } from "@/shared/lib/remapWorkoutJournalCatalogId";
 import { DeleteDialog } from "@/features/fullExerciseList/ui/DeleteDialog";
 import type { CatalogExerciseEditSource, NewExercise } from "../model/types";
 import { CreateExerciseCategorySection } from "./CreateExerciseCategorySection";
@@ -14,6 +17,7 @@ import { CreateExerciseFooter } from "./CreateExerciseFooter";
 import { CreateExerciseIconSection } from "./CreateExerciseIconSection";
 import { CreateExerciseNameField } from "./CreateExerciseNameField";
 import { CreateExercisePhotosSection } from "./CreateExercisePhotosSection";
+import { MergeExerciseDialog } from "./MergeExerciseDialog";
 
 const MAX_PHOTO_SIZE_BYTES = 10 * 1024 * 1024;
 const MAX_PHOTOS_COUNT = 8;
@@ -73,9 +77,14 @@ export const CreateExercise = ({
   const [error, setError] = useState<string>("");
   const [photoError, setPhotoError] = useState<string>("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [mergeDialogOpen, setMergeDialogOpen] = useState(false);
   const createExercise = useExerciseStore((state) => state.createExercise);
   const updateExercise = useExerciseStore((state) => state.updateExercise);
   const deleteExercise = useExerciseStore((state) => state.deleteExercise);
+  const mergeExercises = useExerciseStore((state) => state.mergeExercises);
+  const remapCatalogExerciseId = useCalendarStore(
+    (state) => state.remapCatalogExerciseId,
+  );
   const allExercises = useExerciseStore((state) => state.exercises);
   const isEditing = Boolean(editingExercise);
 
@@ -317,6 +326,50 @@ export const CreateExercise = ({
     setDeleteDialogOpen(true);
   };
 
+  const handleMergeClick = () => {
+    setMergeDialogOpen(true);
+  };
+
+  const resolveTargetMeta = (targetId: string): TargetExerciseMeta | null => {
+    for (const group of allExercises) {
+      const found = group.exercises.find((exercise) => exercise.id === targetId);
+      if (found) {
+        return {
+          name: found.name,
+          categoryId: group.id,
+          category: group.category,
+        };
+      }
+    }
+    return null;
+  };
+
+  const handleMergeConfirm = async (targetId: string) => {
+    if (!editingExercise) {
+      return;
+    }
+
+    const sourceId = editingExercise.id;
+    if (!sourceId || !targetId || sourceId === targetId) {
+      return;
+    }
+
+    const targetMeta = resolveTargetMeta(targetId);
+    if (!targetMeta) {
+      return;
+    }
+
+    await remapWorkoutJournalCatalogId(sourceId, targetId, targetMeta);
+    remapCatalogExerciseId(sourceId, targetId, targetMeta);
+    const merged = mergeExercises(sourceId, targetId);
+    if (!merged) {
+      return;
+    }
+
+    setMergeDialogOpen(false);
+    handleClose();
+  };
+
   const handleDeleteConfirm = () => {
     if (!editingExercise) {
       return;
@@ -328,6 +381,10 @@ export const CreateExercise = ({
 
   const handleDeleteDialogOpenChange = (nextOpen: boolean) => {
     setDeleteDialogOpen(nextOpen);
+  };
+
+  const handleMergeDialogOpenChange = (nextOpen: boolean) => {
+    setMergeDialogOpen(nextOpen);
   };
 
   const handleNameChange = (name: string) => {
@@ -399,6 +456,7 @@ export const CreateExercise = ({
           onCancel={handleClose}
           onSave={handleSave}
           onDelete={handleDeleteClick}
+          onMerge={isEditing ? handleMergeClick : undefined}
           />
         </div>
       </div>
@@ -410,6 +468,21 @@ export const CreateExercise = ({
           type="exercise"
           name={editingExercise.name}
           onConfirm={handleDeleteConfirm}
+        />
+      )}
+
+      {editingExercise && (
+        <MergeExerciseDialog
+          open={mergeDialogOpen}
+          onOpenChange={handleMergeDialogOpenChange}
+          sourceExercise={{
+            id: editingExercise.id,
+            name: editingExercise.name,
+          }}
+          catalog={allExercises}
+          onConfirm={(targetId) => {
+            void handleMergeConfirm(targetId);
+          }}
         />
       )}
     </>

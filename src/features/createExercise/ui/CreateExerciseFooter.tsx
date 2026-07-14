@@ -7,6 +7,7 @@ interface CreateExerciseFooterProps {
   onCancel: () => void;
   onSave: () => void;
   onDelete: () => void;
+  onMerge?: () => void;
 }
 
 export const CreateExerciseFooter = ({
@@ -16,9 +17,10 @@ export const CreateExerciseFooter = ({
   onCancel,
   onSave,
   onDelete,
+  onMerge,
 }: CreateExerciseFooterProps) => {
   return (
-    <div className="flex min-w-0 flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+    <div className="flex min-w-0 flex-col-reverse gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
       <Button variant="outline" className="flex-auto" onClick={onCancel}>
         Отмена
       </Button>
@@ -26,6 +28,12 @@ export const CreateExerciseFooter = ({
       <Button onClick={onSave} className="flex-auto" disabled={saveDisabled}>
         {isEditing ? "Сохранить" : "Создать"}
       </Button>
+
+      {isEditing && onMerge && (
+        <Button variant="outline" className="flex-auto" onClick={onMerge}>
+          Смержить упражнение
+        </Button>
+      )}
 
       {canDelete && (
         <Button variant="destructive" className="flex-auto" onClick={onDelete}>
