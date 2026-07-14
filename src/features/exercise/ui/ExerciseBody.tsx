@@ -1,13 +1,32 @@
 import { Trash2 } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
-import { type ChangeEvent, useCallback, useEffect, useRef } from "react";
+import {
+  type ChangeEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import {
+  AI_FILL_HISTORY_MONTHS,
+  buildAiFillUserPrompt,
+  buildWorkoutLogText,
+  filterExerciseHistoryForAiFill,
+  getAiFillSystemPrompt,
+  parseAiFillSets,
+} from "@/features/aiRecommendations";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { useCalendarStore } from "@/entities/calendarDay";
 import type { Exercise, ExerciseSet } from "@/entities/exercise";
 import { getPlanSetsForWeek, useLoadTableStore } from "@/entities/loadTable";
 import { useUserStore } from "@/entities/user";
 import { StatisticCard } from "@/widgets/statisticCard";
+import {
+  AiGatewayError,
+  createChatCompletion,
+} from "@/shared/api";
+import { readAllTrainingDaysFromStorage } from "@/shared/lib/analyticsStorage";
 import { cn } from "@/shared/lib/classMerge";
 import { CustomButton } from "@/shared/ui";
 import { getSetPrefillFromLastSession } from "@/shared/lib/findLastExerciseSession";
@@ -80,7 +99,13 @@ export const ExerciseBody = ({
     (store) => store.syncExerciseSetsFromPlan,
   );
   const addSetGuardRef = useRef(false);
+  const aiFillGuardRef = useRef(false);
   const firstSetPrefillAttemptedRef = useRef<string | null>(null);
+  const [aiFillLoading, setAiFillLoading] = useState(false);
+  const [aiFillError, setAiFillError] = useState<string | null>(null);
+  const [aiFillEmptyMessage, setAiFillEmptyMessage] = useState<string | null>(
+    null,
+  );
 
   const inputHandler = useCallback(
     (
@@ -171,6 +196,95 @@ export const ExerciseBody = ({
     prefillFromLastSession,
     syncExerciseSetsFromPlan,
   ]);
+
+  const handleAiFill = useCallback(async () => {
+    if (aiFillGuardRef.current || aiFillLoading) {
+      return;
+    }
+    aiFillGuardRef.current = true;
+    setAiFillLoading(true);
+    setAiFillError(null);
+    setAiFillEmptyMessage(null);
+
+    try {
+      const allDays = await readAllTrainingDaysFromStorage();
+      const filtered = filterExerciseHistoryForAiFill(
+        allDays,
+        {
+          name: exercise.name,
+          catalogExerciseId: exercise.catalogExerciseId,
+        },
+        AI_FILL_HISTORY_MONTHS,
+      );
+      const workoutLogText = buildWorkoutLogText(filtered);
+
+      if (!workoutLogText.trim()) {
+        setAiFillEmptyMessage(
+          `Нет истории этого упражнения за последние ${AI_FILL_HISTORY_MONTHS} месяцев.`,
+        );
+        return;
+      }
+
+      const response = await createChatCompletion([
+        { role: "system", content: getAiFillSystemPrompt() },
+        {
+          role: "user",
+          content: buildAiFillUserPrompt(exercise.name, workoutLogText),
+        },
+      ]);
+
+      const content = response.choices?.[0]?.message?.content;
+      if (typeof content !== "string" || !content.trim()) {
+        setAiFillError("Пустой ответ ИИ. Попробуйте ещё раз.");
+        return;
+      }
+
+      const recommendedSets = parseAiFillSets(content);
+
+      const defaultSec =
+        useUserStore.getState().defaultSetDurationSec ??
+        DEFAULT_SET_DURATION_SEC;
+
+      let previousEnd: Date | null = (() => {
+        const lastSet = exercise.sets.at(-1);
+        if (lastSet?.endTime !== undefined && lastSet.endTime !== "") {
+          return new Date(lastSet.endTime);
+        }
+        return null;
+      })();
+
+      for (const recommended of recommendedSets) {
+        const endNow = previousEnd
+          ? new Date(previousEnd.getTime() + defaultSec * 1000)
+          : new Date();
+        const { startTime, endTime } = getSetTimeRange(
+          previousEnd,
+          defaultSec,
+          endNow,
+        );
+
+        addSetToExercise(exercise, {
+          weight: recommended.weight,
+          reps: recommended.reps,
+          startTime: startTime.toISOString(),
+          endTime: endTime.toISOString(),
+        });
+
+        previousEnd = endTime;
+      }
+    } catch (error) {
+      if (error instanceof AiGatewayError) {
+        setAiFillError(error.message);
+      } else if (error instanceof Error && error.message.trim()) {
+        setAiFillError(error.message);
+      } else {
+        setAiFillError("Не удалось заполнить подходы. Попробуйте ещё раз.");
+      }
+    } finally {
+      setAiFillLoading(false);
+      aiFillGuardRef.current = false;
+    }
+  }, [addSetToExercise, aiFillLoading, exercise]);
 
   useEffect(() => {
     if (!prefillFromLastSession || !lastSession?.sets.length) {
@@ -284,7 +398,7 @@ export const ExerciseBody = ({
           );
         })}
       </AnimatePresence>
-      <div className={"flex gap-3 items-center justify-between"}>
+      <div className="flex flex-wrap gap-3 items-center justify-between">
         <StatisticCard
           exerciseName={exercise.name}
           catalogExerciseId={exercise.catalogExerciseId}
@@ -292,6 +406,17 @@ export const ExerciseBody = ({
         <CustomButton classes={"flex-1"} buttonHandler={handleAddSet}>
           Добавить подход
         </CustomButton>
+        <Button
+          type="button"
+          variant="outline"
+          className="flex-1 sm:flex-none"
+          disabled={aiFillLoading}
+          onClick={() => {
+            void handleAiFill();
+          }}
+        >
+          {aiFillLoading ? "Загрузка…" : "ИИ-заполнение"}
+        </Button>
         <Button
           variant="outline"
           className="text-destructive"
@@ -301,6 +426,16 @@ export const ExerciseBody = ({
           <Trash2 />
         </Button>
       </div>
+      {aiFillEmptyMessage ? (
+        <p className="w-full text-xs text-muted-foreground" role="status">
+          {aiFillEmptyMessage}
+        </p>
+      ) : null}
+      {aiFillError ? (
+        <p className="w-full text-xs text-destructive" role="alert">
+          {aiFillError}
+        </p>
+      ) : null}
     </div>
   );
 };
