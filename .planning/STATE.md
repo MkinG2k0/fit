@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 1 UI-SPEC approved
-last_updated: "2026-04-22T12:00:00.000Z"
-last_activity: "2026-07-05 - Completed quick task 260705-w7t: 0 кг для упражнений без веса в статистике"
+stopped_at: Completed quick task 260714-wvs merge exercises
+last_updated: "2026-07-14T20:50:28.000Z"
+last_activity: "2026-07-14 - Completed quick task 260714-wvs: merge catalog exercises"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -28,7 +28,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-14)
 Phase: 1 of 5 (Quick Logging Core & Local Persistence)
 Plan: 0 of 0 in current phase
 Status: Ready to execute
-Last activity: 2026-04-22 - Completed quick task 260422-pbk: Android back в Capacitor как browser history
+Last activity: 2026-07-14 - Completed quick task 260714-wvs: смержить два упражнения каталога
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -67,6 +67,7 @@ Recent decisions affecting current work:
 - [Phase 1] Quick-log flow and local persistence are the first delivery priority.
 - [Phase 4] Progress visibility is measured through weight/reps charts with explicit empty states.
 - [Phase 5] JSON/CSV export and safe import are required for user trust in local-first mode.
+- [260714-wvs] Same-day merge keeps two cards; remaps catalogExerciseId; target metadata preserved; stats derived.
 
 ### Pending Todos
 
@@ -100,9 +101,10 @@ None yet.
 | 260705-vt3 | баг при открытии поиска на мобилках | 2026-07-05 | 079ad4c | [260705-vt3-mobile-search-drawer-layout](./quick/260705-vt3-mobile-search-drawer-layout/) |
 | 260705-vye | убери выбор цвета в пресетах | 2026-07-05 | 5be5da6 | [260705-vye-remove-preset-color-picker](./quick/260705-vye-remove-preset-color-picker/) |
 | 260705-w7t | 0 кг для упражнений без веса (подтягивания) в объёме статистики | 2026-07-05 | — | [260705-w7t-allow-zero-kg-bodyweight-exercises-volum](./quick/260705-w7t-allow-zero-kg-bodyweight-exercises-volum/) |
+| 260714-wvs | смержить два упражнения каталога (ремап журнала/пресетов) | 2026-07-14 | 4c9c41d | [260714-wvs-merge-exercises](./quick/260714-wvs-merge-exercises/) |
 
 ## Session Continuity
 
-Last session: 2026-04-14T13:08:48.687Z
-Stopped at: Phase 1 UI-SPEC approved
-Resume file: .planning/01-quick-logging-core-local-persistence/01-UI-SPEC.md
+Last session: 2026-07-14T20:50:28.000Z
+Stopped at: Completed quick task 260714-wvs merge exercises
+Resume file: None
