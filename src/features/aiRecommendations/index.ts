@@ -6,3 +6,4 @@ export {
 export { filterDaysByPeriod } from "./lib/filterDaysByPeriod";
 export { buildWorkoutLogText } from "./lib/buildWorkoutLogText";
 export { getSystemPrompt, buildUserPrompt } from "./lib/prompts";
+export { AiRecommendationsPanel } from "./ui/AiRecommendationsPanel";
