@@ -5,9 +5,9 @@ milestone_name: milestone
 current_phase: 1
 current_phase_name: Quick Logging Core & Local Persistence
 status: ready
-stopped_at: Completed 260715-18z-01 load-table week not advancing
-last_updated: "2026-07-14T21:59:00.000Z"
-last_activity: "2026-07-15 - Fixed load-table week stuck on week 1 after logging"
+stopped_at: Completed 260715-2az AI ChatGPT gateway recommendations
+last_updated: "2026-07-14T22:55:00.000Z"
+last_activity: "2026-07-15 - AI recommendations via local ChatGPT gateway"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -114,9 +114,10 @@ None yet.
 | fast | load-table: убрать вес тела с деталки и модалки добавления | 2026-07-15 | b262bc4 | — |
 | fast | load-table: Отслеживать → префилл при «Добавить подход» | 2026-07-15 | 63d83e3 | — |
 | 260715-18z | load-table: неделя не двигается после логирования | 2026-07-15 | 2552c6d | [260715-18z-fix-load-table-week-not-advancing-after-](./quick/260715-18z-fix-load-table-week-not-advancing-after-/) |
+| 260715-2az | AI рекомендации: gateway ChatGPT + период журнала | 2026-07-15 | 6063608 | [260715-2az-ai-chatgpt-gateway](./quick/260715-2az-ai-chatgpt-gateway/) |
 
 ## Session Continuity
 
-Last session: 2026-07-14T21:59:00.000Z
-Stopped at: Completed 260715-18z-01 load-table week not advancing
+Last session: 2026-07-14T22:55:00.000Z
+Stopped at: Completed 260715-2az AI ChatGPT gateway recommendations
 Resume file: None
