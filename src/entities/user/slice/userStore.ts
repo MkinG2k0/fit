@@ -10,11 +10,25 @@ const DEFAULT_SET_DURATION_FALLBACK_SEC = 60;
 const MIN_DEFAULT_SET_DURATION_SEC = 30;
 const MAX_DEFAULT_SET_DURATION_SEC = 180;
 
+const DEFAULT_REST_BETWEEN_SETS_SEC = 120;
+const MIN_REST_BETWEEN_SETS_SEC = 15;
+const MAX_REST_BETWEEN_SETS_SEC = 600;
+
 const clampDefaultSetDurationSec = (sec: number): number =>
   Math.min(
     MAX_DEFAULT_SET_DURATION_SEC,
     Math.max(MIN_DEFAULT_SET_DURATION_SEC, Math.round(sec)),
   );
+
+const clampRestBetweenSetsSec = (sec: number): number => {
+  if (!Number.isFinite(sec)) {
+    return DEFAULT_REST_BETWEEN_SETS_SEC;
+  }
+  return Math.min(
+    MAX_REST_BETWEEN_SETS_SEC,
+    Math.max(MIN_REST_BETWEEN_SETS_SEC, Math.round(sec)),
+  );
+};
 
 interface UserState {
   user: IUser;
@@ -35,6 +49,10 @@ interface UserState {
   exerciseCardShowTotalVolumeInHeader: boolean;
   /** Сводка «Общая информация о тренировке» над списком упражнений на день. */
   workoutListShowDaySummary: boolean;
+  /** Автозапуск таймера отдыха после добавления подхода. */
+  restBetweenSetsEnabled: boolean;
+  /** Длительность отдыха между подходами (сек). По умолчанию 120. */
+  restBetweenSetsSec: number;
 }
 
 interface ActionsState {
@@ -50,6 +68,8 @@ interface ActionsState {
   setExerciseCardShowKcalInHeader: (enabled: boolean) => void;
   setExerciseCardShowTotalVolumeInHeader: (enabled: boolean) => void;
   setWorkoutListShowDaySummary: (enabled: boolean) => void;
+  setRestBetweenSetsEnabled: (enabled: boolean) => void;
+  setRestBetweenSetsSec: (sec: number) => void;
   setAccessToken: (token: string) => void;
   deleteUserData: () => void;
   reset: () => void;
@@ -70,6 +90,8 @@ export const useUserStore = create<UserState & ActionsState>()(
       exerciseCardShowKcalInHeader: false,
       exerciseCardShowTotalVolumeInHeader: true,
       workoutListShowDaySummary: true,
+      restBetweenSetsEnabled: true,
+      restBetweenSetsSec: DEFAULT_REST_BETWEEN_SETS_SEC,
       accessToken: "",
 
       setAccessToken: (token) => set({ accessToken: token }),
@@ -136,6 +158,16 @@ export const useUserStore = create<UserState & ActionsState>()(
           workoutListShowDaySummary: enabled,
         })),
 
+      setRestBetweenSetsEnabled: (enabled) =>
+        set(() => ({
+          restBetweenSetsEnabled: enabled,
+        })),
+
+      setRestBetweenSetsSec: (sec) =>
+        set(() => ({
+          restBetweenSetsSec: clampRestBetweenSetsSec(sec),
+        })),
+
       deleteUserData: () =>
         set(() => ({
           user: {
@@ -191,6 +223,15 @@ export const useUserStore = create<UserState & ActionsState>()(
             typeof p.workoutListShowDaySummary === "boolean"
               ? p.workoutListShowDaySummary
               : current.workoutListShowDaySummary,
+          restBetweenSetsEnabled:
+            typeof p.restBetweenSetsEnabled === "boolean"
+              ? p.restBetweenSetsEnabled
+              : current.restBetweenSetsEnabled,
+          restBetweenSetsSec:
+            typeof p.restBetweenSetsSec === "number" &&
+            Number.isFinite(p.restBetweenSetsSec)
+              ? clampRestBetweenSetsSec(p.restBetweenSetsSec)
+              : current.restBetweenSetsSec,
         };
       },
     },
@@ -201,4 +242,7 @@ export {
   MIN_DEFAULT_SET_DURATION_SEC,
   MAX_DEFAULT_SET_DURATION_SEC,
   DEFAULT_SET_DURATION_FALLBACK_SEC,
+  DEFAULT_REST_BETWEEN_SETS_SEC,
+  MIN_REST_BETWEEN_SETS_SEC,
+  MAX_REST_BETWEEN_SETS_SEC,
 };

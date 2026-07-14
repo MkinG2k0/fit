@@ -23,6 +23,13 @@ const clampExportedDefaultSetDurationSec = (value: unknown): number => {
   return Math.min(180, Math.max(30, Math.round(value)));
 };
 
+const clampExportedRestBetweenSetsSec = (value: unknown): number => {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return 120;
+  }
+  return Math.min(600, Math.max(15, Math.round(value)));
+};
+
 export const APP_SETTINGS_SECTION_IDS = {
   theme: "theme",
   exercises: "exercises",
@@ -85,6 +92,8 @@ const isUserProfileExport = (
   exerciseCardShowKcalInHeader?: boolean;
   exerciseCardShowTotalVolumeInHeader?: boolean;
   workoutListShowDaySummary?: boolean;
+  restBetweenSetsEnabled?: boolean;
+  restBetweenSetsSec?: number;
 } => {
   if (!isPlainObject(value)) {
     return false;
@@ -133,6 +142,20 @@ const isUserProfileExport = (
   if (
     "workoutListShowDaySummary" in value &&
     typeof value.workoutListShowDaySummary !== "boolean"
+  ) {
+    return false;
+  }
+  if (
+    "restBetweenSetsEnabled" in value &&
+    typeof value.restBetweenSetsEnabled !== "boolean"
+  ) {
+    return false;
+  }
+  if (
+    "restBetweenSetsSec" in value &&
+    value.restBetweenSetsSec !== undefined &&
+    (typeof value.restBetweenSetsSec !== "number" ||
+      !Number.isFinite(value.restBetweenSetsSec))
   ) {
     return false;
   }
@@ -191,6 +214,8 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         exerciseCardShowKcalInHeader?: boolean;
         exerciseCardShowTotalVolumeInHeader?: boolean;
         workoutListShowDaySummary?: boolean;
+        restBetweenSetsEnabled?: boolean;
+        restBetweenSetsSec?: number;
       };
       return {
         user: state.user ?? { userName: "" },
@@ -207,6 +232,10 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         exerciseCardShowTotalVolumeInHeader:
           state.exerciseCardShowTotalVolumeInHeader ?? true,
         workoutListShowDaySummary: state.workoutListShowDaySummary ?? true,
+        restBetweenSetsEnabled: state.restBetweenSetsEnabled ?? true,
+        restBetweenSetsSec: clampExportedRestBetweenSetsSec(
+          state.restBetweenSetsSec,
+        ),
       };
     },
     importSnapshot: async (payload: unknown) => {
@@ -230,6 +259,8 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
             exerciseCardShowKcalInHeader?: boolean;
             exerciseCardShowTotalVolumeInHeader?: boolean;
             workoutListShowDaySummary?: boolean;
+            restBetweenSetsEnabled?: boolean;
+            restBetweenSetsSec?: number;
           };
           const next = {
             ...existing,
@@ -258,6 +289,13 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
                 payload.workoutListShowDaySummary ??
                 prevState.workoutListShowDaySummary ??
                 true,
+              restBetweenSetsEnabled:
+                payload.restBetweenSetsEnabled ??
+                prevState.restBetweenSetsEnabled ??
+                true,
+              restBetweenSetsSec: clampExportedRestBetweenSetsSec(
+                payload.restBetweenSetsSec ?? prevState.restBetweenSetsSec,
+              ),
             },
           };
           await writeJsonToStorage(USER_STORAGE_KEY, next);
@@ -284,6 +322,10 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
               payload.exerciseCardShowTotalVolumeInHeader ?? true,
             workoutListShowDaySummary:
               payload.workoutListShowDaySummary ?? true,
+            restBetweenSetsEnabled: payload.restBetweenSetsEnabled ?? true,
+            restBetweenSetsSec: clampExportedRestBetweenSetsSec(
+              payload.restBetweenSetsSec,
+            ),
             accessToken: "",
           },
         });
