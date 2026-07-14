@@ -18,6 +18,26 @@ const isCalendarDay = (value: unknown): value is CalendarDay => {
 const exerciseHasLoggedSets = (exercise: Exercise): boolean =>
   exercise.sets.some((set) => set.reps > 0 || set.weight > 0);
 
+const resolveCatalogId = (exercise: Exercise): string =>
+  (exercise.catalogExerciseId ?? exercise.id).trim();
+
+const normalizeExerciseName = (name: string): string =>
+  name.trim().toLowerCase();
+
+const exerciseMatchesTracked = (
+  exercise: Exercise,
+  trimmedId: string,
+  normalizedName: string | null,
+): boolean => {
+  if (resolveCatalogId(exercise) === trimmedId) {
+    return true;
+  }
+  if (normalizedName && normalizeExerciseName(exercise.name) === normalizedName) {
+    return true;
+  }
+  return false;
+};
+
 const monthKeysFromCreatedAtThroughToday = (
   oldestInclusive: dayjs.Dayjs,
   newestInclusive: dayjs.Dayjs,
@@ -43,6 +63,7 @@ const toCurrentWeek = (sessionCount: number): number =>
 export const getLoadTableCurrentWeek = async (
   catalogExerciseId: string,
   createdAtIso: string,
+  exerciseName?: string,
 ): Promise<{ sessionCount: number; currentWeek: number }> => {
   const trimmedId = catalogExerciseId.trim();
   if (!trimmedId) {
@@ -60,6 +81,14 @@ export const getLoadTableCurrentWeek = async (
   if (newestInclusive.isBefore(oldestInclusive, "day")) {
     return { sessionCount: 0, currentWeek: 1 };
   }
+
+  const normalizedName = (() => {
+    if (exerciseName == null) {
+      return null;
+    }
+    const normalized = normalizeExerciseName(exerciseName);
+    return normalized.length > 0 ? normalized : null;
+  })();
 
   const monthKeys = monthKeysFromCreatedAtThroughToday(
     oldestInclusive,
@@ -85,7 +114,7 @@ export const getLoadTableCurrentWeek = async (
 
     const hasSession = rawDay.exercises.some(
       (exercise) =>
-        exercise.catalogExerciseId === trimmedId &&
+        exerciseMatchesTracked(exercise, trimmedId, normalizedName) &&
         exerciseHasLoggedSets(exercise),
     );
     if (hasSession) {
