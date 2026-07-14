@@ -18,8 +18,11 @@ import {
   saveRecommendation,
 } from "../lib/recommendationStorage";
 import {
+  AI_RECOMMENDATION_KINDS,
   AI_RECOMMENDATION_PERIODS,
+  getKindLabel,
   getPeriodLabel,
+  type AiRecommendationKind,
   type AiRecommendationPeriod,
 } from "../model/types";
 import { MarkdownContent } from "./MarkdownContent";
@@ -27,6 +30,8 @@ import { MarkdownContent } from "./MarkdownContent";
 export const AiRecommendationsPanel = () => {
   const [period, setPeriod] =
     useState<AiRecommendationPeriod>("last_workout");
+  const [kind, setKind] = useState<AiRecommendationKind>("next_session");
+  const [customQuery, setCustomQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +43,7 @@ export const AiRecommendationsPanel = () => {
     const loadSaved = async () => {
       setError(null);
       setEmptyMessage(null);
-      const saved = await loadSavedRecommendation(period);
+      const saved = await loadSavedRecommendation(period, kind);
       if (cancelled) {
         return;
       }
@@ -50,7 +55,7 @@ export const AiRecommendationsPanel = () => {
     return () => {
       cancelled = true;
     };
-  }, [period]);
+  }, [period, kind]);
 
   const handleRequest = async () => {
     setError(null);
@@ -69,12 +74,25 @@ export const AiRecommendationsPanel = () => {
         return;
       }
 
+      const trimmedQuery = customQuery.trim();
+      if (kind === "custom" && !trimmedQuery) {
+        setError("Введите ваш запрос — для типа «Свой запрос» текст обязателен.");
+        return;
+      }
+
       const periodLabel = getPeriodLabel(period);
+      const kindLabel = getKindLabel(kind);
+      const optionalCustom = trimmedQuery || undefined;
       const response = await createChatCompletion([
         { role: "system", content: getSystemPrompt() },
         {
           role: "user",
-          content: buildUserPrompt(periodLabel, workoutLogText),
+          content: buildUserPrompt(
+            periodLabel,
+            kindLabel,
+            workoutLogText,
+            optionalCustom,
+          ),
         },
       ]);
 
@@ -84,7 +102,7 @@ export const AiRecommendationsPanel = () => {
         return;
       }
 
-      await saveRecommendation(period, content);
+      await saveRecommendation(period, kind, content);
       setResult(content);
     } catch (err) {
       if (err instanceof AiGatewayError) {
@@ -131,6 +149,49 @@ export const AiRecommendationsPanel = () => {
             </div>
           ))}
         </RadioGroup>
+      </div>
+
+      <div className="grid gap-2">
+        <p className="text-sm font-medium text-foreground">Тип запроса</p>
+        <RadioGroup
+          value={kind}
+          onValueChange={(value) => setKind(value as AiRecommendationKind)}
+          className="grid gap-2"
+          disabled={loading}
+        >
+          {AI_RECOMMENDATION_KINDS.map((option) => (
+            <div
+              key={option.value}
+              className="flex items-center gap-2 rounded-md border border-border px-3 py-2"
+            >
+              <RadioGroupItem
+                value={option.value}
+                id={`ai-kind-${option.value}`}
+              />
+              <Label
+                htmlFor={`ai-kind-${option.value}`}
+                className="cursor-pointer text-sm text-foreground"
+              >
+                {option.label}
+              </Label>
+            </div>
+          ))}
+        </RadioGroup>
+      </div>
+
+      <div className="min-w-0 space-y-2">
+        <label htmlFor="ai-custom-query" className="text-sm font-medium">
+          Ваш запрос
+        </label>
+        <textarea
+          id="ai-custom-query"
+          rows={4}
+          placeholder="Уточните фокус или задайте свой вопрос тренеру"
+          value={customQuery}
+          onChange={(event) => setCustomQuery(event.target.value)}
+          disabled={loading}
+          className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs ring-offset-background placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+        />
       </div>
 
       <Button
