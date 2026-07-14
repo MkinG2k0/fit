@@ -42,6 +42,11 @@ const CreatePresetPage = lazy(() =>
     default: m.CreatePresetPage,
   })),
 );
+const LoadTablePage = lazy(() =>
+  import("@/pages/LoadTablePage").then((m) => ({
+    default: m.LoadTablePage,
+  })),
+);
 
 export const AppRoutes = () => {
   return (
@@ -132,6 +137,14 @@ export const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <BodyMetricsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/load-table"
+        element={
+          <ProtectedRoute>
+            <LoadTablePage />
           </ProtectedRoute>
         }
       />

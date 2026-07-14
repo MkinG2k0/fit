@@ -6,6 +6,7 @@ import {
   Menu,
   Ruler,
   ScrollText,
+  Table2,
   Timer as TimerIcon,
 } from "lucide-react";
 import { useState } from "react";
@@ -62,6 +63,16 @@ export const ProfileDropDownMenu = () => {
           >
             <Ruler />
             <div>Параметры тела</div>
+          </Button>
+
+          <Separator />
+          <Button
+            variant="ghost"
+            className="justify-start"
+            onClick={() => handleNavigate("/load-table")}
+          >
+            <Table2 />
+            <div>Таблица нагрузок</div>
           </Button>
 
           <Separator />

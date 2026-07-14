@@ -19,6 +19,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/analytics": "Аналитика",
   "/settings": "Настройки",
   "/body-metrics": "Параметры тела",
+  "/load-table": "Таблица нагрузок",
   "/activity": "Активность",
   "/health": "Активность",
 };

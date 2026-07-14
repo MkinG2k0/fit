@@ -10,3 +10,4 @@ export { OnboardingPage } from "./OnboardingPage";
 export { BulkCreateExercisesPage } from "./BulkCreateExercisesPage";
 export { CreateExercisePage } from "./CreateExercisePage";
 export { CreatePresetPage } from "./CreatePresetPage";
+export { LoadTablePage } from "./LoadTablePage";
