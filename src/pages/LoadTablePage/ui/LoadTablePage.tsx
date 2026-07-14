@@ -1,12 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   AddLoadTableExerciseDialog,
-  LoadTableDetail,
   LoadTableList,
 } from "@/features/loadTable";
 
 export const LoadTablePage = () => {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const navigate = useNavigate();
   const [isAddOpen, setIsAddOpen] = useState(false);
 
   return (
@@ -15,17 +15,10 @@ export const LoadTablePage = () => {
         Программные проценты от MAX на 16 недель с оценками 1ПМ
       </p>
 
-      {selectedId === null ? (
-        <LoadTableList
-          onSelect={setSelectedId}
-          onAddClick={() => setIsAddOpen(true)}
-        />
-      ) : (
-        <LoadTableDetail
-          exerciseId={selectedId}
-          onBack={() => setSelectedId(null)}
-        />
-      )}
+      <LoadTableList
+        onSelect={(id) => navigate(`/load-table/${id}`)}
+        onAddClick={() => setIsAddOpen(true)}
+      />
 
       <AddLoadTableExerciseDialog open={isAddOpen} onOpenChange={setIsAddOpen} />
     </div>

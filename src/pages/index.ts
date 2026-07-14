@@ -11,3 +11,4 @@ export { BulkCreateExercisesPage } from "./BulkCreateExercisesPage";
 export { CreateExercisePage } from "./CreateExercisePage";
 export { CreatePresetPage } from "./CreatePresetPage";
 export { LoadTablePage } from "./LoadTablePage";
+export { LoadTableDetailPage } from "./LoadTableDetailPage";

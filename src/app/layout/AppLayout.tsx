@@ -24,10 +24,17 @@ const PAGE_TITLES: Record<string, string> = {
   "/health": "Активность",
 };
 
+const resolvePageTitle = (pathname: string) => {
+  if (pathname.startsWith("/load-table/")) {
+    return "Таблица нагрузок";
+  }
+  return PAGE_TITLES[pathname] ?? "Тренировки";
+};
+
 export const AppLayout = ({ children }: AppLayoutProps) => {
   const { pathname } = useLocation();
   const isHomePage = pathname !== "/";
-  const pageTitle = PAGE_TITLES[pathname] ?? "Тренировки";
+  const pageTitle = resolvePageTitle(pathname);
 
   return (
     <div

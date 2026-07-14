@@ -47,6 +47,11 @@ const LoadTablePage = lazy(() =>
     default: m.LoadTablePage,
   })),
 );
+const LoadTableDetailPage = lazy(() =>
+  import("@/pages/LoadTableDetailPage").then((m) => ({
+    default: m.LoadTableDetailPage,
+  })),
+);
 
 export const AppRoutes = () => {
   return (
@@ -145,6 +150,14 @@ export const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <LoadTablePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/load-table/:exerciseId"
+        element={
+          <ProtectedRoute>
+            <LoadTableDetailPage />
           </ProtectedRoute>
         }
       />
