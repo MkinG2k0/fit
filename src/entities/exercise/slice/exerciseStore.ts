@@ -5,7 +5,9 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { zustandAppStorage } from "@/shared/lib/storageAdapter";
 import { createRandomUuid } from "@/shared/lib";
 import { allExercises, trainingPreset } from "@/shared/config/constants";
+import { findCatalogExerciseById } from "../lib/catalogLookup";
 import { buildCategoryId, buildPresetId } from "../lib/exerciseIds";
+import { remapPresetExerciseIds } from "../lib/mergeCatalogExercise";
 import { normalizeExerciseCategories } from "../lib/normalizeExerciseCategories";
 import {
   mergeExercisesWithDefaults,
@@ -40,6 +42,8 @@ interface ExerciseStore {
     updatedTrainingPreset: TrainingPreset,
   ) => void;
   deleteExercise: (exerciseId: string) => void;
+  /** Source → target: пресеты ремап+дедуп, source удаляется из каталога; meta target не трогаем (D-04). */
+  mergeExercises: (sourceId: string, targetId: string) => boolean;
   updateExercise: (params: {
     id: string;
     name: string;
@@ -233,6 +237,36 @@ export const useExerciseStore = create<ExerciseStore>()(
           );
           return { exercises: updatedExercises };
         }),
+      mergeExercises: (sourceId, targetId) => {
+        if (!sourceId || !targetId || sourceId === targetId) {
+          return false;
+        }
+
+        let didMerge = false;
+        set((state) => {
+          const source = findCatalogExerciseById(state.exercises, sourceId);
+          const target = findCatalogExerciseById(state.exercises, targetId);
+          if (!source || !target) {
+            return state;
+          }
+
+          didMerge = true;
+          return {
+            exercises: state.exercises.map((exerciseGroup) => ({
+              ...exerciseGroup,
+              exercises: exerciseGroup.exercises.filter(
+                (exercise) => exercise.id !== sourceId,
+              ),
+            })),
+            trainingPreset: remapPresetExerciseIds(
+              state.trainingPreset,
+              sourceId,
+              targetId,
+            ),
+          };
+        });
+        return didMerge;
+      },
       updateExercise: ({
         id,
         name,

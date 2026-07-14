@@ -9,6 +9,11 @@ import type {
   ExerciseSet,
   SetCalories,
 } from "@/entities/exercise";
+import {
+  dayExercisesNeedRemap,
+  remapDayExercises,
+  type TargetExerciseMeta,
+} from "@/entities/exercise/lib/mergeCatalogExercise";
 import type { CalendarDay } from "../model/types";
 import { createRandomUuid } from "@/shared/lib";
 import { getDaysFromLocalStorage, saveDaysToLocalStorage } from "@/shared/lib/storage";
@@ -66,6 +71,12 @@ interface CalendarStore {
   ) => string;
   deleteExercise: (exercise: Exercise) => void;
   deleteSet: (exercise: Exercise, exerciseSet: ExerciseSet) => void;
+  /** In-memory remap catalogExerciseId source → target; D-01: две карточки в дне остаются. */
+  remapCatalogExerciseId: (
+    sourceId: string,
+    targetId: string,
+    targetMeta?: TargetExerciseMeta,
+  ) => void;
 }
 
 export const useCalendarStore = create<CalendarStore>()((set) => ({
@@ -329,6 +340,55 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
         dateKey,
         newExercises,
       );
+      return { days: newDays };
+    }),
+
+  remapCatalogExerciseId: (sourceId, targetId, targetMeta) =>
+    set((state) => {
+      if (!sourceId || !targetId || sourceId === targetId) {
+        return state;
+      }
+
+      let isChanged = false;
+      const newDays: Record<string, CalendarDay> = {};
+      const affectedMonthKeys = new Set<string>();
+
+      for (const [dateKey, day] of Object.entries(state.days)) {
+        const exercises = day.exercises ?? [];
+        if (!dayExercisesNeedRemap(exercises, sourceId)) {
+          newDays[dateKey] = day;
+          continue;
+        }
+
+        isChanged = true;
+        newDays[dateKey] = {
+          ...day,
+          exercises: remapDayExercises(
+            exercises,
+            sourceId,
+            targetId,
+            targetMeta,
+          ),
+        };
+
+        const monthParts = dateKey.split("-");
+        if (monthParts.length === 3) {
+          affectedMonthKeys.add(`${monthParts[1]}-${monthParts[2]}`);
+        }
+      }
+
+      if (!isChanged) {
+        return state;
+      }
+
+      for (const monthKey of affectedMonthKeys) {
+        const [month, year] = monthKey.split("-");
+        const monthDate = dayjs(`${year}-${month}-01`);
+        if (monthDate.isValid()) {
+          void saveDaysToLocalStorage(monthDate, newDays);
+        }
+      }
+
       return { days: newDays };
     }),
 }));

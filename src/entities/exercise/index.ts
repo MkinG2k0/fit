@@ -17,5 +17,15 @@ export {
 } from "./model/exerciseIcons";
 export { findCatalogExerciseById, findExerciseCategoryById } from "./lib/catalogLookup";
 export { buildCatalogExerciseId, buildCategoryId, buildPresetId } from "./lib/exerciseIds";
+export {
+  computeExerciseMergeStats,
+  type ExerciseMergeStats,
+} from "./lib/computeExerciseMergeStats";
+export {
+  dayExercisesNeedRemap,
+  remapDayExercises,
+  remapPresetExerciseIds,
+  type TargetExerciseMeta,
+} from "./lib/mergeCatalogExercise";
 export { normalizeExerciseCategories } from "./lib/normalizeExerciseCategories";
 export { useExerciseStore } from "./slice/exerciseStore";

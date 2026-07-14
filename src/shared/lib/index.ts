@@ -4,6 +4,7 @@ export * from "./classMerge";
 export * from "./formatTonnage";
 export * from "./stringFormat";
 export * from "./storage";
+export * from "./remapWorkoutJournalCatalogId";
 export * from "./days";
 export * from "./useSyncCalendarSwiperToDate";
 export * from "./storageAdapter";
