@@ -1,8 +1,4 @@
-import { type ChangeEvent, useEffect, useMemo, useState } from "react";
-import {
-  selectSortedBodyMetricsEntries,
-  useBodyMetricsStore,
-} from "@/entities/bodyMetrics";
+import { type ChangeEvent, useEffect, useState } from "react";
 import { useCalendarStore } from "@/entities/calendarDay";
 import { findCatalogExerciseById, useExerciseStore } from "@/entities/exercise";
 import {
@@ -28,22 +24,8 @@ interface LoadTableDetailProps {
   onBack: () => void;
 }
 
-const resolveLatestWeightKg = (
-  entries: ReturnType<typeof useBodyMetricsStore.getState>["entries"],
-) => {
-  const sorted = selectSortedBodyMetricsEntries(entries);
-  for (const entry of sorted) {
-    const weightKg = entry.measurements.weightKg;
-    if (typeof weightKg === "number" && Number.isFinite(weightKg) && weightKg > 0) {
-      return weightKg;
-    }
-  }
-  return null;
-};
-
 export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) => {
   const catalog = useExerciseStore((state) => state.exercises);
-  const bodyEntries = useBodyMetricsStore((state) => state.entries);
   const exercise = useLoadTableStore((state) =>
     state.exercises.find((item) => item.id === exerciseId),
   );
@@ -62,11 +44,6 @@ export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) =>
   const [currentWeek, setCurrentWeek] = useState(1);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
-
-  const latestWeightKg = useMemo(
-    () => resolveLatestWeightKg(bodyEntries),
-    [bodyEntries],
-  );
 
   useEffect(() => {
     if (!exercise) {
@@ -169,30 +146,17 @@ export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) =>
         <p className="text-sm text-muted-foreground">{statusMessage}</p>
       )}
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="load-table-detail-max">MAX (кг)</Label>
-          <Input
-            id="load-table-detail-max"
-            type="number"
-            inputMode="decimal"
-            min={0}
-            step={0.5}
-            value={exercise.maxKg}
-            onChange={handleMaxKgChange}
-          />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="load-table-detail-body-weight">Вес тела (кг)</Label>
-          <Input
-            id="load-table-detail-body-weight"
-            type="number"
-            value={latestWeightKg ?? ""}
-            readOnly
-            disabled
-            className="bg-muted text-muted-foreground"
-          />
-        </div>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="load-table-detail-max">MAX (кг)</Label>
+        <Input
+          id="load-table-detail-max"
+          type="number"
+          inputMode="decimal"
+          min={0}
+          step={0.5}
+          value={exercise.maxKg}
+          onChange={handleMaxKgChange}
+        />
       </div>
 
       {errorMessage && (

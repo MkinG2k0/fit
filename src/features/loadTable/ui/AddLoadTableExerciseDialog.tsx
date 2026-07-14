@@ -1,8 +1,4 @@
-import { useMemo, useState } from "react";
-import {
-  selectSortedBodyMetricsEntries,
-  useBodyMetricsStore,
-} from "@/entities/bodyMetrics";
+import { useState } from "react";
 import { findCatalogExerciseById, useExerciseStore } from "@/entities/exercise";
 import { useLoadTableStore } from "@/entities/loadTable";
 import { FullExerciseCommand } from "@/features/fullExerciseList";
@@ -26,49 +22,18 @@ const isPositiveFiniteNumber = (value: number) => {
   return Number.isFinite(value) && value > 0;
 };
 
-const toTodayIsoDate = () => {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
-
-const resolveLatestWeightKg = (
-  entries: ReturnType<typeof useBodyMetricsStore.getState>["entries"],
-) => {
-  const sorted = selectSortedBodyMetricsEntries(entries);
-  for (const entry of sorted) {
-    const weightKg = entry.measurements.weightKg;
-    if (typeof weightKg === "number" && Number.isFinite(weightKg) && weightKg > 0) {
-      return weightKg;
-    }
-  }
-  return null;
-};
-
 export const AddLoadTableExerciseDialog = ({
   open,
   onOpenChange,
 }: AddLoadTableExerciseDialogProps) => {
   const catalog = useExerciseStore((state) => state.exercises);
-  const bodyEntries = useBodyMetricsStore((state) => state.entries);
-  const addBodyEntry = useBodyMetricsStore((state) => state.addEntry);
   const addExercise = useLoadTableStore((state) => state.addExercise);
   const clearError = useLoadTableStore((state) => state.clearError);
   const loadTableError = useLoadTableStore((state) => state.errorMessage);
 
-  const latestWeight = useMemo(
-    () => resolveLatestWeightKg(bodyEntries),
-    [bodyEntries],
-  );
-
-  const needsBodyWeight = latestWeight === null;
-
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedCatalogId, setSelectedCatalogId] = useState("");
   const [maxKg, setMaxKg] = useState("");
-  const [weightKg, setWeightKg] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
 
   const selectedName =
@@ -77,14 +42,12 @@ export const AddLoadTableExerciseDialog = ({
   const resetForm = () => {
     setSelectedCatalogId("");
     setMaxKg("");
-    setWeightKg("");
     setFormError(null);
     clearError();
   };
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (nextOpen) {
-      setWeightKg("");
       setFormError(null);
       clearError();
     } else {
@@ -104,18 +67,6 @@ export const AddLoadTableExerciseDialog = ({
     if (!isPositiveFiniteNumber(parsedMaxKg)) {
       setFormError("Укажите положительный MAX (кг)");
       return;
-    }
-
-    if (needsBodyWeight) {
-      const parsedWeightKg = Number(weightKg.replace(",", "."));
-      if (!isPositiveFiniteNumber(parsedWeightKg)) {
-        setFormError("Укажите положительный вес тела (кг)");
-        return;
-      }
-      addBodyEntry({
-        recordedAt: toTodayIsoDate(),
-        measurements: { weightKg: parsedWeightKg },
-      });
     }
 
     addExercise({
@@ -167,21 +118,6 @@ export const AddLoadTableExerciseDialog = ({
                 onChange={(event) => setMaxKg(event.target.value)}
               />
             </div>
-
-            {needsBodyWeight && (
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="load-table-body-weight">Вес тела (кг)</Label>
-                <Input
-                  id="load-table-body-weight"
-                  type="number"
-                  inputMode="decimal"
-                  min={0}
-                  step={0.1}
-                  value={weightKg}
-                  onChange={(event) => setWeightKg(event.target.value)}
-                />
-              </div>
-            )}
 
             {(formError || loadTableError) && (
               <p className="text-sm text-destructive">
