@@ -344,12 +344,15 @@ export const CreateExercise = ({
     return null;
   };
 
-  const handleMergeConfirm = async (targetId: string) => {
+  const handleMergeConfirm = async (absorbedId: string) => {
     if (!editingExercise) {
       return;
     }
 
-    const sourceId = editingExercise.id;
+    // Текущее редактируемое упражнение остаётся (target);
+    // выбранное в модалке вливается и удаляется (source).
+    const targetId = editingExercise.id;
+    const sourceId = absorbedId;
     if (!sourceId || !targetId || sourceId === targetId) {
       return;
     }
@@ -367,7 +370,6 @@ export const CreateExercise = ({
     }
 
     setMergeDialogOpen(false);
-    handleClose();
   };
 
   const handleDeleteConfirm = () => {
@@ -475,13 +477,13 @@ export const CreateExercise = ({
         <MergeExerciseDialog
           open={mergeDialogOpen}
           onOpenChange={handleMergeDialogOpenChange}
-          sourceExercise={{
+          keepExercise={{
             id: editingExercise.id,
             name: editingExercise.name,
           }}
           catalog={allExercises}
-          onConfirm={(targetId) => {
-            void handleMergeConfirm(targetId);
+          onConfirm={(absorbedId) => {
+            void handleMergeConfirm(absorbedId);
           }}
         />
       )}

@@ -39,9 +39,11 @@ interface MergeCatalogOption {
 interface MergeExerciseDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  sourceExercise: { id: string; name: string };
+  /** Упражнение, которое останется после merge (текущее редактируемое). */
+  keepExercise: { id: string; name: string };
   catalog: ExerciseCategory[];
-  onConfirm: (targetId: string) => void;
+  /** Передаётся id упражнения, которое будет влито и удалено. */
+  onConfirm: (absorbedId: string) => void;
 }
 
 const emptyStats = (): ExerciseMergeStats => ({
@@ -56,14 +58,15 @@ const formatStatsLine = (stats: ExerciseMergeStats) =>
 export const MergeExerciseDialog = ({
   open,
   onOpenChange,
-  sourceExercise,
+  keepExercise,
   catalog,
   onConfirm,
 }: MergeExerciseDialogProps) => {
-  const [targetId, setTargetId] = useState<string>("");
+  const [absorbedId, setAbsorbedId] = useState<string>("");
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [sourceStats, setSourceStats] = useState<ExerciseMergeStats>(emptyStats);
-  const [targetStats, setTargetStats] = useState<ExerciseMergeStats>(emptyStats);
+  const [keepStats, setKeepStats] = useState<ExerciseMergeStats>(emptyStats);
+  const [absorbedStats, setAbsorbedStats] =
+    useState<ExerciseMergeStats>(emptyStats);
   const [isLoadingStats, setIsLoadingStats] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
 
@@ -71,26 +74,26 @@ export const MergeExerciseDialog = ({
     () =>
       catalog.flatMap((group) =>
         group.exercises
-          .filter((exercise) => exercise.id !== sourceExercise.id)
+          .filter((exercise) => exercise.id !== keepExercise.id)
           .map((exercise) => ({
             id: exercise.id,
             name: exercise.name,
             category: group.category,
           })),
       ),
-    [catalog, sourceExercise.id],
+    [catalog, keepExercise.id],
   );
 
-  const selectedTarget = catalogOptions.find(
-    (option) => option.id === targetId,
+  const selectedAbsorbed = catalogOptions.find(
+    (option) => option.id === absorbedId,
   );
 
   useEffect(() => {
     if (!open) {
-      setTargetId("");
+      setAbsorbedId("");
       setPickerOpen(false);
-      setSourceStats(emptyStats());
-      setTargetStats(emptyStats());
+      setKeepStats(emptyStats());
+      setAbsorbedStats(emptyStats());
       setIsConfirming(false);
       return;
     }
@@ -103,11 +106,11 @@ export const MergeExerciseDialog = ({
         if (cancelled) {
           return;
         }
-        setSourceStats(computeExerciseMergeStats(days, sourceExercise.id));
-        if (targetId) {
-          setTargetStats(computeExerciseMergeStats(days, targetId));
+        setKeepStats(computeExerciseMergeStats(days, keepExercise.id));
+        if (absorbedId) {
+          setAbsorbedStats(computeExerciseMergeStats(days, absorbedId));
         } else {
-          setTargetStats(emptyStats());
+          setAbsorbedStats(emptyStats());
         }
       } finally {
         if (!cancelled) {
@@ -120,11 +123,11 @@ export const MergeExerciseDialog = ({
     return () => {
       cancelled = true;
     };
-  }, [open, sourceExercise.id, targetId]);
+  }, [open, keepExercise.id, absorbedId]);
 
   const canConfirm =
-    Boolean(targetId) &&
-    targetId !== sourceExercise.id &&
+    Boolean(absorbedId) &&
+    absorbedId !== keepExercise.id &&
     !isConfirming &&
     !isLoadingStats;
 
@@ -133,7 +136,7 @@ export const MergeExerciseDialog = ({
       return;
     }
     setIsConfirming(true);
-    onConfirm(targetId);
+    onConfirm(absorbedId);
   };
 
   return (
@@ -142,28 +145,28 @@ export const MergeExerciseDialog = ({
         <DialogHeader>
           <DialogTitle>Смержить упражнение</DialogTitle>
           <DialogDescription>
-            Данные «{sourceExercise.name}» перейдут к выбранному упражнению.
-            Исходное будет удалено; название, фото и описание целевого не
-            изменятся.
+            Данные выбранного упражнения перейдут к «{keepExercise.name}».
+            Выбранное будет удалено; название, фото и описание «
+            {keepExercise.name}» не изменятся.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="rounded-md border border-border bg-muted/40 p-3">
             <p className="text-sm font-medium text-foreground">
-              {sourceExercise.name}
+              {keepExercise.name}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
               {isLoadingStats
                 ? "Считаем статистику…"
-                : formatStatsLine(sourceStats)}
+                : formatStatsLine(keepStats)}
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">Исходное</p>
+            <p className="mt-1 text-xs text-muted-foreground">Останется</p>
           </div>
 
           <div className="space-y-2">
             <p className="text-sm font-medium text-foreground">
-              Объединить с
+              Влить и удалить
             </p>
             <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
               <PopoverTrigger asChild>
@@ -174,8 +177,8 @@ export const MergeExerciseDialog = ({
                   aria-expanded={pickerOpen}
                 >
                   <span className="truncate text-left">
-                    {selectedTarget
-                      ? `${selectedTarget.name} (${selectedTarget.category})`
+                    {selectedAbsorbed
+                      ? `${selectedAbsorbed.name} (${selectedAbsorbed.category})`
                       : "Выберите упражнение"}
                   </span>
                   <ChevronsUpDown className="size-4 shrink-0 opacity-50" />
@@ -191,13 +194,13 @@ export const MergeExerciseDialog = ({
                     <CommandEmpty>Упражнения не найдены</CommandEmpty>
                     <CommandGroup>
                       {catalogOptions.map((option) => {
-                        const isSelected = option.id === targetId;
+                        const isSelected = option.id === absorbedId;
                         return (
                           <CommandItem
                             key={option.id}
                             value={`${option.name} ${option.category}`}
                             onSelect={() => {
-                              setTargetId(option.id);
+                              setAbsorbedId(option.id);
                               setPickerOpen(false);
                             }}
                           >
@@ -226,17 +229,19 @@ export const MergeExerciseDialog = ({
             </Popover>
           </div>
 
-          {selectedTarget && (
+          {selectedAbsorbed && (
             <div className="rounded-md border border-border bg-muted/40 p-3">
               <p className="text-sm font-medium text-foreground">
-                {selectedTarget.name}
+                {selectedAbsorbed.name}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
                 {isLoadingStats
                   ? "Считаем статистику…"
-                  : formatStatsLine(targetStats)}
+                  : formatStatsLine(absorbedStats)}
               </p>
-              <p className="mt-1 text-xs text-muted-foreground">Целевое</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Будет удалено
+              </p>
             </div>
           )}
         </div>
