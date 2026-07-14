@@ -5,9 +5,9 @@ milestone_name: milestone
 current_phase: 1
 current_phase_name: Quick Logging Core & Local Persistence
 status: ready
-stopped_at: Completed 260715-3fn rest timer deadline + settings
-last_updated: "2026-07-14T23:42:00.000Z"
-last_activity: "2026-07-15 - Rest timer fix with react-timer-hook and between-sets settings"
+stopped_at: Completed 260715-3t7 AI fill feature flag
+last_updated: "2026-07-15T02:51:00.000Z"
+last_activity: "2026-07-15 - AI fill feature flag in settings (default off)"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -30,7 +30,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-14)
 Phase: 1 of 5 (Quick Logging Core & Local Persistence)
 Plan: 0 of 0 in current phase
 Status: Ready to execute
-Last activity: 2026-07-15 - Completed quick task 260715-3fn: rest timer deadline + between-sets settings
+Last activity: 2026-07-15 - Completed quick task 260715-3t7: AI fill feature flag (default off)
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -74,6 +74,7 @@ Recent decisions affecting current work:
 - [260715-0qr] Load-table week from sessions since createdAt; Track prefills 3 plan sets; Reset updates createdAt; current week highlighted.
 - [260715-18z] Load-table sessions match via resolved catalog id or name; detail refetches currentWeek on revisit/show.
 - [260715-3fn] Rest timer uses persisted endAt deadline + react-timer-hook; rest-between-sets default 120s auto-starts after add set.
+- [260715-3t7] AI fill gated by aiFillEnabled (default false); Settings card + transfer; button hidden when off.
 
 ### Pending Todos
 
@@ -121,9 +122,10 @@ None yet.
 | 260715-2o1 | AI рекомендации: типы + свой текстовый запрос | 2026-07-15 | 4ff2295 | [260715-2o1-ai](./quick/260715-2o1-ai/) |
 | 260715-308 | ИИ-заполнение подходов: 6 мес истории, append only | 2026-07-15 | ee8f6e5 | [260715-308-ai-fill-exercise-sets-button-send-6-mont](./quick/260715-308-ai-fill-exercise-sets-button-send-6-mont/) |
 | 260715-3fn | Таймер: deadline + отдых между подходами в сводке | 2026-07-15 | 8748b62 | [260715-3fn-2](./quick/260715-3fn-2/) |
+| 260715-3t7 | Фича-флаг «ИИ-заполнение» в настройках (default OFF) | 2026-07-15 | 3efff2c | [260715-3t7-ai-fill-feature-flag](./quick/260715-3t7-ai-fill-feature-flag/) |
 
 ## Session Continuity
 
-Last session: 2026-07-14T23:42:00.000Z
-Stopped at: Completed 260715-3fn rest timer deadline + settings
+Last session: 2026-07-15T02:51:00.000Z
+Stopped at: Completed 260715-3t7 AI fill feature flag
 Resume file: None
