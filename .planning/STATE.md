@@ -5,9 +5,9 @@ milestone_name: milestone
 current_phase: 1
 current_phase_name: Quick Logging Core & Local Persistence
 status: ready
-stopped_at: Completed 260715-2az AI ChatGPT gateway recommendations
-last_updated: "2026-07-14T22:55:00.000Z"
-last_activity: "2026-07-15 - AI recommendations via local ChatGPT gateway"
+stopped_at: Completed 260715-308 AI fill exercise sets button
+last_updated: "2026-07-14T23:15:17.000Z"
+last_activity: "2026-07-15 - AI fill «ИИ-заполнение» append-only for exercise sets"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -30,7 +30,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-14)
 Phase: 1 of 5 (Quick Logging Core & Local Persistence)
 Plan: 0 of 0 in current phase
 Status: Ready to execute
-Last activity: 2026-07-14 - Completed quick task 260715-2o1: AI рекомендации: типы рекомендаций + свой текстовый запрос
+Last activity: 2026-07-15 - Completed quick task 260715-308: ИИ-заполнение подходов (6 мес, append only)
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -118,9 +118,10 @@ None yet.
 | fast | AI рекомендации: сохранять и обновлять при повторном запросе | 2026-07-15 | 4063e32 | — |
 | fast | AI рекомендации: рендер markdown ответа | 2026-07-15 | 25a308f | — |
 | 260715-2o1 | AI рекомендации: типы + свой текстовый запрос | 2026-07-15 | 4ff2295 | [260715-2o1-ai](./quick/260715-2o1-ai/) |
+| 260715-308 | ИИ-заполнение подходов: 6 мес истории, append only | 2026-07-15 | ee8f6e5 | [260715-308-ai-fill-exercise-sets-button-send-6-mont](./quick/260715-308-ai-fill-exercise-sets-button-send-6-mont/) |
 
 ## Session Continuity
 
-Last session: 2026-07-14T22:55:00.000Z
-Stopped at: Completed 260715-2az AI ChatGPT gateway recommendations
+Last session: 2026-07-14T23:15:17.000Z
+Stopped at: Completed 260715-308 AI fill exercise sets button
 Resume file: None
