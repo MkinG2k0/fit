@@ -94,6 +94,7 @@ const isUserProfileExport = (
   workoutListShowDaySummary?: boolean;
   restBetweenSetsEnabled?: boolean;
   restBetweenSetsSec?: number;
+  aiFillEnabled?: boolean;
 } => {
   if (!isPlainObject(value)) {
     return false;
@@ -159,6 +160,9 @@ const isUserProfileExport = (
   ) {
     return false;
   }
+  if ("aiFillEnabled" in value && typeof value.aiFillEnabled !== "boolean") {
+    return false;
+  }
   return true;
 };
 
@@ -216,6 +220,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         workoutListShowDaySummary?: boolean;
         restBetweenSetsEnabled?: boolean;
         restBetweenSetsSec?: number;
+        aiFillEnabled?: boolean;
       };
       return {
         user: state.user ?? { userName: "" },
@@ -236,6 +241,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         restBetweenSetsSec: clampExportedRestBetweenSetsSec(
           state.restBetweenSetsSec,
         ),
+        aiFillEnabled: state.aiFillEnabled ?? false,
       };
     },
     importSnapshot: async (payload: unknown) => {
@@ -261,6 +267,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
             workoutListShowDaySummary?: boolean;
             restBetweenSetsEnabled?: boolean;
             restBetweenSetsSec?: number;
+            aiFillEnabled?: boolean;
           };
           const next = {
             ...existing,
@@ -296,6 +303,8 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
               restBetweenSetsSec: clampExportedRestBetweenSetsSec(
                 payload.restBetweenSetsSec ?? prevState.restBetweenSetsSec,
               ),
+              aiFillEnabled:
+                payload.aiFillEnabled ?? prevState.aiFillEnabled ?? false,
             },
           };
           await writeJsonToStorage(USER_STORAGE_KEY, next);
@@ -326,6 +335,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
             restBetweenSetsSec: clampExportedRestBetweenSetsSec(
               payload.restBetweenSetsSec,
             ),
+            aiFillEnabled: payload.aiFillEnabled ?? false,
             accessToken: "",
           },
         });

@@ -53,6 +53,8 @@ interface UserState {
   restBetweenSetsEnabled: boolean;
   /** Длительность отдыха между подходами (сек). По умолчанию 120. */
   restBetweenSetsSec: number;
+  /** Экспериментальное ИИ-заполнение подходов. По умолчанию выкл. */
+  aiFillEnabled: boolean;
 }
 
 interface ActionsState {
@@ -70,6 +72,7 @@ interface ActionsState {
   setWorkoutListShowDaySummary: (enabled: boolean) => void;
   setRestBetweenSetsEnabled: (enabled: boolean) => void;
   setRestBetweenSetsSec: (sec: number) => void;
+  setAiFillEnabled: (enabled: boolean) => void;
   setAccessToken: (token: string) => void;
   deleteUserData: () => void;
   reset: () => void;
@@ -92,6 +95,7 @@ export const useUserStore = create<UserState & ActionsState>()(
       workoutListShowDaySummary: true,
       restBetweenSetsEnabled: true,
       restBetweenSetsSec: DEFAULT_REST_BETWEEN_SETS_SEC,
+      aiFillEnabled: false,
       accessToken: "",
 
       setAccessToken: (token) => set({ accessToken: token }),
@@ -168,6 +172,11 @@ export const useUserStore = create<UserState & ActionsState>()(
           restBetweenSetsSec: clampRestBetweenSetsSec(sec),
         })),
 
+      setAiFillEnabled: (enabled) =>
+        set(() => ({
+          aiFillEnabled: enabled,
+        })),
+
       deleteUserData: () =>
         set(() => ({
           user: {
@@ -232,6 +241,10 @@ export const useUserStore = create<UserState & ActionsState>()(
             Number.isFinite(p.restBetweenSetsSec)
               ? clampRestBetweenSetsSec(p.restBetweenSetsSec)
               : current.restBetweenSetsSec,
+          aiFillEnabled:
+            typeof p.aiFillEnabled === "boolean"
+              ? p.aiFillEnabled
+              : current.aiFillEnabled,
         };
       },
     },
