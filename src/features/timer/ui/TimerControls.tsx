@@ -16,17 +16,19 @@ export const TimerControls = ({
   return (
     <div className="flex flex-col w-[50%] space-y-4 fixed bottom-5">
       <button
+        type="button"
         onClick={onStart}
-        className={`px-6 py-2 bg-black text-white text-2xl rounded transition-opacity duration-500 disabled:opacity-50 ${
-          isRunning && "opacity-70"
+        className={`rounded bg-foreground px-6 py-2 text-2xl text-background transition-opacity duration-500 disabled:opacity-50 ${
+          isRunning ? "opacity-70" : ""
         }`}
         disabled={minutes === 0 && seconds === 0 && !isRunning}
       >
         {isRunning ? "Пауза" : "Старт"}
       </button>
       <button
+        type="button"
         onClick={onReset}
-        className="px-6 py-2 bg-gray-400 text-white text-2xl rounded hover:bg-gray-600"
+        className="rounded bg-muted-foreground px-6 py-2 text-2xl text-background hover:opacity-90"
       >
         Сброс
       </button>

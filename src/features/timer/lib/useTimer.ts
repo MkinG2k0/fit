@@ -1,81 +1,131 @@
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
+import { useTimer as useLibTimer } from "react-timer-hook";
+import {
+  clampRestDurationSec,
+  getRemainingMs,
+  useRestTimerStore,
+} from "../slice/restTimerStore";
+import { playNotificationSound, sendPushNotification } from "./notifications";
 
-export const useTimer = (initialMinutes = 2, initialSeconds = 0) => {
-  const [minutes, setMinutes] = useState(initialMinutes);
-  const [seconds, setSeconds] = useState(initialSeconds);
-  const [initialMinutesState, setInitialMinutesState] = useState(initialMinutes);
-  const [initialSecondsState, setInitialSecondsState] = useState(initialSeconds);
-  const [isRunning, setIsRunning] = useState(false);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+const idleExpiry = () => new Date(Date.now() + 60_000);
 
-  const clearTimer = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
+export const useTimer = () => {
+  const endAt = useRestTimerStore((s) => s.endAt);
+  const durationSec = useRestTimerStore((s) => s.durationSec);
+  const pausedRemainingMs = useRestTimerStore((s) => s.pausedRemainingMs);
+  const storeStart = useRestTimerStore((s) => s.start);
+  const storeClear = useRestTimerStore((s) => s.clear);
+  const storePause = useRestTimerStore((s) => s.pause);
+  const storeResume = useRestTimerStore((s) => s.resume);
+  const storeSetDurationSec = useRestTimerStore((s) => s.setDurationSec);
+
+  const expireFiredRef = useRef(false);
+  const restartRef = useRef<(expiry: Date, autoStart?: boolean) => void>(
+    () => undefined,
+  );
+  const pauseLibRef = useRef<() => void>(() => undefined);
+
+  const handleExpire = useCallback(() => {
+    if (expireFiredRef.current) {
+      return;
     }
-  }, []);
+    expireFiredRef.current = true;
+    playNotificationSound();
+    void sendPushNotification();
+    storeClear();
+  }, [storeClear]);
+
+  const initialExpiry =
+    endAt != null
+      ? new Date(endAt)
+      : pausedRemainingMs != null
+        ? new Date(Date.now() + pausedRemainingMs)
+        : idleExpiry();
+
+  const {
+    seconds: libSeconds,
+    minutes: libMinutes,
+    isRunning: libIsRunning,
+    pause: pauseLib,
+    restart,
+  } = useLibTimer({
+    expiryTimestamp: initialExpiry,
+    autoStart: endAt != null,
+    onExpire: handleExpire,
+  });
+
+  restartRef.current = restart;
+  pauseLibRef.current = pauseLib;
+
+  useEffect(() => {
+    if (endAt != null) {
+      expireFiredRef.current = false;
+      restartRef.current(new Date(endAt), true);
+      return;
+    }
+    if (pausedRemainingMs != null && pausedRemainingMs > 0) {
+      restartRef.current(new Date(Date.now() + pausedRemainingMs), false);
+      pauseLibRef.current();
+      return;
+    }
+    restartRef.current(idleExpiry(), false);
+  }, [endAt, pausedRemainingMs]);
+
+  const isActive = endAt != null || pausedRemainingMs != null;
+  const isRunning = endAt != null && libIsRunning;
+
+  const idleMinutes = Math.floor(durationSec / 60);
+  const idleSeconds = durationSec % 60;
+
+  const minutes = isActive ? libMinutes : idleMinutes;
+  const seconds = isActive ? libSeconds : idleSeconds;
+  const initialMinutes = idleMinutes;
+  const initialSeconds = idleSeconds;
 
   const startTimer = useCallback(() => {
-    if (isRunning) {
-      clearTimer();
-      setIsRunning(false);
-    } else {
-      setIsRunning(true);
-      intervalRef.current = setInterval(() => {
-        setSeconds((prevSeconds) => {
-          if (prevSeconds > 0) {
-            return prevSeconds - 1;
-          } else {
-            setMinutes((prevMinutes) => {
-              if (prevMinutes > 0) {
-                return prevMinutes - 1;
-              } else {
-                setIsRunning(false);
-                return 0;
-              }
-            });
-            return 59;
-          }
-        });
-      }, 1000);
+    if (endAt != null) {
+      storePause();
+      pauseLibRef.current();
+      return;
     }
-  }, [isRunning, clearTimer]);
+    if (pausedRemainingMs != null) {
+      storeResume();
+      return;
+    }
+    storeStart(durationSec);
+  }, [durationSec, endAt, pausedRemainingMs, storePause, storeResume, storeStart]);
 
   const resetTimer = useCallback(() => {
-    clearTimer();
-    setIsRunning(false);
-    setMinutes(initialMinutesState);
-    setSeconds(initialSecondsState);
-  }, [clearTimer, initialMinutesState, initialSecondsState]);
+    expireFiredRef.current = false;
+    storeClear();
+    restartRef.current(idleExpiry(), false);
+  }, [storeClear]);
 
   const setTime = useCallback(
     (newMinutes: number, newSeconds: number) => {
-      const clampedMinutes = Math.min(newMinutes, 60);
-      const clampedSeconds = Math.min(newSeconds, 59);
-      setMinutes(clampedMinutes);
-      setSeconds(clampedSeconds);
-      setInitialMinutesState(clampedMinutes);
-      setInitialSecondsState(clampedSeconds);
+      if (endAt != null || pausedRemainingMs != null) {
+        return;
+      }
+      const rawMin = Number.isFinite(newMinutes) ? newMinutes : 0;
+      const rawSec = Number.isFinite(newSeconds) ? newSeconds : 0;
+      const clampedMinutes = Math.min(Math.max(0, Math.round(rawMin)), 60);
+      const clampedSeconds = Math.min(Math.max(0, Math.round(rawSec)), 59);
+      storeSetDurationSec(
+        clampRestDurationSec(clampedMinutes * 60 + clampedSeconds),
+      );
     },
-    [],
+    [endAt, pausedRemainingMs, storeSetDurationSec],
   );
-
-  useEffect(() => {
-    if (minutes === 0 && seconds === 0 && isRunning) {
-      clearTimer();
-      setIsRunning(false);
-    }
-  }, [minutes, seconds, isRunning, clearTimer]);
 
   return {
     minutes,
     seconds,
-    initialMinutes: initialMinutesState,
-    initialSeconds: initialSecondsState,
+    initialMinutes,
+    initialSeconds,
     isRunning,
+    remainingMs: getRemainingMs(endAt, pausedRemainingMs),
     startTimer,
     resetTimer,
     setTime,
   };
 };
-

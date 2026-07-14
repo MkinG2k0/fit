@@ -54,6 +54,7 @@
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.3",
     "react-swipeable": "^7.0.2",
+    "react-timer-hook": "^4.0.6",
     "recharts": "2.15.4",
     "rollup-plugin-visualizer": "^7.0.1",
     "shadcn": "^3.5.0",

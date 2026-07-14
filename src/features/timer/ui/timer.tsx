@@ -1,8 +1,6 @@
-import { useEffect } from "react";
-import { useTimer } from "../lib/useTimer";
-import { playNotificationSound, sendPushNotification } from "../lib/notifications";
 import { TimerDisplay } from "./TimerDisplay";
 import { TimerControls } from "./TimerControls";
+import { useTimer } from "../lib/useTimer";
 
 export const Timer = () => {
   const {
@@ -14,14 +12,7 @@ export const Timer = () => {
     startTimer,
     resetTimer,
     setTime,
-  } = useTimer(2, 0);
-
-  useEffect(() => {
-    if (minutes === 0 && seconds === 0 && isRunning) {
-      playNotificationSound();
-      sendPushNotification();
-    }
-  }, [minutes, seconds, isRunning]);
+  } = useTimer();
 
   return (
     <div className="flex flex-col items-center">
