@@ -6,6 +6,7 @@ import {
   Menu,
   Ruler,
   ScrollText,
+  Sparkles,
   Table2,
   Timer as TimerIcon,
 } from "lucide-react";
@@ -101,6 +102,16 @@ export const ProfileDropDownMenu = () => {
           >
             <ChartColumnBig />
             <div>Аналитика</div>
+          </Button>
+
+          <Separator />
+          <Button
+            variant="ghost"
+            className="justify-start"
+            onClick={() => handleNavigate("/ai-recommendations")}
+          >
+            <Sparkles />
+            <div>AI рекомендации</div>
           </Button>
 
           <Separator />

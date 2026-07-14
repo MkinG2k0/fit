@@ -52,6 +52,11 @@ const LoadTableDetailPage = lazy(() =>
     default: m.LoadTableDetailPage,
   })),
 );
+const AiRecommendationsPage = lazy(() =>
+  import("@/pages/AiRecommendationsPage").then((m) => ({
+    default: m.AiRecommendationsPage,
+  })),
+);
 
 export const AppRoutes = () => {
   return (
@@ -126,6 +131,14 @@ export const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <AnalyticsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ai-recommendations"
+        element={
+          <ProtectedRoute>
+            <AiRecommendationsPage />
           </ProtectedRoute>
         }
       />

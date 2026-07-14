@@ -17,6 +17,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/presets/edit": "Редактирование пресета",
   "/timer": "Таймер",
   "/analytics": "Аналитика",
+  "/ai-recommendations": "AI рекомендации",
   "/settings": "Настройки",
   "/body-metrics": "Параметры тела",
   "/load-table": "Таблица нагрузок",
