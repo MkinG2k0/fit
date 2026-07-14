@@ -5,11 +5,7 @@ import { type ChangeEvent, useCallback, useEffect, useRef } from "react";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { useCalendarStore } from "@/entities/calendarDay";
 import type { Exercise, ExerciseSet } from "@/entities/exercise";
-import {
-  getLoadTableCurrentWeek,
-  getPlanSetsForWeek,
-  useLoadTableStore,
-} from "@/entities/loadTable";
+import { getPlanSetsForWeek, useLoadTableStore } from "@/entities/loadTable";
 import { useUserStore } from "@/entities/user";
 import { StatisticCard } from "@/widgets/statisticCard";
 import { cn } from "@/shared/lib/classMerge";
@@ -44,6 +40,35 @@ export const ExerciseBody = ({
     exercise.name,
     exercise.catalogExerciseId,
   );
+  const selectedDate = useCalendarStore((store) => store.selectedDate);
+  const isSelectedDateToday = selectedDate.isSame(new Date(), "day");
+  const loadTableEntry = useLoadTableStore((state) => {
+    const catalogExerciseId = exercise.catalogExerciseId?.trim();
+    if (!catalogExerciseId) {
+      return undefined;
+    }
+    return state.exercises.find(
+      (item) => item.catalogExerciseId === catalogExerciseId,
+    );
+  });
+  const loadTablePlanSummary = (() => {
+    if (!isSelectedDateToday || !loadTableEntry) {
+      return null;
+    }
+    const planSets = getPlanSetsForWeek(
+      loadTableEntry.maxKg,
+      loadTableEntry.currentWeek,
+    );
+    if (planSets.length === 0) {
+      return null;
+    }
+    return {
+      week: loadTableEntry.currentWeek,
+      setsSummary: planSets
+        .map((set) => `${set.reps}×${set.weight}`)
+        .join(" · "),
+    };
+  })();
   const showCaloriesUi = useWorkoutCaloriesUiEnabled();
   const prefillFromLastSession = useUserStore(
     (s) => s.exerciseCardShowLastSessionResult ?? false,
@@ -97,22 +122,17 @@ export const ExerciseBody = ({
       let reps = lastSet?.reps ?? 0;
 
       const catalogExerciseId = exercise.catalogExerciseId?.trim();
-      const trackedEntry = catalogExerciseId
+      const loadTableEntry = catalogExerciseId
         ? useLoadTableStore
             .getState()
-            .exercises.find(
-              (item) =>
-                item.catalogExerciseId === catalogExerciseId &&
-                item.isTracking,
-            )
+            .exercises.find((item) => item.catalogExerciseId === catalogExerciseId)
         : undefined;
 
-      if (trackedEntry) {
-        const { currentWeek } = await getLoadTableCurrentWeek(
-          trackedEntry.catalogExerciseId,
-          trackedEntry.createdAt,
+      if (loadTableEntry) {
+        const planSets = getPlanSetsForWeek(
+          loadTableEntry.maxKg,
+          loadTableEntry.currentWeek,
         );
-        const planSets = getPlanSetsForWeek(trackedEntry.maxKg, currentWeek);
 
         // Пустая карточка (нет подходов или все без значений) — сразу все подходы из таблицы.
         if (isExerciseCardEmpty(exercise.sets) && planSets.length > 0) {
@@ -161,15 +181,12 @@ export const ExerciseBody = ({
     }
 
     const catalogExerciseId = exercise.catalogExerciseId?.trim();
-    const isTracked = catalogExerciseId
+    const isInLoadTable = catalogExerciseId
       ? useLoadTableStore
           .getState()
-          .exercises.some(
-            (item) =>
-              item.catalogExerciseId === catalogExerciseId && item.isTracking,
-          )
+          .exercises.some((item) => item.catalogExerciseId === catalogExerciseId)
       : false;
-    if (isTracked) {
+    if (isInLoadTable) {
       firstSetPrefillAttemptedRef.current = exercise.id;
       return;
     }
@@ -205,6 +222,16 @@ export const ExerciseBody = ({
           role="note"
         >
           Прошлый раз, {lastSession.dateLabel}: {lastSession.setsSummary}
+        </p>
+      ) : null}
+
+      {loadTablePlanSummary ? (
+        <p
+          className="w-full px-4 text-center text-xs leading-snug text-muted-foreground"
+          role="note"
+        >
+          По таблице, неделя {loadTablePlanSummary.week}:{" "}
+          {loadTablePlanSummary.setsSummary}
         </p>
       ) : null}
 

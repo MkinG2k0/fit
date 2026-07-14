@@ -2,9 +2,8 @@ export interface LoadTableExercise {
   id: string;
   catalogExerciseId: string;
   maxKg: number;
-  createdAt: string;
-  /** Если true — при «Добавить подход» в дневнике подставляются вес/reps из плана. */
-  isTracking: boolean;
+  /** Текущая неделя плана 1–16; сдвигается кнопкой в детали таблицы. */
+  currentWeek: number;
 }
 
 export interface LoadTableExerciseDraft {

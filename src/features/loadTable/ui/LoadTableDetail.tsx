@@ -1,10 +1,6 @@
-import { type ChangeEvent, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { type ChangeEvent, useState } from "react";
 import { findCatalogExerciseById, useExerciseStore } from "@/entities/exercise";
-import {
-  getLoadTableCurrentWeek,
-  useLoadTableStore,
-} from "@/entities/loadTable";
+import { useLoadTableStore } from "@/entities/loadTable";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
   Dialog,
@@ -24,75 +20,22 @@ interface LoadTableDetailProps {
 }
 
 export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) => {
-  const location = useLocation();
   const catalog = useExerciseStore((state) => state.exercises);
   const exercise = useLoadTableStore((state) =>
     state.exercises.find((item) => item.id === exerciseId),
   );
   const updateExercise = useLoadTableStore((state) => state.updateExercise);
-  const setExerciseTracking = useLoadTableStore(
-    (state) => state.setExerciseTracking,
+  const advanceExerciseWeek = useLoadTableStore(
+    (state) => state.advanceExerciseWeek,
   );
   const resetExerciseProgress = useLoadTableStore(
     (state) => state.resetExerciseProgress,
   );
   const errorMessage = useLoadTableStore((state) => state.errorMessage);
+  const clearError = useLoadTableStore((state) => state.clearError);
 
-  const [currentWeek, setCurrentWeek] = useState(1);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
-
-  useEffect(() => {
-    if (!exercise) {
-      return;
-    }
-
-    const exerciseName = findCatalogExerciseById(
-      catalog,
-      exercise.catalogExerciseId,
-    )?.name;
-
-    let cancelled = false;
-
-    const fetchWeek = () => {
-      void getLoadTableCurrentWeek(
-        exercise.catalogExerciseId,
-        exercise.createdAt,
-        exerciseName,
-      ).then((result) => {
-        if (!cancelled) {
-          setCurrentWeek(result.currentWeek);
-        }
-      });
-    };
-
-    fetchWeek();
-
-    const onVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        fetchWeek();
-      }
-    };
-
-    const onPageShow = () => {
-      fetchWeek();
-    };
-
-    document.addEventListener("visibilitychange", onVisibilityChange);
-    window.addEventListener("pageshow", onPageShow);
-
-    return () => {
-      cancelled = true;
-      document.removeEventListener("visibilitychange", onVisibilityChange);
-      window.removeEventListener("pageshow", onPageShow);
-    };
-  }, [
-    exercise?.id,
-    exercise?.createdAt,
-    exercise?.catalogExerciseId,
-    catalog,
-    location.key,
-  ]);
 
   if (!exercise) {
     return (
@@ -108,6 +51,7 @@ export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) =>
   const name =
     findCatalogExerciseById(catalog, exercise.catalogExerciseId)?.name ??
     "Упражнение";
+  const isLastWeek = exercise.currentWeek >= 16;
 
   const handleMaxKgChange = (event: ChangeEvent<HTMLInputElement>) => {
     const next = Number(event.target.value.replace(",", "."));
@@ -117,20 +61,19 @@ export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) =>
     updateExercise(exercise.id, { maxKg: next });
   };
 
-  const handleTrackToggle = () => {
-    const nextTracking = !exercise.isTracking;
-    setExerciseTracking(exercise.id, nextTracking);
-    setStatusMessage(
-      nextTracking
-        ? "Отслеживание включено. При «Добавить подход» подставятся вес и повторы из таблицы."
-        : "Отслеживание выключено.",
-    );
+  const handleAdvanceWeek = () => {
+    clearError();
+    advanceExerciseWeek(exercise.id);
+    const nextWeek = Math.min(16, exercise.currentWeek + 1);
+    if (exercise.currentWeek < 16) {
+      setStatusMessage(`Текущая неделя — ${nextWeek}.`);
+    }
   };
 
   const handleResetConfirm = () => {
+    clearError();
     resetExerciseProgress(exercise.id);
     setIsResetDialogOpen(false);
-    setCurrentWeek(1);
     setStatusMessage("Счёт недель сброшен. Текущая неделя — 1.");
   };
 
@@ -140,17 +83,16 @@ export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) =>
         <h2 className="min-w-0 truncate text-base font-medium text-foreground">
           {name}
         </h2>
-      <p className="text-sm text-muted-foreground">3 подхода / 2 раза в неделю</p>
+        <p className="text-sm text-muted-foreground">3 подхода / 2 раза в неделю</p>
       </div>
-
 
       <div className="flex flex-wrap gap-2">
         <Button
           type="button"
-          variant={exercise.isTracking ? "secondary" : "default"}
-          onClick={handleTrackToggle}
+          onClick={handleAdvanceWeek}
+          disabled={isLastWeek}
         >
-          {exercise.isTracking ? "Отслеживается" : "Отслеживать"}
+          Следующая неделя
         </Button>
         <Button
           type="button"
@@ -160,6 +102,11 @@ export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) =>
           Сбросить
         </Button>
       </div>
+
+      <p className="text-sm text-muted-foreground">
+        Текущая неделя: {exercise.currentWeek} из 16. При «Добавить подход» в
+        дневнике подставятся вес и повторы этой недели.
+      </p>
 
       {statusMessage && (
         <p className="text-sm text-muted-foreground">{statusMessage}</p>
@@ -182,15 +129,17 @@ export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) =>
         <p className="text-sm text-destructive">{errorMessage}</p>
       )}
 
-      <LoadTableWeekGrid maxKg={exercise.maxKg} currentWeek={currentWeek} />
+      <LoadTableWeekGrid
+        maxKg={exercise.maxKg}
+        currentWeek={exercise.currentWeek}
+      />
 
       <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Сбросить счёт недель?</DialogTitle>
             <DialogDescription>
-              Счётчик недель обнулится: программа начнётся заново с недели 1.
-              Записи в дневнике тренировок не изменятся.
+              Текущая неделя станет 1. Записи в дневнике тренировок не изменятся.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

@@ -9,6 +9,9 @@ import type {
 
 type LoadTableStatus = "idle" | "error";
 
+const MIN_WEEK = 1;
+const MAX_WEEK = 16;
+
 interface LoadTableState {
   exercises: LoadTableExercise[];
   status: LoadTableStatus;
@@ -19,15 +22,22 @@ interface LoadTableActions {
   addExercise: (draft: LoadTableExerciseDraft) => void;
   updateExercise: (id: string, patch: LoadTableExerciseUpdate) => void;
   removeExercise: (id: string) => void;
-  /** Включить/выключить подстановку плана при добавлении подхода. */
-  setExerciseTracking: (id: string, isTracking: boolean) => void;
-  /** Сброс цикла: createdAt = сейчас, счёт недель начинается с 1. */
+  /** Сдвинуть текущую неделю плана на +1 (не выше 16). */
+  advanceExerciseWeek: (id: string) => void;
+  /** Сброс цикла: текущая неделя = 1. */
   resetExerciseProgress: (id: string) => void;
   clearError: () => void;
 }
 
 const isPositiveFiniteNumber = (value: unknown): value is number => {
   return typeof value === "number" && Number.isFinite(value) && value > 0;
+};
+
+const clampWeek = (value: unknown): number => {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return MIN_WEEK;
+  }
+  return Math.min(MAX_WEEK, Math.max(MIN_WEEK, Math.round(value)));
 };
 
 const createExerciseId = () => {
@@ -81,8 +91,7 @@ export const useLoadTableStore = create<LoadTableState & LoadTableActions>()(
             id: createExerciseId(),
             catalogExerciseId,
             maxKg: draft.maxKg,
-            createdAt: new Date().toISOString(),
-            isTracking: false,
+            currentWeek: MIN_WEEK,
           };
 
           return {
@@ -137,7 +146,7 @@ export const useLoadTableStore = create<LoadTableState & LoadTableActions>()(
           errorMessage: null,
         })),
 
-      setExerciseTracking: (id, isTracking) =>
+      advanceExerciseWeek: (id) =>
         set((state) => {
           const existing = state.exercises.find((exercise) => exercise.id === id);
           if (!existing) {
@@ -148,13 +157,21 @@ export const useLoadTableStore = create<LoadTableState & LoadTableActions>()(
             };
           }
 
+          if (existing.currentWeek >= MAX_WEEK) {
+            return {
+              ...state,
+              status: "error",
+              errorMessage: "Уже последняя неделя плана (16)",
+            };
+          }
+
           return {
             ...state,
             exercises: state.exercises.map((exercise) =>
               exercise.id === id
                 ? {
                     ...exercise,
-                    isTracking,
+                    currentWeek: clampWeek(exercise.currentWeek + 1),
                   }
                 : exercise,
             ),
@@ -180,7 +197,7 @@ export const useLoadTableStore = create<LoadTableState & LoadTableActions>()(
               exercise.id === id
                 ? {
                     ...exercise,
-                    createdAt: new Date().toISOString(),
+                    currentWeek: MIN_WEEK,
                   }
                 : exercise,
             ),
@@ -202,10 +219,15 @@ export const useLoadTableStore = create<LoadTableState & LoadTableActions>()(
       merge: (persisted, current) => {
         const persistedState = persisted as Partial<LoadTableState> | undefined;
         const exercises = (persistedState?.exercises ?? current.exercises).map(
-          (exercise) => ({
-            ...exercise,
-            isTracking: exercise.isTracking === true,
-          }),
+          (exercise) => {
+            const raw = exercise as LoadTableExercise & Record<string, unknown>;
+            return {
+              id: raw.id,
+              catalogExerciseId: raw.catalogExerciseId,
+              maxKg: raw.maxKg,
+              currentWeek: clampWeek(raw.currentWeek),
+            };
+          },
         );
         return {
           ...current,
