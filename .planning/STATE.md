@@ -115,10 +115,10 @@ None yet.
 | fast | load-table: Отслеживать → префилл при «Добавить подход» | 2026-07-15 | 63d83e3 | — |
 | 260715-18z | load-table: неделя не двигается после логирования | 2026-07-15 | 2552c6d | [260715-18z-fix-load-table-week-not-advancing-after-](./quick/260715-18z-fix-load-table-week-not-advancing-after-/) |
 | 260715-2az | AI рекомендации: gateway ChatGPT + период журнала | 2026-07-15 | 6063608 | [260715-2az-ai-chatgpt-gateway](./quick/260715-2az-ai-chatgpt-gateway/) |
+| fast | AI рекомендации: сохранять и обновлять при повторном запросе | 2026-07-15 | 4063e32 | — |
 
 ## Session Continuity
 
 Last session: 2026-07-14T22:55:00.000Z
 Stopped at: Completed 260715-2az AI ChatGPT gateway recommendations
 Resume file: None
-| fast | AI рекомендации: сохранять и обновлять при повторном запросе | 2026-07-15 | 4063e32 | — |
