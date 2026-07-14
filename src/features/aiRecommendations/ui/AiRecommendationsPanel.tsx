@@ -22,6 +22,7 @@ import {
   getPeriodLabel,
   type AiRecommendationPeriod,
 } from "../model/types";
+import { MarkdownContent } from "./MarkdownContent";
 
 export const AiRecommendationsPanel = () => {
   const [period, setPeriod] =
@@ -165,9 +166,7 @@ export const AiRecommendationsPanel = () => {
           <p className="mb-2 text-sm font-medium text-foreground">
             Рекомендации
           </p>
-          <p className="whitespace-pre-wrap text-sm text-foreground">
-            {result}
-          </p>
+          <MarkdownContent content={result} />
         </div>
       ) : null}
     </div>
