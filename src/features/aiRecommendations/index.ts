@@ -20,6 +20,7 @@ export {
   getAiFillSystemPrompt,
   buildAiFillUserPrompt,
 } from "./lib/buildAiFillPrompts";
+export { formatCurrentSessionSets } from "./lib/formatCurrentSessionSets";
 export {
   parseAiFillSets,
   type AiFillSetValues,

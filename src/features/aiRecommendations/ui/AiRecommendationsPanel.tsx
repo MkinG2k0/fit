@@ -82,7 +82,8 @@ export const AiRecommendationsPanel = () => {
 
       const periodLabel = getPeriodLabel(period);
       const kindLabel = getKindLabel(kind);
-      const optionalCustom = trimmedQuery || undefined;
+      const optionalCustom =
+        kind === "custom" ? trimmedQuery : undefined;
       const response = await createChatCompletion([
         { role: "system", content: getSystemPrompt() },
         {
@@ -179,20 +180,22 @@ export const AiRecommendationsPanel = () => {
         </RadioGroup>
       </div>
 
-      <div className="min-w-0 space-y-2">
-        <label htmlFor="ai-custom-query" className="text-sm font-medium">
-          Ваш запрос
-        </label>
-        <textarea
-          id="ai-custom-query"
-          rows={4}
-          placeholder="Уточните фокус или задайте свой вопрос тренеру"
-          value={customQuery}
-          onChange={(event) => setCustomQuery(event.target.value)}
-          disabled={loading}
-          className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs ring-offset-background placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-        />
-      </div>
+      {kind === "custom" ? (
+        <div className="min-w-0 space-y-2">
+          <label htmlFor="ai-custom-query" className="text-sm font-medium">
+            Ваш запрос
+          </label>
+          <textarea
+            id="ai-custom-query"
+            rows={4}
+            placeholder="Задайте свой вопрос тренеру"
+            value={customQuery}
+            onChange={(event) => setCustomQuery(event.target.value)}
+            disabled={loading}
+            className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs ring-offset-background placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+          />
+        </div>
+      ) : null}
 
       <Button
         type="button"

@@ -13,6 +13,7 @@ import {
   buildAiFillUserPrompt,
   buildWorkoutLogText,
   filterExerciseHistoryForAiFill,
+  formatCurrentSessionSets,
   getAiFillSystemPrompt,
   parseAiFillSets,
 } from "@/features/aiRecommendations";
@@ -224,6 +225,7 @@ export const ExerciseBody = ({
     setAiFillEmptyMessage(null);
 
     try {
+      const alreadyDoneTodayText = formatCurrentSessionSets(exercise.sets);
       const allDays = await readAllTrainingDaysFromStorage();
       const filtered = filterExerciseHistoryForAiFill(
         allDays,
@@ -235,7 +237,7 @@ export const ExerciseBody = ({
       );
       const workoutLogText = buildWorkoutLogText(filtered);
 
-      if (!workoutLogText.trim()) {
+      if (!workoutLogText.trim() && !alreadyDoneTodayText) {
         setAiFillEmptyMessage(
           `Нет истории этого упражнения за последние ${AI_FILL_HISTORY_MONTHS} месяцев.`,
         );
@@ -246,7 +248,11 @@ export const ExerciseBody = ({
         { role: "system", content: getAiFillSystemPrompt() },
         {
           role: "user",
-          content: buildAiFillUserPrompt(exercise.name, workoutLogText),
+          content: buildAiFillUserPrompt(
+            exercise.name,
+            workoutLogText,
+            alreadyDoneTodayText,
+          ),
         },
       ]);
 
@@ -257,6 +263,13 @@ export const ExerciseBody = ({
       }
 
       const recommendedSets = parseAiFillSets(content);
+
+      if (recommendedSets.length === 0) {
+        setAiFillEmptyMessage(
+          "ИИ не предложил новых подходов — по уже сделанному объёма достаточно.",
+        );
+        return;
+      }
 
       const defaultSec =
         useUserStore.getState().defaultSetDurationSec ??
@@ -424,9 +437,6 @@ export const ExerciseBody = ({
           exerciseName={exercise.name}
           catalogExerciseId={exercise.catalogExerciseId}
         />
-        <CustomButton classes={"flex-1"} buttonHandler={handleAddSet}>
-          Добавить подход
-        </CustomButton>
         {aiFillEnabled ? (
           <Button
             type="button"
@@ -440,6 +450,9 @@ export const ExerciseBody = ({
             {aiFillLoading ? "Загрузка…" : "ИИ-заполнение"}
           </Button>
         ) : null}
+        <CustomButton classes={"flex-1"} buttonHandler={handleAddSet}>
+          Добавить подход
+        </CustomButton>
         <Button
           variant="outline"
           className="text-destructive"

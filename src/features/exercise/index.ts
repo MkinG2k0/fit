@@ -5,7 +5,6 @@ export { ExerciseCardDisplaySettingsCard } from "./ui/ExerciseCardDisplaySetting
 export { DefaultExercisesSettingsCard } from "./ui/DefaultExercisesSettingsCard";
 export { WorkoutSummaryDisplaySettingsCard } from "./ui/WorkoutSummaryDisplaySettingsCard";
 export { RestBetweenSetsSettingsCard } from "./ui/RestBetweenSetsSettingsCard";
-export { AiFillSettingsCard } from "./ui/AiFillSettingsCard";
 export { WorkoutCaloriesSettingsCard } from "./ui/WorkoutCaloriesSettingsCard";
 export { useWorkoutCaloriesRecalculationRunner } from "./calories/lib/useWorkoutCaloriesRecalculationRunner";
 

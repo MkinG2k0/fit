@@ -105,7 +105,9 @@ export const parseAiFillSets = (raw: string): AiFillSetValues[] => {
     sets.push({ weight, reps });
   }
 
-  if (sets.length === 0) {
+  // Валидный JSON с sets:[] — ок (ИИ считает, что добавлять нечего).
+  // Пустой результат после отсева мусора — ошибка.
+  if (sets.length === 0 && items.length > 0) {
     throw new Error(EMPTY_SETS_ERROR);
   }
 

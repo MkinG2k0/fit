@@ -39,6 +39,8 @@ export const ExerciseCardDisplaySettingsCard = ({
   const setExerciseCardShowTotalVolumeInHeader = useUserStore(
     (s) => s.setExerciseCardShowTotalVolumeInHeader,
   );
+  const aiFillEnabled = useUserStore((s) => s.aiFillEnabled ?? false);
+  const setAiFillEnabled = useUserStore((s) => s.setAiFillEnabled);
 
   const handleLastSessionCheckedChange = useCallback(
     (value: boolean | "indeterminate") => {
@@ -59,6 +61,13 @@ export const ExerciseCardDisplaySettingsCard = ({
       setExerciseCardShowTotalVolumeInHeader(value === true);
     },
     [setExerciseCardShowTotalVolumeInHeader],
+  );
+
+  const handleAiFillCheckedChange = useCallback(
+    (value: boolean | "indeterminate") => {
+      setAiFillEnabled(value === true);
+    },
+    [setAiFillEnabled],
   );
 
   return (
@@ -148,6 +157,30 @@ export const ExerciseCardDisplaySettingsCard = ({
               раскрытии. Первый подход и каждый новый по кнопке «Добавить подход»
               подставляют повторения и вес из соответствующего подхода прошлой
               тренировки (если подходов было меньше — берётся последний).
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-start gap-3 rounded-md border border-border p-3">
+          <Checkbox
+            id="exercise-card-ai-fill"
+            checked={aiFillEnabled}
+            onCheckedChange={handleAiFillCheckedChange}
+            aria-describedby="exercise-card-ai-fill-hint"
+          />
+          <div className="grid min-w-0 gap-1">
+            <Label
+              htmlFor="exercise-card-ai-fill"
+              className="cursor-pointer text-sm font-medium leading-none"
+            >
+              Показывать кнопку ИИ-заполнения
+            </Label>
+            <p
+              id="exercise-card-ai-fill-hint"
+              className="text-xs text-muted-foreground"
+            >
+              Экспериментальное автозаполнение подходов по истории упражнения.
+              Если выключить, кнопка «ИИ-заполнение» скрыта в раскрытой карточке.
             </p>
           </div>
         </div>

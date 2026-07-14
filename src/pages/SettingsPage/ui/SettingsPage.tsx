@@ -2,7 +2,6 @@ import { ThemeSettingsCard } from "@/features/themeSwitcher";
 import { SettingsTransferCard } from "@/features/appSettingsTransfer";
 import { ProfileRingGoalsSettingsCard } from "@/features/profileRingGoalsSettings";
 import {
-  AiFillSettingsCard,
   DefaultExercisesSettingsCard,
   ExerciseCardDisplaySettingsCard,
   RestBetweenSetsSettingsCard,
@@ -33,8 +32,6 @@ export const SettingsPage = () => {
       <WorkoutSummaryDisplaySettingsCard />
 
       <RestBetweenSetsSettingsCard />
-
-      <AiFillSettingsCard />
 
       <ExerciseCardDisplaySettingsCard />
 
