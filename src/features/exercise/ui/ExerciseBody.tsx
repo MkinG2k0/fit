@@ -5,6 +5,11 @@ import { type ChangeEvent, useCallback, useEffect, useRef } from "react";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { useCalendarStore } from "@/entities/calendarDay";
 import type { Exercise, ExerciseSet } from "@/entities/exercise";
+import {
+  getLoadTableCurrentWeek,
+  getPlanSetsForWeek,
+  useLoadTableStore,
+} from "@/entities/loadTable";
 import { useUserStore } from "@/entities/user";
 import { StatisticCard } from "@/widgets/statisticCard";
 import { cn } from "@/shared/lib/classMerge";
@@ -56,7 +61,7 @@ export const ExerciseBody = ({
     [exercise, onChangeHandler],
   );
 
-  const handleAddSet = useCallback(() => {
+  const handleAddSet = useCallback(async () => {
     if (addSetGuardRef.current) {
       return;
     }
@@ -78,14 +83,46 @@ export const ExerciseBody = ({
         endNow,
       );
 
-      const nextSetIndex = exercise.sets.length;
-      const prefill = prefillFromLastSession
-        ? getSetPrefillFromLastSession(lastSession?.sets, nextSetIndex)
-        : null;
+      let weight = lastSet?.weight ?? 0;
+      let reps = lastSet?.reps ?? 0;
+
+      const catalogExerciseId = exercise.catalogExerciseId?.trim();
+      const trackedEntry = catalogExerciseId
+        ? useLoadTableStore
+            .getState()
+            .exercises.find(
+              (item) =>
+                item.catalogExerciseId === catalogExerciseId &&
+                item.isTracking,
+            )
+        : undefined;
+
+      if (trackedEntry) {
+        const { currentWeek } = await getLoadTableCurrentWeek(
+          trackedEntry.catalogExerciseId,
+          trackedEntry.createdAt,
+        );
+        const planSet = getPlanSetsForWeek(
+          trackedEntry.maxKg,
+          currentWeek,
+        )[0];
+        if (planSet) {
+          weight = planSet.weight;
+          reps = planSet.reps;
+        }
+      } else if (prefillFromLastSession) {
+        const nextSetIndex = exercise.sets.length;
+        const prefill = getSetPrefillFromLastSession(
+          lastSession?.sets,
+          nextSetIndex,
+        );
+        weight = prefill.weight;
+        reps = prefill.reps;
+      }
 
       addSetToExercise(exercise, {
-        weight: prefill?.weight ?? lastSet?.weight ?? 0,
-        reps: prefill?.reps ?? lastSet?.reps ?? 0,
+        weight,
+        reps,
         startTime: startTime.toISOString(),
         endTime: endTime.toISOString(),
       });
@@ -104,6 +141,20 @@ export const ExerciseBody = ({
       return;
     }
     if (firstSetPrefillAttemptedRef.current === exercise.id) {
+      return;
+    }
+
+    const catalogExerciseId = exercise.catalogExerciseId?.trim();
+    const isTracked = catalogExerciseId
+      ? useLoadTableStore
+          .getState()
+          .exercises.some(
+            (item) =>
+              item.catalogExerciseId === catalogExerciseId && item.isTracking,
+          )
+      : false;
+    if (isTracked) {
+      firstSetPrefillAttemptedRef.current = exercise.id;
       return;
     }
 

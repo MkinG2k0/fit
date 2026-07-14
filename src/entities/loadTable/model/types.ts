@@ -3,6 +3,8 @@ export interface LoadTableExercise {
   catalogExerciseId: string;
   maxKg: number;
   createdAt: string;
+  /** Если true — при «Добавить подход» в дневнике подставляются вес/reps из плана. */
+  isTracking: boolean;
 }
 
 export interface LoadTableExerciseDraft {

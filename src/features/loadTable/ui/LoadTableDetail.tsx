@@ -1,9 +1,7 @@
 import { type ChangeEvent, useEffect, useState } from "react";
-import { useCalendarStore } from "@/entities/calendarDay";
 import { findCatalogExerciseById, useExerciseStore } from "@/entities/exercise";
 import {
   getLoadTableCurrentWeek,
-  getPlanSetsForWeek,
   useLoadTableStore,
 } from "@/entities/loadTable";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
@@ -30,16 +28,13 @@ export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) =>
     state.exercises.find((item) => item.id === exerciseId),
   );
   const updateExercise = useLoadTableStore((state) => state.updateExercise);
+  const setExerciseTracking = useLoadTableStore(
+    (state) => state.setExerciseTracking,
+  );
   const resetExerciseProgress = useLoadTableStore(
     (state) => state.resetExerciseProgress,
   );
   const errorMessage = useLoadTableStore((state) => state.errorMessage);
-
-  const selectedDate = useCalendarStore((state) => state.selectedDate);
-  const days = useCalendarStore((state) => state.days);
-  const syncExerciseSetsFromPlan = useCalendarStore(
-    (state) => state.syncExerciseSetsFromPlan,
-  );
 
   const [currentWeek, setCurrentWeek] = useState(1);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -88,24 +83,13 @@ export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) =>
     updateExercise(exercise.id, { maxKg: next });
   };
 
-  const handleTrack = () => {
-    const planSets = getPlanSetsForWeek(exercise.maxKg, currentWeek);
-    const dateKey = selectedDate.format("DD-MM-YYYY");
-    const dayExercises = days[dateKey]?.exercises ?? [];
-    const dayExercise = dayExercises.find(
-      (item) => item.catalogExerciseId === exercise.catalogExerciseId,
-    );
-
-    if (!dayExercise) {
-      setStatusMessage(
-        "Упражнения нет в выбранном дне календаря. Добавьте его в дневник, затем нажмите «Отслеживать».",
-      );
-      return;
-    }
-
-    syncExerciseSetsFromPlan(dayExercise, planSets);
+  const handleTrackToggle = () => {
+    const nextTracking = !exercise.isTracking;
+    setExerciseTracking(exercise.id, nextTracking);
     setStatusMessage(
-      `Подходы обновлены: 3×${planSets[0]!.weight} кг × ${planSets[0]!.reps} (неделя ${currentWeek}).`,
+      nextTracking
+        ? "Отслеживание включено. При «Добавить подход» подставятся вес и повторы из таблицы."
+        : "Отслеживание выключено.",
     );
   };
 
@@ -119,19 +103,20 @@ export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) =>
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2">
-        <Button type="button" variant="outline" size="sm" onClick={onBack}>
-          Назад
-        </Button>
         <h2 className="min-w-0 truncate text-base font-medium text-foreground">
           {name}
         </h2>
+      <p className="text-sm text-muted-foreground">3 подхода / 2 раза в неделю</p>
       </div>
 
-      <p className="text-sm text-muted-foreground">3 подхода / 2 раза в неделю</p>
 
       <div className="flex flex-wrap gap-2">
-        <Button type="button" onClick={handleTrack}>
-          Отслеживать
+        <Button
+          type="button"
+          variant={exercise.isTracking ? "secondary" : "default"}
+          onClick={handleTrackToggle}
+        >
+          {exercise.isTracking ? "Отслеживается" : "Отслеживать"}
         </Button>
         <Button
           type="button"

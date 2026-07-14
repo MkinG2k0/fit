@@ -19,6 +19,8 @@ interface LoadTableActions {
   addExercise: (draft: LoadTableExerciseDraft) => void;
   updateExercise: (id: string, patch: LoadTableExerciseUpdate) => void;
   removeExercise: (id: string) => void;
+  /** Включить/выключить подстановку плана при добавлении подхода. */
+  setExerciseTracking: (id: string, isTracking: boolean) => void;
   /** Сброс цикла: createdAt = сейчас, счёт недель начинается с 1. */
   resetExerciseProgress: (id: string) => void;
   clearError: () => void;
@@ -80,6 +82,7 @@ export const useLoadTableStore = create<LoadTableState & LoadTableActions>()(
             catalogExerciseId,
             maxKg: draft.maxKg,
             createdAt: new Date().toISOString(),
+            isTracking: false,
           };
 
           return {
@@ -134,6 +137,32 @@ export const useLoadTableStore = create<LoadTableState & LoadTableActions>()(
           errorMessage: null,
         })),
 
+      setExerciseTracking: (id, isTracking) =>
+        set((state) => {
+          const existing = state.exercises.find((exercise) => exercise.id === id);
+          if (!existing) {
+            return {
+              ...state,
+              status: "error",
+              errorMessage: "Упражнение не найдено",
+            };
+          }
+
+          return {
+            ...state,
+            exercises: state.exercises.map((exercise) =>
+              exercise.id === id
+                ? {
+                    ...exercise,
+                    isTracking,
+                  }
+                : exercise,
+            ),
+            status: "idle",
+            errorMessage: null,
+          };
+        }),
+
       resetExerciseProgress: (id) =>
         set((state) => {
           const existing = state.exercises.find((exercise) => exercise.id === id);
@@ -170,6 +199,20 @@ export const useLoadTableStore = create<LoadTableState & LoadTableActions>()(
     {
       name: getLoadTableStorageKey(),
       storage: createJSONStorage(() => loadTableStorageApi),
+      merge: (persisted, current) => {
+        const persistedState = persisted as Partial<LoadTableState> | undefined;
+        const exercises = (persistedState?.exercises ?? current.exercises).map(
+          (exercise) => ({
+            ...exercise,
+            isTracking: exercise.isTracking === true,
+          }),
+        );
+        return {
+          ...current,
+          ...persistedState,
+          exercises,
+        };
+      },
     },
   ),
 );
