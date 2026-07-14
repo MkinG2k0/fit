@@ -19,6 +19,8 @@ interface LoadTableActions {
   addExercise: (draft: LoadTableExerciseDraft) => void;
   updateExercise: (id: string, patch: LoadTableExerciseUpdate) => void;
   removeExercise: (id: string) => void;
+  /** Сброс цикла: createdAt = сейчас, счёт недель начинается с 1. */
+  resetExerciseProgress: (id: string) => void;
   clearError: () => void;
 }
 
@@ -131,6 +133,32 @@ export const useLoadTableStore = create<LoadTableState & LoadTableActions>()(
           status: "idle",
           errorMessage: null,
         })),
+
+      resetExerciseProgress: (id) =>
+        set((state) => {
+          const existing = state.exercises.find((exercise) => exercise.id === id);
+          if (!existing) {
+            return {
+              ...state,
+              status: "error",
+              errorMessage: "Упражнение не найдено",
+            };
+          }
+
+          return {
+            ...state,
+            exercises: state.exercises.map((exercise) =>
+              exercise.id === id
+                ? {
+                    ...exercise,
+                    createdAt: new Date().toISOString(),
+                  }
+                : exercise,
+            ),
+            status: "idle",
+            errorMessage: null,
+          };
+        }),
 
       clearError: () =>
         set((state) => ({
