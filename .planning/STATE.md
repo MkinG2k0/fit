@@ -107,6 +107,7 @@ None yet.
 | 260714-wvs | смержить два упражнения каталога (ремап журнала/пресетов) | 2026-07-14 | 4c9c41d | [260714-wvs-merge-exercises](./quick/260714-wvs-merge-exercises/) |
 | 260715-052 | таблица нагрузок: 16 недель Жим.xlsx, MAX, body-metrics | 2026-07-15 | f6d139a | [260715-052-16-xlsx-max-body-metrics-editable](./quick/260715-052-16-xlsx-max-body-metrics-editable/) |
 | fast | load-table: повторы из шаблона, убрать maxReps из форм | 2026-07-15 | 1fbde97 | — |
+| fast | load-table: вес тела в модалке только без записи в параметрах | 2026-07-15 | f293b66 | — |
 
 ## Session Continuity
 
