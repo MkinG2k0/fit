@@ -7,7 +7,7 @@ current_phase_name: Quick Logging Core & Local Persistence
 status: ready
 stopped_at: Completed 260715-0qr-01 load-table week prefill
 last_updated: "2026-07-14T21:45:00.000Z"
-last_activity: "2026-07-15 - Completed quick task 260715-0qr: автозаполнение из load-table"
+last_activity: "2026-07-15 - Removed body weight from load-table UI"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -110,6 +110,7 @@ None yet.
 | fast | load-table: повторы из шаблона, убрать maxReps из форм | 2026-07-15 | 1fbde97 | — |
 | fast | load-table: вес тела в модалке только без записи в параметрах | 2026-07-15 | f293b66 | — |
 | 260715-0qr | автозаполнение из load-table: неделя, Отслеживать, Сбросить | 2026-07-15 | 0d71e13 | [260715-0qr-load-table-createdat-loadtabledetail-cre](./quick/260715-0qr-load-table-createdat-loadtabledetail-cre/) |
+| fast | load-table: убрать вес тела с деталки и модалки добавления | 2026-07-15 | b262bc4 | — |
 
 ## Session Continuity
 
