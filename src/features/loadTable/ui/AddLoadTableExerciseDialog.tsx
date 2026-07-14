@@ -63,6 +63,8 @@ export const AddLoadTableExerciseDialog = ({
     [bodyEntries],
   );
 
+  const needsBodyWeight = latestWeight === null;
+
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedCatalogId, setSelectedCatalogId] = useState("");
   const [maxKg, setMaxKg] = useState("");
@@ -75,14 +77,14 @@ export const AddLoadTableExerciseDialog = ({
   const resetForm = () => {
     setSelectedCatalogId("");
     setMaxKg("");
-    setWeightKg(latestWeight !== null ? String(latestWeight) : "");
+    setWeightKg("");
     setFormError(null);
     clearError();
   };
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (nextOpen) {
-      setWeightKg(latestWeight !== null ? String(latestWeight) : "");
+      setWeightKg("");
       setFormError(null);
       clearError();
     } else {
@@ -94,7 +96,6 @@ export const AddLoadTableExerciseDialog = ({
 
   const handleConfirm = () => {
     const parsedMaxKg = Number(maxKg.replace(",", "."));
-    const parsedWeightKg = Number(weightKg.replace(",", "."));
 
     if (!selectedCatalogId.trim()) {
       setFormError("Выберите упражнение");
@@ -104,15 +105,18 @@ export const AddLoadTableExerciseDialog = ({
       setFormError("Укажите положительный MAX (кг)");
       return;
     }
-    if (!isPositiveFiniteNumber(parsedWeightKg)) {
-      setFormError("Укажите положительный вес тела (кг)");
-      return;
-    }
 
-    addBodyEntry({
-      recordedAt: toTodayIsoDate(),
-      measurements: { weightKg: parsedWeightKg },
-    });
+    if (needsBodyWeight) {
+      const parsedWeightKg = Number(weightKg.replace(",", "."));
+      if (!isPositiveFiniteNumber(parsedWeightKg)) {
+        setFormError("Укажите положительный вес тела (кг)");
+        return;
+      }
+      addBodyEntry({
+        recordedAt: toTodayIsoDate(),
+        measurements: { weightKg: parsedWeightKg },
+      });
+    }
 
     addExercise({
       catalogExerciseId: selectedCatalogId,
@@ -164,18 +168,20 @@ export const AddLoadTableExerciseDialog = ({
               />
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="load-table-body-weight">Вес тела (кг)</Label>
-              <Input
-                id="load-table-body-weight"
-                type="number"
-                inputMode="decimal"
-                min={0}
-                step={0.1}
-                value={weightKg}
-                onChange={(event) => setWeightKg(event.target.value)}
-              />
-            </div>
+            {needsBodyWeight && (
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="load-table-body-weight">Вес тела (кг)</Label>
+                <Input
+                  id="load-table-body-weight"
+                  type="number"
+                  inputMode="decimal"
+                  min={0}
+                  step={0.1}
+                  value={weightKg}
+                  onChange={(event) => setWeightKg(event.target.value)}
+                />
+              </div>
+            )}
 
             {(formError || loadTableError) && (
               <p className="text-sm text-destructive">
