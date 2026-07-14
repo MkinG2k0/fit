@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AiGatewayError,
   createChatCompletion,
@@ -14,6 +14,10 @@ import { buildWorkoutLogText } from "../lib/buildWorkoutLogText";
 import { filterDaysByPeriod } from "../lib/filterDaysByPeriod";
 import { buildUserPrompt, getSystemPrompt } from "../lib/prompts";
 import {
+  loadSavedRecommendation,
+  saveRecommendation,
+} from "../lib/recommendationStorage";
+import {
   AI_RECOMMENDATION_PERIODS,
   getPeriodLabel,
   type AiRecommendationPeriod,
@@ -27,8 +31,27 @@ export const AiRecommendationsPanel = () => {
   const [error, setError] = useState<string | null>(null);
   const [emptyMessage, setEmptyMessage] = useState<string | null>(null);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadSaved = async () => {
+      setError(null);
+      setEmptyMessage(null);
+      const saved = await loadSavedRecommendation(period);
+      if (cancelled) {
+        return;
+      }
+      setResult(saved?.content ?? null);
+    };
+
+    void loadSaved();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [period]);
+
   const handleRequest = async () => {
-    setResult(null);
     setError(null);
     setEmptyMessage(null);
     setLoading(true);
@@ -60,6 +83,7 @@ export const AiRecommendationsPanel = () => {
         return;
       }
 
+      await saveRecommendation(period, content);
       setResult(content);
     } catch (err) {
       if (err instanceof AiGatewayError) {
@@ -73,6 +97,8 @@ export const AiRecommendationsPanel = () => {
       setLoading(false);
     }
   };
+
+  const hasSaved = Boolean(result);
 
   return (
     <div className="grid gap-4">
@@ -111,7 +137,11 @@ export const AiRecommendationsPanel = () => {
         onClick={() => void handleRequest()}
         disabled={loading}
       >
-        {loading ? "Загрузка…" : "Получить рекомендации"}
+        {loading
+          ? "Загрузка…"
+          : hasSaved
+            ? "Обновить рекомендации"
+            : "Получить рекомендации"}
       </Button>
 
       {loading ? (
