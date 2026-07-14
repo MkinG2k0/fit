@@ -40,9 +40,6 @@ const validateDraft = (draft: LoadTableExerciseDraft) => {
   if (!isPositiveFiniteNumber(draft.maxKg)) {
     return "Укажите положительный MAX (кг)";
   }
-  if (!isPositiveFiniteNumber(draft.maxReps)) {
-    return "Укажите положительное число повторов";
-  }
   return null;
 };
 
@@ -80,7 +77,6 @@ export const useLoadTableStore = create<LoadTableState & LoadTableActions>()(
             id: createExerciseId(),
             catalogExerciseId,
             maxKg: draft.maxKg,
-            maxReps: draft.maxReps,
             createdAt: new Date().toISOString(),
           };
 
@@ -104,21 +100,12 @@ export const useLoadTableStore = create<LoadTableState & LoadTableActions>()(
           }
 
           const nextMaxKg = patch.maxKg !== undefined ? patch.maxKg : existing.maxKg;
-          const nextMaxReps =
-            patch.maxReps !== undefined ? patch.maxReps : existing.maxReps;
 
           if (patch.maxKg !== undefined && !isPositiveFiniteNumber(nextMaxKg)) {
             return {
               ...state,
               status: "error",
               errorMessage: "Укажите положительный MAX (кг)",
-            };
-          }
-          if (patch.maxReps !== undefined && !isPositiveFiniteNumber(nextMaxReps)) {
-            return {
-              ...state,
-              status: "error",
-              errorMessage: "Укажите положительное число повторов",
             };
           }
 
@@ -129,7 +116,6 @@ export const useLoadTableStore = create<LoadTableState & LoadTableActions>()(
                 ? {
                     ...exercise,
                     maxKg: nextMaxKg,
-                    maxReps: nextMaxReps,
                   }
                 : exercise,
             ),

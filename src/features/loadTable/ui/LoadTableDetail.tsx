@@ -65,14 +65,6 @@ export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) =>
     updateExercise(exercise.id, { maxKg: next });
   };
 
-  const handleMaxRepsChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const next = Number(event.target.value.replace(",", "."));
-    if (!Number.isFinite(next)) {
-      return;
-    }
-    updateExercise(exercise.id, { maxReps: next });
-  };
-
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2">
@@ -86,7 +78,7 @@ export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) =>
 
       <p className="text-sm text-muted-foreground">3 подхода / 2 раза в неделю</p>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="load-table-detail-max">MAX (кг)</Label>
           <Input
@@ -97,18 +89,6 @@ export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) =>
             step={0.5}
             value={exercise.maxKg}
             onChange={handleMaxKgChange}
-          />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="load-table-detail-reps">Макс. повторы</Label>
-          <Input
-            id="load-table-detail-reps"
-            type="number"
-            inputMode="numeric"
-            min={1}
-            step={1}
-            value={exercise.maxReps}
-            onChange={handleMaxRepsChange}
           />
         </div>
         <div className="flex flex-col gap-1.5">

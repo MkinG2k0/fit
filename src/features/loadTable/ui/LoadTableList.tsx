@@ -53,7 +53,7 @@ export const LoadTableList = ({ onSelect, onAddClick }: LoadTableListProps) => {
                     {name}
                   </span>
                   <span className="text-xs text-muted-foreground">
-                    MAX {entry.maxKg} кг · макс. {entry.maxReps} повт.
+                    MAX {entry.maxKg} кг
                   </span>
                 </button>
                 <Button

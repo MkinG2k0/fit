@@ -2,19 +2,16 @@ export interface LoadTableExercise {
   id: string;
   catalogExerciseId: string;
   maxKg: number;
-  maxReps: number;
   createdAt: string;
 }
 
 export interface LoadTableExerciseDraft {
   catalogExerciseId: string;
   maxKg: number;
-  maxReps: number;
 }
 
 export interface LoadTableExerciseUpdate {
   maxKg?: number;
-  maxReps?: number;
 }
 
 export interface LoadTableScheduleWeek {

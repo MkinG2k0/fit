@@ -66,7 +66,6 @@ export const AddLoadTableExerciseDialog = ({
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedCatalogId, setSelectedCatalogId] = useState("");
   const [maxKg, setMaxKg] = useState("");
-  const [maxReps, setMaxReps] = useState("");
   const [weightKg, setWeightKg] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -76,7 +75,6 @@ export const AddLoadTableExerciseDialog = ({
   const resetForm = () => {
     setSelectedCatalogId("");
     setMaxKg("");
-    setMaxReps("");
     setWeightKg(latestWeight !== null ? String(latestWeight) : "");
     setFormError(null);
     clearError();
@@ -96,7 +94,6 @@ export const AddLoadTableExerciseDialog = ({
 
   const handleConfirm = () => {
     const parsedMaxKg = Number(maxKg.replace(",", "."));
-    const parsedMaxReps = Number(maxReps.replace(",", "."));
     const parsedWeightKg = Number(weightKg.replace(",", "."));
 
     if (!selectedCatalogId.trim()) {
@@ -105,10 +102,6 @@ export const AddLoadTableExerciseDialog = ({
     }
     if (!isPositiveFiniteNumber(parsedMaxKg)) {
       setFormError("Укажите положительный MAX (кг)");
-      return;
-    }
-    if (!isPositiveFiniteNumber(parsedMaxReps)) {
-      setFormError("Укажите положительное число повторов");
       return;
     }
     if (!isPositiveFiniteNumber(parsedWeightKg)) {
@@ -124,7 +117,6 @@ export const AddLoadTableExerciseDialog = ({
     addExercise({
       catalogExerciseId: selectedCatalogId,
       maxKg: parsedMaxKg,
-      maxReps: parsedMaxReps,
     });
 
     const storeError = useLoadTableStore.getState().errorMessage;
@@ -169,19 +161,6 @@ export const AddLoadTableExerciseDialog = ({
                 step={0.5}
                 value={maxKg}
                 onChange={(event) => setMaxKg(event.target.value)}
-              />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="load-table-max-reps">Макс. повторы</Label>
-              <Input
-                id="load-table-max-reps"
-                type="number"
-                inputMode="numeric"
-                min={1}
-                step={1}
-                value={maxReps}
-                onChange={(event) => setMaxReps(event.target.value)}
               />
             </div>
 
