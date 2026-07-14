@@ -107,6 +107,7 @@ export const ExerciseBody = ({
   const prefillFromLastSession = useUserStore(
     (s) => s.exerciseCardShowLastSessionResult ?? false,
   );
+  const aiFillEnabled = useUserStore((s) => s.aiFillEnabled ?? false);
 
   const onChangeHandler = useCalendarStore((store) => store.setExerciseValues);
   const addSetToExercise = useCalendarStore((store) => store.addSetToExercise);
@@ -426,17 +427,19 @@ export const ExerciseBody = ({
         <CustomButton classes={"flex-1"} buttonHandler={handleAddSet}>
           Добавить подход
         </CustomButton>
-        <Button
-          type="button"
-          variant="outline"
-          className="flex-1 sm:flex-none"
-          disabled={aiFillLoading}
-          onClick={() => {
-            void handleAiFill();
-          }}
-        >
-          {aiFillLoading ? "Загрузка…" : "ИИ-заполнение"}
-        </Button>
+        {aiFillEnabled ? (
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1 sm:flex-none"
+            disabled={aiFillLoading}
+            onClick={() => {
+              void handleAiFill();
+            }}
+          >
+            {aiFillLoading ? "Загрузка…" : "ИИ-заполнение"}
+          </Button>
+        ) : null}
         <Button
           variant="outline"
           className="text-destructive"
@@ -446,12 +449,12 @@ export const ExerciseBody = ({
           <Trash2 />
         </Button>
       </div>
-      {aiFillEmptyMessage ? (
+      {aiFillEnabled && aiFillEmptyMessage ? (
         <p className="w-full text-xs text-muted-foreground" role="status">
           {aiFillEmptyMessage}
         </p>
       ) : null}
-      {aiFillError ? (
+      {aiFillEnabled && aiFillError ? (
         <p className="w-full text-xs text-destructive" role="alert">
           {aiFillError}
         </p>
