@@ -13,3 +13,4 @@ export { CreatePresetPage } from "./CreatePresetPage";
 export { LoadTablePage } from "./LoadTablePage";
 export { LoadTableDetailPage } from "./LoadTableDetailPage";
 export { AiRecommendationsPage } from "./AiRecommendationsPage";
+export { NewsPage } from "./NewsPage";

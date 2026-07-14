@@ -4,6 +4,7 @@ import {
   Cog,
   House,
   Menu,
+  Newspaper,
   Ruler,
   ScrollText,
   Sparkles,
@@ -102,6 +103,16 @@ export const ProfileDropDownMenu = () => {
           >
             <ChartColumnBig />
             <div>Аналитика</div>
+          </Button>
+
+          <Separator />
+          <Button
+            variant="ghost"
+            className="justify-start"
+            onClick={() => handleNavigate("/news")}
+          >
+            <Newspaper />
+            <div>Новости</div>
           </Button>
 
           <Separator />

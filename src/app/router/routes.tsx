@@ -57,6 +57,11 @@ const AiRecommendationsPage = lazy(() =>
     default: m.AiRecommendationsPage,
   })),
 );
+const NewsPage = lazy(() =>
+  import("@/pages/NewsPage").then((m) => ({
+    default: m.NewsPage,
+  })),
+);
 
 export const AppRoutes = () => {
   return (
@@ -139,6 +144,14 @@ export const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <AiRecommendationsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/news"
+        element={
+          <ProtectedRoute>
+            <NewsPage />
           </ProtectedRoute>
         }
       />
