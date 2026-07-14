@@ -5,9 +5,9 @@ milestone_name: milestone
 current_phase: 1
 current_phase_name: Quick Logging Core & Local Persistence
 status: ready
-stopped_at: Completed 260715-308 AI fill exercise sets button
-last_updated: "2026-07-14T23:15:17.000Z"
-last_activity: "2026-07-15 - AI fill «ИИ-заполнение» append-only for exercise sets"
+stopped_at: Completed 260715-3fn rest timer deadline + settings
+last_updated: "2026-07-14T23:42:00.000Z"
+last_activity: "2026-07-15 - Rest timer fix with react-timer-hook and between-sets settings"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -30,7 +30,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-14)
 Phase: 1 of 5 (Quick Logging Core & Local Persistence)
 Plan: 0 of 0 in current phase
 Status: Ready to execute
-Last activity: 2026-07-15 - Completed quick task 260715-308: ИИ-заполнение подходов (6 мес, append only)
+Last activity: 2026-07-15 - Completed quick task 260715-3fn: rest timer deadline + between-sets settings
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -73,6 +73,7 @@ Recent decisions affecting current work:
 - [260715-052] Load table: body-metrics weight on add (detail read-only); user MAX; fixed 16-week Жим.xlsx template; UI-only 3×2 caption; `/load-table` nav; multi-exercise list with editable MAX/maxReps.
 - [260715-0qr] Load-table week from sessions since createdAt; Track prefills 3 plan sets; Reset updates createdAt; current week highlighted.
 - [260715-18z] Load-table sessions match via resolved catalog id or name; detail refetches currentWeek on revisit/show.
+- [260715-3fn] Rest timer uses persisted endAt deadline + react-timer-hook; rest-between-sets default 120s auto-starts after add set.
 
 ### Pending Todos
 
@@ -119,9 +120,10 @@ None yet.
 | fast | AI рекомендации: рендер markdown ответа | 2026-07-15 | 25a308f | — |
 | 260715-2o1 | AI рекомендации: типы + свой текстовый запрос | 2026-07-15 | 4ff2295 | [260715-2o1-ai](./quick/260715-2o1-ai/) |
 | 260715-308 | ИИ-заполнение подходов: 6 мес истории, append only | 2026-07-15 | ee8f6e5 | [260715-308-ai-fill-exercise-sets-button-send-6-mont](./quick/260715-308-ai-fill-exercise-sets-button-send-6-mont/) |
+| 260715-3fn | Таймер: deadline + отдых между подходами в сводке | 2026-07-15 | 8748b62 | [260715-3fn-2](./quick/260715-3fn-2/) |
 
 ## Session Continuity
 
-Last session: 2026-07-14T23:15:17.000Z
-Stopped at: Completed 260715-308 AI fill exercise sets button
+Last session: 2026-07-14T23:42:00.000Z
+Stopped at: Completed 260715-3fn rest timer deadline + settings
 Resume file: None
