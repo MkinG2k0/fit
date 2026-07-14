@@ -1,4 +1,5 @@
 import { type ChangeEvent, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { findCatalogExerciseById, useExerciseStore } from "@/entities/exercise";
 import {
   getLoadTableCurrentWeek,
@@ -23,6 +24,7 @@ interface LoadTableDetailProps {
 }
 
 export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) => {
+  const location = useLocation();
   const catalog = useExerciseStore((state) => state.exercises);
   const exercise = useLoadTableStore((state) =>
     state.exercises.find((item) => item.id === exerciseId),
@@ -45,20 +47,52 @@ export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) =>
       return;
     }
 
-    let cancelled = false;
-    void getLoadTableCurrentWeek(
+    const exerciseName = findCatalogExerciseById(
+      catalog,
       exercise.catalogExerciseId,
-      exercise.createdAt,
-    ).then((result) => {
-      if (!cancelled) {
-        setCurrentWeek(result.currentWeek);
+    )?.name;
+
+    let cancelled = false;
+
+    const fetchWeek = () => {
+      void getLoadTableCurrentWeek(
+        exercise.catalogExerciseId,
+        exercise.createdAt,
+        exerciseName,
+      ).then((result) => {
+        if (!cancelled) {
+          setCurrentWeek(result.currentWeek);
+        }
+      });
+    };
+
+    fetchWeek();
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        fetchWeek();
       }
-    });
+    };
+
+    const onPageShow = () => {
+      fetchWeek();
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("pageshow", onPageShow);
 
     return () => {
       cancelled = true;
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("pageshow", onPageShow);
     };
-  }, [exercise?.id, exercise?.createdAt, exercise?.catalogExerciseId]);
+  }, [
+    exercise?.id,
+    exercise?.createdAt,
+    exercise?.catalogExerciseId,
+    catalog,
+    location.key,
+  ]);
 
   if (!exercise) {
     return (
