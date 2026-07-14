@@ -5,9 +5,9 @@ milestone_name: milestone
 current_phase: 1
 current_phase_name: Quick Logging Core & Local Persistence
 status: ready
-stopped_at: Completed 260715-0qr-01 load-table week prefill
-last_updated: "2026-07-14T21:45:00.000Z"
-last_activity: "2026-07-15 - Removed body weight from load-table UI"
+stopped_at: Completed 260715-18z-01 load-table week not advancing
+last_updated: "2026-07-14T21:59:00.000Z"
+last_activity: "2026-07-15 - Fixed load-table week stuck on week 1 after logging"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -30,7 +30,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-14)
 Phase: 1 of 5 (Quick Logging Core & Local Persistence)
 Plan: 0 of 0 in current phase
 Status: Ready to execute
-Last activity: 2026-07-15 - Removed body weight from load-table UI
+Last activity: 2026-07-15 - Fixed load-table week stuck on week 1 after logging
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -72,6 +72,7 @@ Recent decisions affecting current work:
 - [260714-wvs] Same-day merge keeps two cards; remaps catalogExerciseId; target metadata preserved; stats derived.
 - [260715-052] Load table: body-metrics weight on add (detail read-only); user MAX; fixed 16-week Жим.xlsx template; UI-only 3×2 caption; `/load-table` nav; multi-exercise list with editable MAX/maxReps.
 - [260715-0qr] Load-table week from sessions since createdAt; Track prefills 3 plan sets; Reset updates createdAt; current week highlighted.
+- [260715-18z] Load-table sessions match via resolved catalog id or name; detail refetches currentWeek on revisit/show.
 
 ### Pending Todos
 
@@ -112,9 +113,10 @@ None yet.
 | 260715-0qr | автозаполнение из load-table: неделя, Отслеживать, Сбросить | 2026-07-15 | 0d71e13 | [260715-0qr-load-table-createdat-loadtabledetail-cre](./quick/260715-0qr-load-table-createdat-loadtabledetail-cre/) |
 | fast | load-table: убрать вес тела с деталки и модалки добавления | 2026-07-15 | b262bc4 | — |
 | fast | load-table: Отслеживать → префилл при «Добавить подход» | 2026-07-15 | 63d83e3 | — |
+| 260715-18z | load-table: неделя не двигается после логирования | 2026-07-15 | 2552c6d | [260715-18z-fix-load-table-week-not-advancing-after-](./quick/260715-18z-fix-load-table-week-not-advancing-after-/) |
 
 ## Session Continuity
 
-Last session: 2026-07-14T21:45:00.000Z
-Stopped at: Completed 260715-0qr-01 load-table week prefill
+Last session: 2026-07-14T21:59:00.000Z
+Stopped at: Completed 260715-18z-01 load-table week not advancing
 Resume file: None
