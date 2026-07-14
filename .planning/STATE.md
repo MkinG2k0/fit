@@ -30,7 +30,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-14)
 Phase: 1 of 5 (Quick Logging Core & Local Persistence)
 Plan: 0 of 0 in current phase
 Status: Ready to execute
-Last activity: 2026-07-14 - Completed quick task 260715-2az: AI рекомендации: страница выбора периода и запрос к ChatGPT gateway
+Last activity: 2026-07-14 - Completed quick task 260715-2o1: AI рекомендации: типы рекомендаций + свой текстовый запрос
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -117,6 +117,7 @@ None yet.
 | 260715-2az | AI рекомендации: gateway ChatGPT + период журнала | 2026-07-15 | 6063608 | [260715-2az-ai-chatgpt-gateway](./quick/260715-2az-ai-chatgpt-gateway/) |
 | fast | AI рекомендации: сохранять и обновлять при повторном запросе | 2026-07-15 | 4063e32 | — |
 | fast | AI рекомендации: рендер markdown ответа | 2026-07-15 | 25a308f | — |
+| 260715-2o1 | AI рекомендации: типы + свой текстовый запрос | 2026-07-15 | 4ff2295 | [260715-2o1-ai](./quick/260715-2o1-ai/) |
 
 ## Session Continuity
 
