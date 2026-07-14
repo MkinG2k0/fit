@@ -1,4 +1,5 @@
 export { Timer } from "./ui/timer.tsx";
+export { RestCountdownBadge } from "./ui/RestCountdownBadge";
 export {
   useRestTimerStore,
   getRemainingMs,

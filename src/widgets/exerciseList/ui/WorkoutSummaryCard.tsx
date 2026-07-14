@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { formatKcalOneDecimal } from "@/features/exercise/calories";
+import { RestCountdownBadge } from "@/features/timer";
 import { cn, formatTonnage } from "@shared/lib";
 
 export interface WorkoutSummary {
@@ -42,11 +43,23 @@ export const WorkoutSummaryCard = ({
         <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
           Общая информация о тренировке
         </p>
-        {isWorkoutExtraOpen ? (
-          <ChevronUp className="size-4 shrink-0 text-muted-foreground" />
-        ) : (
-          <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
-        )}
+        <div className="flex shrink-0 items-center gap-2">
+          <div
+            onClick={(event) => {
+              event.stopPropagation();
+            }}
+            onKeyDown={(event) => {
+              event.stopPropagation();
+            }}
+          >
+            <RestCountdownBadge />
+          </div>
+          {isWorkoutExtraOpen ? (
+            <ChevronUp className="size-4 shrink-0 text-muted-foreground" />
+          ) : (
+            <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
+          )}
+        </div>
       </div>
       <div
         className={cn(

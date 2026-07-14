@@ -21,6 +21,10 @@ import { useCalendarStore } from "@/entities/calendarDay";
 import type { Exercise, ExerciseSet } from "@/entities/exercise";
 import { getPlanSetsForWeek, useLoadTableStore } from "@/entities/loadTable";
 import { useUserStore } from "@/entities/user";
+import {
+  DEFAULT_REST_DURATION_SEC,
+  useRestTimerStore,
+} from "@/features/timer";
 import { StatisticCard } from "@/widgets/statisticCard";
 import {
   AiGatewayError,
@@ -49,6 +53,17 @@ const isExerciseCardEmpty = (sets: ExerciseSet[]) => {
     return true;
   }
   return sets.every((set) => set.reps === 0 && set.weight === 0);
+};
+
+const startRestBetweenSetsIfEnabled = () => {
+  const { restBetweenSetsEnabled, restBetweenSetsSec } =
+    useUserStore.getState();
+  if (!restBetweenSetsEnabled) {
+    return;
+  }
+  useRestTimerStore
+    .getState()
+    .start(restBetweenSetsSec ?? DEFAULT_REST_DURATION_SEC);
 };
 
 export const ExerciseBody = ({
@@ -186,6 +201,7 @@ export const ExerciseBody = ({
         startTime: startTime.toISOString(),
         endTime: endTime.toISOString(),
       });
+      startRestBetweenSetsIfEnabled();
     } finally {
       addSetGuardRef.current = false;
     }
@@ -271,6 +287,10 @@ export const ExerciseBody = ({
         });
 
         previousEnd = endTime;
+      }
+
+      if (recommendedSets.length > 0) {
+        startRestBetweenSetsIfEnabled();
       }
     } catch (error) {
       if (error instanceof AiGatewayError) {
