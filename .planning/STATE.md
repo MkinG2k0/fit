@@ -2,14 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
+current_phase: 1
+current_phase_name: Quick Logging Core & Local Persistence
 status: executing
-stopped_at: Completed quick task 260714-wvs merge exercises
-last_updated: "2026-07-14T20:50:28.000Z"
-last_activity: "2026-07-14 - Completed quick task 260714-wvs: merge catalog exercises"
+stopped_at: Completed 260715-052-01 load-table quick plan
+last_updated: "2026-07-14T21:20:00.000Z"
+last_activity: "2026-07-15 - Completed quick task 260715-052: таблица нагрузок"
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 0
+  total_plans: 3
   completed_plans: 0
   percent: 0
 ---
@@ -28,7 +30,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-14)
 Phase: 1 of 5 (Quick Logging Core & Local Persistence)
 Plan: 0 of 0 in current phase
 Status: Ready to execute
-Last activity: 2026-07-14 - Completed quick task 260714-wvs: смержить два упражнения каталога
+Last activity: 2026-07-15 - Completed quick task 260715-052: таблица нагрузок
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -68,6 +70,7 @@ Recent decisions affecting current work:
 - [Phase 4] Progress visibility is measured through weight/reps charts with explicit empty states.
 - [Phase 5] JSON/CSV export and safe import are required for user trust in local-first mode.
 - [260714-wvs] Same-day merge keeps two cards; remaps catalogExerciseId; target metadata preserved; stats derived.
+- [260715-052] Load table: body-metrics weight on add (detail read-only); user MAX; fixed 16-week Жим.xlsx template; UI-only 3×2 caption; `/load-table` nav; multi-exercise list with editable MAX/maxReps.
 
 ### Pending Todos
 
@@ -102,9 +105,10 @@ None yet.
 | 260705-vye | убери выбор цвета в пресетах | 2026-07-05 | 5be5da6 | [260705-vye-remove-preset-color-picker](./quick/260705-vye-remove-preset-color-picker/) |
 | 260705-w7t | 0 кг для упражнений без веса (подтягивания) в объёме статистики | 2026-07-05 | — | [260705-w7t-allow-zero-kg-bodyweight-exercises-volum](./quick/260705-w7t-allow-zero-kg-bodyweight-exercises-volum/) |
 | 260714-wvs | смержить два упражнения каталога (ремап журнала/пресетов) | 2026-07-14 | 4c9c41d | [260714-wvs-merge-exercises](./quick/260714-wvs-merge-exercises/) |
+| 260715-052 | таблица нагрузок: 16 недель Жим.xlsx, MAX, body-metrics | 2026-07-15 | f6d139a | [260715-052-16-xlsx-max-body-metrics-editable](./quick/260715-052-16-xlsx-max-body-metrics-editable/) |
 
 ## Session Continuity
 
-Last session: 2026-07-14T20:50:28.000Z
-Stopped at: Completed quick task 260714-wvs merge exercises
+Last session: 2026-07-14T21:20:00.000Z
+Stopped at: Completed 260715-052-01 load-table quick plan
 Resume file: None
