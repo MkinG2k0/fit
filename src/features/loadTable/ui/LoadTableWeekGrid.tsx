@@ -2,6 +2,7 @@ import { buildWeekRows } from "@/entities/loadTable";
 
 interface LoadTableWeekGridProps {
   maxKg: number;
+  currentWeek?: number;
 }
 
 const formatKg = (value: number | null) => {
@@ -11,7 +12,10 @@ const formatKg = (value: number | null) => {
   return value.toFixed(1);
 };
 
-export const LoadTableWeekGrid = ({ maxKg }: LoadTableWeekGridProps) => {
+export const LoadTableWeekGrid = ({
+  maxKg,
+  currentWeek,
+}: LoadTableWeekGridProps) => {
   const rows = buildWeekRows(maxKg);
 
   return (
@@ -30,26 +34,38 @@ export const LoadTableWeekGrid = ({ maxKg }: LoadTableWeekGridProps) => {
           </tr>
         </thead>
         <tbody>
-          {rows.map((row) => (
-            <tr key={row.week} className="border-t border-border">
-              <td className="px-2 py-1.5 text-foreground">{row.week}</td>
-              <td className="px-2 py-1.5 text-foreground">{row.percent}</td>
-              <td className="px-2 py-1.5 text-foreground">{formatKg(row.weightKg)}</td>
-              <td className="px-2 py-1.5 text-foreground">{row.reps}</td>
-              <td className="px-2 py-1.5 text-foreground">
-                {formatKg(row.formulas.brzycki)}
-              </td>
-              <td className="px-2 py-1.5 text-foreground">
-                {formatKg(row.formulas.epley)}
-              </td>
-              <td className="px-2 py-1.5 text-foreground">
-                {formatKg(row.formulas.lander)}
-              </td>
-              <td className="px-2 py-1.5 text-foreground">
-                {formatKg(row.formulas.avg)}
-              </td>
-            </tr>
-          ))}
+          {rows.map((row) => {
+            const isCurrentWeek = currentWeek === row.week;
+            return (
+              <tr
+                key={row.week}
+                className={
+                  isCurrentWeek
+                    ? "border-t border-border bg-accent/40"
+                    : "border-t border-border"
+                }
+              >
+                <td className="px-2 py-1.5 text-foreground">{row.week}</td>
+                <td className="px-2 py-1.5 text-foreground">{row.percent}</td>
+                <td className="px-2 py-1.5 text-foreground">
+                  {formatKg(row.weightKg)}
+                </td>
+                <td className="px-2 py-1.5 text-foreground">{row.reps}</td>
+                <td className="px-2 py-1.5 text-foreground">
+                  {formatKg(row.formulas.brzycki)}
+                </td>
+                <td className="px-2 py-1.5 text-foreground">
+                  {formatKg(row.formulas.epley)}
+                </td>
+                <td className="px-2 py-1.5 text-foreground">
+                  {formatKg(row.formulas.lander)}
+                </td>
+                <td className="px-2 py-1.5 text-foreground">
+                  {formatKg(row.formulas.avg)}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
