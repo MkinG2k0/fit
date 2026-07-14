@@ -30,7 +30,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-14)
 Phase: 1 of 5 (Quick Logging Core & Local Persistence)
 Plan: 0 of 0 in current phase
 Status: Ready to execute
-Last activity: 2026-07-15 - Completed quick task 260715-0qr: автозаполнение из load-table
+Last activity: 2026-07-15 - Removed body weight from load-table UI
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -111,6 +111,7 @@ None yet.
 | fast | load-table: вес тела в модалке только без записи в параметрах | 2026-07-15 | f293b66 | — |
 | 260715-0qr | автозаполнение из load-table: неделя, Отслеживать, Сбросить | 2026-07-15 | 0d71e13 | [260715-0qr-load-table-createdat-loadtabledetail-cre](./quick/260715-0qr-load-table-createdat-loadtabledetail-cre/) |
 | fast | load-table: убрать вес тела с деталки и модалки добавления | 2026-07-15 | b262bc4 | — |
+| fast | load-table: Отслеживать → префилл при «Добавить подход» | 2026-07-15 | 63d83e3 | — |
 
 ## Session Continuity
 
