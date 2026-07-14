@@ -39,6 +39,16 @@ export const ExerciseSetRow = ({
     deleteSet(exercise, set);
   }, [deleteSet, exercise, set]);
 
+  const handleChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>, setItem: ExerciseSet) => {
+      event.target.value = event.target.value
+        .replace(",", ".")
+        .replace(/^0+(?=\d)/, "");
+      onInputChange(event, setItem);
+    },
+    [onInputChange],
+  );
+
   return (
     <div
       className={cn(
@@ -61,13 +71,14 @@ export const ExerciseSetRow = ({
             "h-12 w-full rounded-md border-primary bg-background text-center text-2xl text-foreground font-numeric shadow-none ring-0 outline-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0",
             "text-primary",
           )}
-          type="number"
-          min={0}
+          type="text"
+          inputMode="numeric"
+          autoComplete="off"
           placeholder="Кол-во"
           name="reps"
-          value={isEmptySet ? "" : set.reps}
+          value={isEmptySet ? "" : String(set.reps)}
           onChange={(e) => {
-            onInputChange(e, set);
+            handleChange(e, set);
           }}
         />
       </div>
@@ -77,13 +88,14 @@ export const ExerciseSetRow = ({
             "h-12 w-full rounded-md border-primary bg-background text-center text-2xl text-foreground font-numeric shadow-none ring-0 outline-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0",
             "text-primary",
           )}
-          type="number"
-          min={0}
+          type="text"
+          inputMode="decimal"
+          autoComplete="off"
           placeholder="Кг"
           name="weight"
-          value={isEmptySet ? "" : set.weight}
+          value={isEmptySet ? "" : String(set.weight)}
           onChange={(e) => {
-            onInputChange(e, set);
+            handleChange(e, set);
           }}
         />
       </div>
