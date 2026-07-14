@@ -106,9 +106,10 @@ None yet.
 | 260705-w7t | 0 кг для упражнений без веса (подтягивания) в объёме статистики | 2026-07-05 | — | [260705-w7t-allow-zero-kg-bodyweight-exercises-volum](./quick/260705-w7t-allow-zero-kg-bodyweight-exercises-volum/) |
 | 260714-wvs | смержить два упражнения каталога (ремап журнала/пресетов) | 2026-07-14 | 4c9c41d | [260714-wvs-merge-exercises](./quick/260714-wvs-merge-exercises/) |
 | 260715-052 | таблица нагрузок: 16 недель Жим.xlsx, MAX, body-metrics | 2026-07-15 | f6d139a | [260715-052-16-xlsx-max-body-metrics-editable](./quick/260715-052-16-xlsx-max-body-metrics-editable/) |
+| fast | load-table: повторы из шаблона, убрать maxReps из форм | 2026-07-15 | 1fbde97 | — |
 
 ## Session Continuity
 
-Last session: 2026-07-14T21:20:00.000Z
-Stopped at: Completed 260715-052-01 load-table quick plan
+Last session: 2026-07-15T00:00:00.000Z
+Stopped at: Fast fix — load-table maxReps from schedule
 Resume file: None
