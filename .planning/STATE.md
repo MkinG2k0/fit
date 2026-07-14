@@ -4,10 +4,10 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 1
 current_phase_name: Quick Logging Core & Local Persistence
-status: executing
-stopped_at: Completed 260715-052-01 load-table quick plan
-last_updated: "2026-07-14T21:20:00.000Z"
-last_activity: "2026-07-15 - Completed quick task 260715-052: таблица нагрузок"
+status: ready
+stopped_at: Completed 260715-0qr-01 load-table week prefill
+last_updated: "2026-07-14T21:45:00.000Z"
+last_activity: "2026-07-15 - Completed quick task 260715-0qr: автозаполнение из load-table"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -30,7 +30,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-14)
 Phase: 1 of 5 (Quick Logging Core & Local Persistence)
 Plan: 0 of 0 in current phase
 Status: Ready to execute
-Last activity: 2026-07-15 - Completed quick task 260715-052: таблица нагрузок
+Last activity: 2026-07-15 - Completed quick task 260715-0qr: автозаполнение из load-table
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -71,6 +71,7 @@ Recent decisions affecting current work:
 - [Phase 5] JSON/CSV export and safe import are required for user trust in local-first mode.
 - [260714-wvs] Same-day merge keeps two cards; remaps catalogExerciseId; target metadata preserved; stats derived.
 - [260715-052] Load table: body-metrics weight on add (detail read-only); user MAX; fixed 16-week Жим.xlsx template; UI-only 3×2 caption; `/load-table` nav; multi-exercise list with editable MAX/maxReps.
+- [260715-0qr] Load-table week from sessions since createdAt; Track prefills 3 plan sets; Reset updates createdAt; current week highlighted.
 
 ### Pending Todos
 
@@ -108,9 +109,10 @@ None yet.
 | 260715-052 | таблица нагрузок: 16 недель Жим.xlsx, MAX, body-metrics | 2026-07-15 | f6d139a | [260715-052-16-xlsx-max-body-metrics-editable](./quick/260715-052-16-xlsx-max-body-metrics-editable/) |
 | fast | load-table: повторы из шаблона, убрать maxReps из форм | 2026-07-15 | 1fbde97 | — |
 | fast | load-table: вес тела в модалке только без записи в параметрах | 2026-07-15 | f293b66 | — |
+| 260715-0qr | автозаполнение из load-table: неделя, Отслеживать, Сбросить | 2026-07-15 | 0d71e13 | [260715-0qr-load-table-createdat-loadtabledetail-cre](./quick/260715-0qr-load-table-createdat-loadtabledetail-cre/) |
 
 ## Session Continuity
 
-Last session: 2026-07-15T00:00:00.000Z
-Stopped at: Fast fix — load-table maxReps from schedule
+Last session: 2026-07-14T21:45:00.000Z
+Stopped at: Completed 260715-0qr-01 load-table week prefill
 Resume file: None
