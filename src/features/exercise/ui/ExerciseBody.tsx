@@ -29,6 +29,13 @@ interface ExerciseBodyProps {
   onDeleteRequested: () => void;
 }
 
+const isExerciseCardEmpty = (sets: ExerciseSet[]) => {
+  if (sets.length === 0) {
+    return true;
+  }
+  return sets.every((set) => set.reps === 0 && set.weight === 0);
+};
+
 export const ExerciseBody = ({
   exercise,
   onDeleteRequested,
@@ -44,6 +51,9 @@ export const ExerciseBody = ({
 
   const onChangeHandler = useCalendarStore((store) => store.setExerciseValues);
   const addSetToExercise = useCalendarStore((store) => store.addSetToExercise);
+  const syncExerciseSetsFromPlan = useCalendarStore(
+    (store) => store.syncExerciseSetsFromPlan,
+  );
   const addSetGuardRef = useRef(false);
   const firstSetPrefillAttemptedRef = useRef<string | null>(null);
 
@@ -102,10 +112,15 @@ export const ExerciseBody = ({
           trackedEntry.catalogExerciseId,
           trackedEntry.createdAt,
         );
-        const planSet = getPlanSetsForWeek(
-          trackedEntry.maxKg,
-          currentWeek,
-        )[0];
+        const planSets = getPlanSetsForWeek(trackedEntry.maxKg, currentWeek);
+
+        // Пустая карточка (нет подходов или все без значений) — сразу все подходы из таблицы.
+        if (isExerciseCardEmpty(exercise.sets) && planSets.length > 0) {
+          syncExerciseSetsFromPlan(exercise, planSets);
+          return;
+        }
+
+        const planSet = planSets[0];
         if (planSet) {
           weight = planSet.weight;
           reps = planSet.reps;
@@ -134,6 +149,7 @@ export const ExerciseBody = ({
     exercise,
     lastSession?.sets,
     prefillFromLastSession,
+    syncExerciseSetsFromPlan,
   ]);
 
   useEffect(() => {
