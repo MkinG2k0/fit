@@ -1,4 +1,4 @@
-import { type ChangeEvent, useCallback } from "react";
+import { type ChangeEvent, useCallback, useState } from "react";
 import { X } from "lucide-react";
 import { Input } from "@/shared/ui/shadCNComponents/ui/input";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
@@ -24,6 +24,36 @@ interface ExerciseSetRowProps {
 const isSetEmpty = (setItem: ExerciseSet) =>
   setItem.reps === 0 && setItem.weight === 0;
 
+/** Digits + at most one `.`; rejects other characters. Returns null if invalid. */
+const sanitizeDecimalDraft = (raw: string): string | null => {
+  const normalized = raw.replace(",", ".");
+  if (normalized === "") {
+    return "";
+  }
+  if (!/^\d*\.?\d*$/.test(normalized)) {
+    return null;
+  }
+  return normalized.replace(/^0+(?=\d)/, "");
+};
+
+const isCompleteDecimalDraft = (draft: string): boolean => {
+  if (draft === "" || draft === ".") {
+    return draft === "";
+  }
+  if (draft.endsWith(".")) {
+    return false;
+  }
+  return Number.isFinite(Number(draft));
+};
+
+const commitDecimalDraft = (draft: string): string => {
+  let value = draft.replace(",", ".");
+  if (value === "." || value.endsWith(".")) {
+    value = value.slice(0, -1);
+  }
+  return value;
+};
+
 export const ExerciseSetRow = ({
   exercise,
   set,
@@ -34,12 +64,24 @@ export const ExerciseSetRow = ({
 }: ExerciseSetRowProps) => {
   const deleteSet = useCalendarStore((s) => s.deleteSet);
   const isEmptySet = isSetEmpty(set);
+  const [isWeightFocused, setIsWeightFocused] = useState(false);
+  const [weightDraft, setWeightDraft] = useState("");
 
   const handleDelete = useCallback(() => {
     deleteSet(exercise, set);
   }, [deleteSet, exercise, set]);
 
-  const handleChange = useCallback(
+  const emitWeightChange = useCallback(
+    (value: string, setItem: ExerciseSet) => {
+      const syntheticEvent = {
+        target: { name: "weight", value },
+      } as ChangeEvent<HTMLInputElement>;
+      onInputChange(syntheticEvent, setItem);
+    },
+    [onInputChange],
+  );
+
+  const handleRepsChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>, setItem: ExerciseSet) => {
       event.target.value = event.target.value
         .replace(",", ".")
@@ -48,6 +90,41 @@ export const ExerciseSetRow = ({
     },
     [onInputChange],
   );
+
+  const handleWeightFocus = useCallback(() => {
+    setIsWeightFocused(true);
+    setWeightDraft(isEmptySet ? "" : String(set.weight));
+  }, [isEmptySet, set.weight]);
+
+  const handleWeightChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>, setItem: ExerciseSet) => {
+      const sanitized = sanitizeDecimalDraft(event.target.value);
+      if (sanitized === null) {
+        return;
+      }
+      setWeightDraft(sanitized);
+      if (isCompleteDecimalDraft(sanitized)) {
+        emitWeightChange(sanitized, setItem);
+      }
+    },
+    [emitWeightChange],
+  );
+
+  const handleWeightBlur = useCallback(
+    (setItem: ExerciseSet) => {
+      const committed = commitDecimalDraft(weightDraft);
+      emitWeightChange(committed, setItem);
+      setIsWeightFocused(false);
+      setWeightDraft("");
+    },
+    [emitWeightChange, weightDraft],
+  );
+
+  const weightValue = isWeightFocused
+    ? weightDraft
+    : isEmptySet
+      ? ""
+      : String(set.weight);
 
   return (
     <div
@@ -78,7 +155,7 @@ export const ExerciseSetRow = ({
           name="reps"
           value={isEmptySet ? "" : String(set.reps)}
           onChange={(e) => {
-            handleChange(e, set);
+            handleRepsChange(e, set);
           }}
         />
       </div>
@@ -93,9 +170,13 @@ export const ExerciseSetRow = ({
           autoComplete="off"
           placeholder="Кг"
           name="weight"
-          value={isEmptySet ? "" : String(set.weight)}
+          value={weightValue}
+          onFocus={handleWeightFocus}
           onChange={(e) => {
-            handleChange(e, set);
+            handleWeightChange(e, set);
+          }}
+          onBlur={() => {
+            handleWeightBlur(set);
           }}
         />
       </div>
