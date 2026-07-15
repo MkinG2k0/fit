@@ -5,9 +5,9 @@ milestone_name: milestone
 current_phase: 1
 current_phase_name: Quick Logging Core & Local Persistence
 status: ready
-stopped_at: Completed 260715-3t7 AI fill feature flag
-last_updated: "2026-07-15T02:51:00.000Z"
-last_activity: "2026-07-15 - AI fill feature flag in settings (default off)"
+stopped_at: Completed 260715-40l news page
+last_updated: "2026-07-15T03:05:00.000Z"
+last_activity: "2026-07-15 - News page with ISO-week changelog"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -30,7 +30,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-14)
 Phase: 1 of 5 (Quick Logging Core & Local Persistence)
 Plan: 0 of 0 in current phase
 Status: Ready to execute
-Last activity: 2026-07-15 - Completed quick task 260715-3t7: AI fill feature flag (default off)
+Last activity: 2026-07-15 - Completed quick task 260715-40l: News page with ISO-week changelog
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -123,9 +123,10 @@ None yet.
 | 260715-308 | ИИ-заполнение подходов: 6 мес истории, append only | 2026-07-15 | ee8f6e5 | [260715-308-ai-fill-exercise-sets-button-send-6-mont](./quick/260715-308-ai-fill-exercise-sets-button-send-6-mont/) |
 | 260715-3fn | Таймер: deadline + отдых между подходами в сводке | 2026-07-15 | 8748b62 | [260715-3fn-2](./quick/260715-3fn-2/) |
 | 260715-3t7 | Фича-флаг «ИИ-заполнение» в настройках (default OFF) | 2026-07-15 | 3efff2c | [260715-3t7-ai-fill-feature-flag](./quick/260715-3t7-ai-fill-feature-flag/) |
+| 260715-40l | Страница «Новости» с changelog по ISO-неделям | 2026-07-15 | 3f17e64 | [260715-40l-news-page](./quick/260715-40l-news-page/) |
 
 ## Session Continuity
 
-Last session: 2026-07-15T02:51:00.000Z
-Stopped at: Completed 260715-3t7 AI fill feature flag
+Last session: 2026-07-15T03:05:00.000Z
+Stopped at: Completed 260715-40l news page
 Resume file: None
