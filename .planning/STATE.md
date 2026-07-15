@@ -125,6 +125,7 @@ None yet.
 | 260715-3t7 | Фича-флаг «ИИ-заполнение» в настройках (default OFF) | 2026-07-15 | 3efff2c | [260715-3t7-ai-fill-feature-flag](./quick/260715-3t7-ai-fill-feature-flag/) |
 | 260715-40l | Страница «Новости» с changelog по ISO-неделям | 2026-07-15 | 3f17e64 | [260715-40l-news-page](./quick/260715-40l-news-page/) |
 | 260715-vrc | Дробный вес: draft-string пока фокус (12. / 12.5) | 2026-07-15 | e1e308d | [260715-vrc-12-5](./quick/260715-vrc-12-5/) |
+| fast | Кнопка ИИ-заполнения: текст → иконка Sparkles | 2026-07-15 | 8fee417 | — |
 
 ## Session Continuity
 
