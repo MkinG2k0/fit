@@ -141,7 +141,7 @@ export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) =>
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex min-w-0 flex-col gap-4">
       <div className="flex items-center gap-2">
         <h2 className="min-w-0 truncate text-base font-medium text-foreground">
           {name}

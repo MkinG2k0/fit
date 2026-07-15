@@ -126,7 +126,7 @@ export const AddLoadTableExerciseDialog = ({
             )}
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter>
             <Button
               type="button"
               variant="outline"

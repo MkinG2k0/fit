@@ -19,8 +19,8 @@ export const LoadTableWeekGrid = ({
   const rows = buildWeekRows(maxKg);
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-border">
-      <table className="w-full min-w-[44rem] border-collapse text-left text-sm">
+    <div className="min-w-0 w-full max-w-full overflow-x-auto overscroll-x-contain rounded-lg border border-border [-webkit-overflow-scrolling:touch]">
+      <table className="w-max min-w-full border-collapse text-left text-sm">
         <thead className="bg-muted/50 text-xs text-muted-foreground">
           <tr>
             <th className="whitespace-nowrap px-2 py-2 font-medium">Неделя</th>
