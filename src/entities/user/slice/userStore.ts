@@ -11,8 +11,9 @@ const MIN_DEFAULT_SET_DURATION_SEC = 30;
 const MAX_DEFAULT_SET_DURATION_SEC = 180;
 
 const DEFAULT_REST_BETWEEN_SETS_SEC = 120;
-const MIN_REST_BETWEEN_SETS_SEC = 15;
+const MIN_REST_BETWEEN_SETS_SEC = 30;
 const MAX_REST_BETWEEN_SETS_SEC = 600;
+const REST_BETWEEN_SETS_STEP_SEC = 30;
 
 const clampDefaultSetDurationSec = (sec: number): number =>
   Math.min(
@@ -24,9 +25,11 @@ const clampRestBetweenSetsSec = (sec: number): number => {
   if (!Number.isFinite(sec)) {
     return DEFAULT_REST_BETWEEN_SETS_SEC;
   }
+  const snapped =
+    Math.round(sec / REST_BETWEEN_SETS_STEP_SEC) * REST_BETWEEN_SETS_STEP_SEC;
   return Math.min(
     MAX_REST_BETWEEN_SETS_SEC,
-    Math.max(MIN_REST_BETWEEN_SETS_SEC, Math.round(sec)),
+    Math.max(MIN_REST_BETWEEN_SETS_SEC, snapped),
   );
 };
 

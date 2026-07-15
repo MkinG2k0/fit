@@ -27,7 +27,8 @@ const clampExportedRestBetweenSetsSec = (value: unknown): number => {
   if (typeof value !== "number" || !Number.isFinite(value)) {
     return 120;
   }
-  return Math.min(600, Math.max(15, Math.round(value)));
+  const snapped = Math.round(value / 30) * 30;
+  return Math.min(600, Math.max(30, snapped));
 };
 
 export const APP_SETTINGS_SECTION_IDS = {

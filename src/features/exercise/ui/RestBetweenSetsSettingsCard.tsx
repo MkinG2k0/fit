@@ -17,6 +17,27 @@ import {
 } from "@/shared/ui/shadCNComponents/ui/card";
 import { Label } from "@/shared/ui/shadCNComponents/ui/label";
 
+const REST_DURATION_STEP_SEC = 30;
+
+const sliderMinSec =
+  Math.ceil(MIN_REST_BETWEEN_SETS_SEC / REST_DURATION_STEP_SEC) *
+  REST_DURATION_STEP_SEC;
+const sliderMaxSec =
+  Math.floor(MAX_REST_BETWEEN_SETS_SEC / REST_DURATION_STEP_SEC) *
+  REST_DURATION_STEP_SEC;
+
+const formatRestDurationLabel = (sec: number): string => {
+  const minutes = Math.floor(sec / 60);
+  const seconds = sec % 60;
+  if (seconds === 0) {
+    return `${minutes} мин`;
+  }
+  if (minutes === 0) {
+    return `${seconds} сек`;
+  }
+  return `${minutes} мин ${seconds} сек`;
+};
+
 interface RestBetweenSetsSettingsCardProps {
   className?: string;
 }
@@ -35,7 +56,14 @@ export const RestBetweenSetsSettingsCard = ({
   );
   const setRestBetweenSetsSec = useUserStore((s) => s.setRestBetweenSetsSec);
 
-  const durationMinutes = Math.round(restBetweenSetsSec / 60);
+  const durationSec = Math.min(
+    sliderMaxSec,
+    Math.max(
+      sliderMinSec,
+      Math.round(restBetweenSetsSec / REST_DURATION_STEP_SEC) *
+        REST_DURATION_STEP_SEC,
+    ),
+  );
 
   const handleCheckedChange = useCallback(
     (value: boolean | "indeterminate") => {
@@ -46,11 +74,11 @@ export const RestBetweenSetsSettingsCard = ({
 
   const handleDurationChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      const minutes = Number(event.target.value);
-      if (!Number.isFinite(minutes)) {
+      const sec = Number(event.target.value);
+      if (!Number.isFinite(sec)) {
         return;
       }
-      setRestBetweenSetsSec(minutes * 60);
+      setRestBetweenSetsSec(sec);
     },
     [setRestBetweenSetsSec],
   );
@@ -99,21 +127,21 @@ export const RestBetweenSetsSettingsCard = ({
                 htmlFor="rest-between-sets-duration"
                 className="text-sm font-medium leading-none"
               >
-                Длительность: {durationMinutes} мин
+                Длительность: {formatRestDurationLabel(durationSec)}
               </Label>
               <input
                 id="rest-between-sets-duration"
                 type="range"
-                min={Math.ceil(MIN_REST_BETWEEN_SETS_SEC / 60)}
-                max={Math.floor(MAX_REST_BETWEEN_SETS_SEC / 60)}
-                step={1}
-                value={durationMinutes}
+                min={sliderMinSec}
+                max={sliderMaxSec}
+                step={REST_DURATION_STEP_SEC}
+                value={durationSec}
                 onChange={handleDurationChange}
                 className="w-full accent-primary"
               />
               <p className="text-xs text-muted-foreground">
-                От {Math.ceil(MIN_REST_BETWEEN_SETS_SEC / 60)} до{" "}
-                {Math.floor(MAX_REST_BETWEEN_SETS_SEC / 60)} минут.
+                От {formatRestDurationLabel(sliderMinSec)} до{" "}
+                {formatRestDurationLabel(sliderMaxSec)}, шаг 30 сек.
               </p>
             </div>
           </div>
