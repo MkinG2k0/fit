@@ -1,4 +1,4 @@
-import { Trash2 } from "lucide-react";
+import { Loader2, Sparkles, Trash2 } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
 import {
@@ -441,13 +441,18 @@ export const ExerciseBody = ({
           <Button
             type="button"
             variant="outline"
-            className="flex-1 sm:flex-none"
+            size="icon"
+            aria-label={aiFillLoading ? "Загрузка…" : "ИИ-заполнение"}
             disabled={aiFillLoading}
             onClick={() => {
               void handleAiFill();
             }}
           >
-            {aiFillLoading ? "Загрузка…" : "ИИ-заполнение"}
+            {aiFillLoading ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              <Sparkles />
+            )}
           </Button>
         ) : null}
         <CustomButton classes={"flex-1"} buttonHandler={handleAddSet}>
