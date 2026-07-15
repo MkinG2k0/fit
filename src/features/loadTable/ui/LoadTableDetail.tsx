@@ -19,6 +19,43 @@ interface LoadTableDetailProps {
   onBack: () => void;
 }
 
+/** Digits + at most one `.`; rejects other characters. Returns null if invalid. */
+const sanitizeDecimalDraft = (raw: string): string | null => {
+  const normalized = raw.replace(",", ".");
+  if (normalized === "") {
+    return "";
+  }
+  if (!/^\d*\.?\d*$/.test(normalized)) {
+    return null;
+  }
+  return normalized.replace(/^0+(?=\d)/, "");
+};
+
+const isCompleteDecimalDraft = (draft: string): boolean => {
+  if (draft === "" || draft === ".") {
+    return draft === "";
+  }
+  if (draft.endsWith(".")) {
+    return false;
+  }
+  return Number.isFinite(Number(draft));
+};
+
+const toNonNegativeMaxKg = (draft: string, fallback: number): number => {
+  let value = draft.replace(",", ".");
+  if (value === "." || value.endsWith(".")) {
+    value = value.slice(0, -1);
+  }
+  if (value === "") {
+    return 0;
+  }
+  const next = Number(value);
+  if (!Number.isFinite(next) || next < 0) {
+    return fallback;
+  }
+  return next;
+};
+
 export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) => {
   const catalog = useExerciseStore((state) => state.exercises);
   const exercise = useLoadTableStore((state) =>
@@ -36,6 +73,8 @@ export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) =>
 
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+  const [isMaxKgFocused, setIsMaxKgFocused] = useState(false);
+  const [maxKgDraft, setMaxKgDraft] = useState("");
 
   if (!exercise) {
     return (
@@ -53,12 +92,36 @@ export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) =>
     "Упражнение";
   const isLastWeek = exercise.currentWeek >= 16;
 
+  const handleMaxKgFocus = () => {
+    setIsMaxKgFocused(true);
+    setMaxKgDraft(String(exercise.maxKg));
+  };
+
   const handleMaxKgChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const next = Number(event.target.value.replace(",", "."));
-    if (!Number.isFinite(next)) {
+    const sanitized = sanitizeDecimalDraft(event.target.value);
+    if (sanitized === null) {
+      return;
+    }
+    setMaxKgDraft(sanitized);
+    if (!isCompleteDecimalDraft(sanitized)) {
+      return;
+    }
+    if (sanitized === "") {
+      updateExercise(exercise.id, { maxKg: 0 });
+      return;
+    }
+    const next = Number(sanitized);
+    if (!Number.isFinite(next) || next < 0) {
       return;
     }
     updateExercise(exercise.id, { maxKg: next });
+  };
+
+  const handleMaxKgBlur = () => {
+    const next = toNonNegativeMaxKg(maxKgDraft, exercise.maxKg);
+    updateExercise(exercise.id, { maxKg: next });
+    setIsMaxKgFocused(false);
+    setMaxKgDraft("");
   };
 
   const handleAdvanceWeek = () => {
@@ -116,12 +179,13 @@ export const LoadTableDetail = ({ exerciseId, onBack }: LoadTableDetailProps) =>
         <Label htmlFor="load-table-detail-max">MAX (кг)</Label>
         <Input
           id="load-table-detail-max"
-          type="number"
+          type="text"
           inputMode="decimal"
-          min={0}
-          step={0.5}
-          value={exercise.maxKg}
+          autoComplete="off"
+          value={isMaxKgFocused ? maxKgDraft : String(exercise.maxKg)}
+          onFocus={handleMaxKgFocus}
           onChange={handleMaxKgChange}
+          onBlur={handleMaxKgBlur}
         />
       </div>
 
