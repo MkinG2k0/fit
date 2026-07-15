@@ -5,10 +5,3 @@ export interface NewsEntry {
   title: string;
   summary: string;
 }
-
-export interface NewsWeekGroup {
-  /** YYYY-MM-DD Monday (ISO week start) */
-  weekStartDate: string;
-  label: string;
-  entries: NewsEntry[];
-}
