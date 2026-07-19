@@ -38,7 +38,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.fit.myapp.ACTIVITY_WIDGET_REFRESH" />
+                <action android:name="com.aifit.fit.ACTIVITY_WIDGET_REFRESH" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -51,7 +51,7 @@
             android:label="@string/widget_muscle_balance_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.fit.myapp.MUSCLE_BALANCE_WIDGET_REFRESH" />
+                <action android:name="com.aifit.fit.MUSCLE_BALANCE_WIDGET_REFRESH" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"

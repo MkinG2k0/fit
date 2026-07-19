@@ -1,4 +1,4 @@
-package com.fit.myapp;
+package com.aifit.fit;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class ActivityWidget extends AppWidgetProvider {
 
-    static final String ACTION_REFRESH  = "com.fit.myapp.ACTIVITY_WIDGET_REFRESH";
+    static final String ACTION_REFRESH  = "com.aifit.fit.ACTIVITY_WIDGET_REFRESH";
     static final String CAP_PREFS       = "CapacitorStorage";
     static final String MONTH_INDEX_KEY = "workout:month-index";
     static final int    DAYS_PER_WEEK   = 7;

@@ -1,4 +1,4 @@
-package com.fit.myapp;
+package com.aifit.fit;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class MuscleBalanceWidget extends AppWidgetProvider {
 
-    static final String ACTION_REFRESH = "com.fit.myapp.MUSCLE_BALANCE_WIDGET_REFRESH";
+    static final String ACTION_REFRESH = "com.aifit.fit.MUSCLE_BALANCE_WIDGET_REFRESH";
     static final String CAP_PREFS = "CapacitorStorage";
     static final String MONTH_INDEX_KEY = "workout:month-index";
 

@@ -1,4 +1,4 @@
-package com.fit.myapp;
+package com.aifit.fit;
 
 import android.os.Bundle;
 import androidx.core.view.WindowCompat;

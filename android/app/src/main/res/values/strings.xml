@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">fit</string>
     <string name="title_activity_main">fit</string>
-    <string name="package_name">com.fit.myapp</string>
-    <string name="custom_url_scheme">com.fit.myapp</string>
+    <string name="package_name">com.aifit.fit</string>
+    <string name="custom_url_scheme">com.aifit.fit</string>
     <string name="widget_muscle_balance_label">Мышечный баланс</string>
 </resources>
