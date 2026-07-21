@@ -5,6 +5,7 @@ const PERIOD_LABEL: Record<AnalyticsPeriod, string> = {
   "7d": "7 дней",
   "30d": "30 дней",
   "90d": "90 дней",
+  "180d": "180 дней",
   "365d": "1 год",
 };
 
