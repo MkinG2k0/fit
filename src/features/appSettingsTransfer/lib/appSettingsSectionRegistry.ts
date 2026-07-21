@@ -92,6 +92,7 @@ const isUserProfileExport = (
   exerciseCardShowLastSessionResult?: boolean;
   exerciseCardShowKcalInHeader?: boolean;
   exerciseCardShowTotalVolumeInHeader?: boolean;
+  exerciseCardReorderEnabled?: boolean;
   workoutListShowDaySummary?: boolean;
   restBetweenSetsEnabled?: boolean;
   restBetweenSetsSec?: number;
@@ -139,6 +140,12 @@ const isUserProfileExport = (
   if (
     "exerciseCardShowTotalVolumeInHeader" in value &&
     typeof value.exerciseCardShowTotalVolumeInHeader !== "boolean"
+  ) {
+    return false;
+  }
+  if (
+    "exerciseCardReorderEnabled" in value &&
+    typeof value.exerciseCardReorderEnabled !== "boolean"
   ) {
     return false;
   }
@@ -225,6 +232,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         exerciseCardShowLastSessionResult?: boolean;
         exerciseCardShowKcalInHeader?: boolean;
         exerciseCardShowTotalVolumeInHeader?: boolean;
+        exerciseCardReorderEnabled?: boolean;
         workoutListShowDaySummary?: boolean;
         restBetweenSetsEnabled?: boolean;
         restBetweenSetsSec?: number;
@@ -245,6 +253,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
           state.exerciseCardShowKcalInHeader ?? false,
         exerciseCardShowTotalVolumeInHeader:
           state.exerciseCardShowTotalVolumeInHeader ?? true,
+        exerciseCardReorderEnabled: state.exerciseCardReorderEnabled ?? false,
         workoutListShowDaySummary: state.workoutListShowDaySummary ?? true,
         restBetweenSetsEnabled: state.restBetweenSetsEnabled ?? true,
         restBetweenSetsSec: clampExportedRestBetweenSetsSec(
@@ -275,6 +284,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
             exerciseCardShowLastSessionResult?: boolean;
             exerciseCardShowKcalInHeader?: boolean;
             exerciseCardShowTotalVolumeInHeader?: boolean;
+            exerciseCardReorderEnabled?: boolean;
             workoutListShowDaySummary?: boolean;
             restBetweenSetsEnabled?: boolean;
             restBetweenSetsSec?: number;
@@ -304,6 +314,10 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
                 payload.exerciseCardShowTotalVolumeInHeader ??
                 prevState.exerciseCardShowTotalVolumeInHeader ??
                 true,
+              exerciseCardReorderEnabled:
+                payload.exerciseCardReorderEnabled ??
+                prevState.exerciseCardReorderEnabled ??
+                false,
               workoutListShowDaySummary:
                 payload.workoutListShowDaySummary ??
                 prevState.workoutListShowDaySummary ??
@@ -345,6 +359,8 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
               payload.exerciseCardShowKcalInHeader ?? false,
             exerciseCardShowTotalVolumeInHeader:
               payload.exerciseCardShowTotalVolumeInHeader ?? true,
+            exerciseCardReorderEnabled:
+              payload.exerciseCardReorderEnabled ?? false,
             workoutListShowDaySummary:
               payload.workoutListShowDaySummary ?? true,
             restBetweenSetsEnabled: payload.restBetweenSetsEnabled ?? true,

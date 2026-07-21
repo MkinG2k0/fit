@@ -50,6 +50,8 @@ interface UserState {
   exerciseCardShowKcalInHeader: boolean;
   /** Суммарный объём (повторы × вес) в шапке карточки. */
   exerciseCardShowTotalVolumeInHeader: boolean;
+  /** Перетаскивание карточек для смены порядка упражнений в списке дня. */
+  exerciseCardReorderEnabled: boolean;
   /** Сводка «Общая информация о тренировке» над списком упражнений на день. */
   workoutListShowDaySummary: boolean;
   /** Автозапуск таймера отдыха после добавления подхода. */
@@ -74,6 +76,7 @@ interface ActionsState {
   setExerciseCardShowLastSessionResult: (enabled: boolean) => void;
   setExerciseCardShowKcalInHeader: (enabled: boolean) => void;
   setExerciseCardShowTotalVolumeInHeader: (enabled: boolean) => void;
+  setExerciseCardReorderEnabled: (enabled: boolean) => void;
   setWorkoutListShowDaySummary: (enabled: boolean) => void;
   setRestBetweenSetsEnabled: (enabled: boolean) => void;
   setRestBetweenSetsSec: (sec: number) => void;
@@ -98,6 +101,7 @@ export const useUserStore = create<UserState & ActionsState>()(
       exerciseCardShowLastSessionResult: false,
       exerciseCardShowKcalInHeader: false,
       exerciseCardShowTotalVolumeInHeader: true,
+      exerciseCardReorderEnabled: false,
       workoutListShowDaySummary: true,
       restBetweenSetsEnabled: true,
       restBetweenSetsSec: DEFAULT_REST_BETWEEN_SETS_SEC,
@@ -162,6 +166,11 @@ export const useUserStore = create<UserState & ActionsState>()(
       setExerciseCardShowTotalVolumeInHeader: (enabled) =>
         set(() => ({
           exerciseCardShowTotalVolumeInHeader: enabled,
+        })),
+
+      setExerciseCardReorderEnabled: (enabled) =>
+        set(() => ({
+          exerciseCardReorderEnabled: enabled,
         })),
 
       setWorkoutListShowDaySummary: (enabled) =>
@@ -240,6 +249,10 @@ export const useUserStore = create<UserState & ActionsState>()(
             typeof p.exerciseCardShowTotalVolumeInHeader === "boolean"
               ? p.exerciseCardShowTotalVolumeInHeader
               : current.exerciseCardShowTotalVolumeInHeader,
+          exerciseCardReorderEnabled:
+            typeof p.exerciseCardReorderEnabled === "boolean"
+              ? p.exerciseCardReorderEnabled
+              : current.exerciseCardReorderEnabled,
           workoutListShowDaySummary:
             typeof p.workoutListShowDaySummary === "boolean"
               ? p.workoutListShowDaySummary

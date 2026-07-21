@@ -1,4 +1,4 @@
-import { AnimatePresence, Reorder, useDragControls } from "motion/react";
+import { AnimatePresence, motion, Reorder, useDragControls } from "motion/react";
 import { useEffect, useMemo, type PointerEvent as ReactPointerEvent } from "react";
 import { AddExercise } from "@/features/addExercise";
 import { ExerciseCard } from "@/features/exercise";
@@ -9,6 +9,13 @@ import { useUserStore } from "@/entities/user";
 import { calcSetVolumeKg } from "@/shared/lib/calcSetVolumeKg";
 import { FixedBottomBar } from "@shared/ui";
 import { WorkoutSummaryCard } from "./WorkoutSummaryCard";
+
+const listItemMotionProps = {
+  initial: { height: 0, opacity: 0 },
+  animate: { height: "auto", opacity: 1 },
+  exit: { height: 0, opacity: 0 },
+  transition: { duration: 0.3, ease: "easeInOut" as const },
+};
 
 const ReorderableExerciseItem = ({ exercise }: { exercise: Exercise }) => {
   const dragControls = useDragControls();
@@ -27,10 +34,7 @@ const ReorderableExerciseItem = ({ exercise }: { exercise: Exercise }) => {
       value={exercise.id}
       dragListener={false}
       dragControls={dragControls}
-      initial={{ height: 0, opacity: 0 }}
-      animate={{ height: "auto", opacity: 1 }}
-      exit={{ height: 0, opacity: 0 }}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
+      {...listItemMotionProps}
       className="relative"
     >
       <ExerciseCard
@@ -41,10 +45,19 @@ const ReorderableExerciseItem = ({ exercise }: { exercise: Exercise }) => {
   );
 };
 
+const StaticExerciseItem = ({ exercise }: { exercise: Exercise }) => (
+  <motion.div {...listItemMotionProps} className="relative">
+    <ExerciseCard exercise={exercise} />
+  </motion.div>
+);
+
 export const ExerciseList = () => {
   const showCaloriesUi = useWorkoutCaloriesUiEnabled();
   const workoutListShowDaySummary = useUserStore(
     (s) => s.workoutListShowDaySummary ?? true,
+  );
+  const exerciseCardReorderEnabled = useUserStore(
+    (s) => s.exerciseCardReorderEnabled ?? false,
   );
   const days = useCalendarStore((state) => state.days);
   const selectedDate = useCalendarStore((state) => state.selectedDate);
@@ -107,19 +120,29 @@ export const ExerciseList = () => {
             workoutSummary={workoutSummary}
           />
         ) : null}
-        <Reorder.Group
-          as="div"
-          axis="y"
-          values={exerciseIds}
-          onReorder={reorderExercises}
-          className="flex flex-col gap-2"
-        >
-          <AnimatePresence>
-            {exerciseArray.map((ex) => (
-              <ReorderableExerciseItem key={ex.id} exercise={ex} />
-            ))}
-          </AnimatePresence>
-        </Reorder.Group>
+        {exerciseCardReorderEnabled ? (
+          <Reorder.Group
+            as="div"
+            axis="y"
+            values={exerciseIds}
+            onReorder={reorderExercises}
+            className="flex flex-col gap-2"
+          >
+            <AnimatePresence>
+              {exerciseArray.map((ex) => (
+                <ReorderableExerciseItem key={ex.id} exercise={ex} />
+              ))}
+            </AnimatePresence>
+          </Reorder.Group>
+        ) : (
+          <div className="flex flex-col gap-2">
+            <AnimatePresence>
+              {exerciseArray.map((ex) => (
+                <StaticExerciseItem key={ex.id} exercise={ex} />
+              ))}
+            </AnimatePresence>
+          </div>
+        )}
       </div>
       <FixedBottomBar>
         <AddExercise />

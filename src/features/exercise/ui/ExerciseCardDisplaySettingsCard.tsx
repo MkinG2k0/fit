@@ -39,6 +39,12 @@ export const ExerciseCardDisplaySettingsCard = ({
   const setExerciseCardShowTotalVolumeInHeader = useUserStore(
     (s) => s.setExerciseCardShowTotalVolumeInHeader,
   );
+  const exerciseCardReorderEnabled = useUserStore(
+    (s) => s.exerciseCardReorderEnabled ?? false,
+  );
+  const setExerciseCardReorderEnabled = useUserStore(
+    (s) => s.setExerciseCardReorderEnabled,
+  );
   const aiFillEnabled = useUserStore((s) => s.aiFillEnabled ?? false);
   const setAiFillEnabled = useUserStore((s) => s.setAiFillEnabled);
 
@@ -61,6 +67,13 @@ export const ExerciseCardDisplaySettingsCard = ({
       setExerciseCardShowTotalVolumeInHeader(value === true);
     },
     [setExerciseCardShowTotalVolumeInHeader],
+  );
+
+  const handleReorderCheckedChange = useCallback(
+    (value: boolean | "indeterminate") => {
+      setExerciseCardReorderEnabled(value === true);
+    },
+    [setExerciseCardReorderEnabled],
   );
 
   const handleAiFillCheckedChange = useCallback(
@@ -157,6 +170,31 @@ export const ExerciseCardDisplaySettingsCard = ({
               раскрытии. Первый подход и каждый новый по кнопке «Добавить подход»
               подставляют повторения и вес из соответствующего подхода прошлой
               тренировки (если подходов было меньше — берётся последний).
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-start gap-3 rounded-md border border-border p-3">
+          <Checkbox
+            id="exercise-card-reorder"
+            checked={exerciseCardReorderEnabled}
+            onCheckedChange={handleReorderCheckedChange}
+            aria-describedby="exercise-card-reorder-hint"
+          />
+          <div className="grid min-w-0 gap-1">
+            <Label
+              htmlFor="exercise-card-reorder"
+              className="cursor-pointer text-sm font-medium leading-none"
+            >
+              Перетаскивание карточек
+            </Label>
+            <p
+              id="exercise-card-reorder-hint"
+              className="text-xs text-muted-foreground"
+            >
+              Показывает ручку слева на карточке: можно менять порядок упражнений
+              в списке дня. Если выключить — ручка скрыта, порядок не меняется
+              перетаскиванием.
             </p>
           </div>
         </div>
