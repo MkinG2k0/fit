@@ -1,5 +1,7 @@
 import type { AnalyticsPeriod, DashboardAnalytics } from "@/entities/analytics";
+import type { CalendarDay } from "@/entities/calendarDay";
 import { AnalyticsPeriodCompareCard } from "@/features/analyticsPeriodCompare";
+import { ShareStatsButton } from "@/features/shareStats";
 import { AnalyticsCard } from "@/shared/ui/analytics";
 import { cn } from "@/shared/ui/lib/utils";
 import { AnalyticsActivityHeatmapCard } from "./AnalyticsActivityHeatmapCard";
@@ -11,6 +13,7 @@ interface AnalyticsDashboardProps {
   analytics: DashboardAnalytics;
   period: AnalyticsPeriod;
   onPeriodChange: (period: AnalyticsPeriod) => void;
+  days: Record<string, CalendarDay>;
   className?: string;
 }
 
@@ -18,23 +21,32 @@ export const AnalyticsDashboard = ({
   analytics,
   period,
   onPeriodChange,
+  days,
   className,
 }: AnalyticsDashboardProps) => {
   if (analytics.trends.length === 0) {
     return (
-      <AnalyticsCard className={cn(className)}>
-        <p className="text-lg font-semibold text-foreground">
-          Нет данных для аналитики
-        </p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Добавьте упражнения или измените фильтры для построения метрик.
-        </p>
-      </AnalyticsCard>
+      <section className={cn("grid gap-3 sm:gap-4", className)}>
+        <div className="flex justify-end">
+          <ShareStatsButton days={days} defaultPeriod={period} />
+        </div>
+        <AnalyticsCard>
+          <p className="text-lg font-semibold text-foreground">
+            Нет данных для аналитики
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Добавьте упражнения или измените фильтры для построения метрик.
+          </p>
+        </AnalyticsCard>
+      </section>
     );
   }
 
   return (
     <section className={cn("grid gap-3 sm:gap-4", className)}>
+      <div className="flex justify-end">
+        <ShareStatsButton days={days} defaultPeriod={period} />
+      </div>
       <AnalyticsHeroCard
         analytics={analytics}
         summary={analytics.summary}

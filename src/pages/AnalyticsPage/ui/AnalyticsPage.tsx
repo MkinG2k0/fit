@@ -49,6 +49,7 @@ export const AnalyticsPage = () => {
         analytics={analytics}
         period={filters.period}
         onPeriodChange={handlePeriodChange}
+        days={allTrainingDays}
       />
     </div>
   );
