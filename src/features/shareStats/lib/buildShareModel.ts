@@ -116,10 +116,24 @@ export const buildShareModel = (
       selection.period,
       baseDate,
     ).flatMap((session) => {
-      const exercise = session.exercises.find(
+      const [firstExercise, ...duplicateExercises] = session.exercises.filter(
         (item) => item.id === selection.exerciseId,
       );
-      return exercise ? [{ dateKey: session.dateKey, exercise }] : [];
+      if (!firstExercise) {
+        return [];
+      }
+
+      const exercise = duplicateExercises.reduce(
+        (aggregate, item) => ({
+          ...aggregate,
+          tonnage: aggregate.tonnage + item.tonnage,
+          totalReps: aggregate.totalReps + item.totalReps,
+          maxWeight: Math.max(aggregate.maxWeight, item.maxWeight),
+        }),
+        firstExercise,
+      );
+
+      return [{ dateKey: session.dateKey, exercise }];
     });
 
     if (exerciseSessions.length === 0) {
