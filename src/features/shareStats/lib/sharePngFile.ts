@@ -2,7 +2,6 @@ import { Capacitor } from "@capacitor/core";
 import { Directory, Filesystem } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
 
-const BASE64_CHUNK_SIZE = 0x8000;
 const REVOKE_OBJECT_URL_DELAY_MS = 1000;
 const CANCELLED_ERROR_TOKENS = ["cancel", "canceled", "cancelled"];
 
@@ -10,20 +9,27 @@ export type SharePngResult =
   | "native-share"
   | "native-cancelled"
   | "web-share"
+  // Silent cancel — UI treats like native-cancelled (no error toast).
+  | "web-cancelled"
   | "browser-download";
 
-const blobToBase64 = async (blob: Blob): Promise<string> => {
-  const bytes = new Uint8Array(await blob.arrayBuffer());
-  let binary = "";
-
-  for (let offset = 0; offset < bytes.length; offset += BASE64_CHUNK_SIZE) {
-    binary += String.fromCharCode(
-      ...bytes.subarray(offset, offset + BASE64_CHUNK_SIZE),
-    );
-  }
-
-  return btoa(binary);
-};
+const blobToBase64 = (blob: Blob): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      if (typeof result !== "string") {
+        reject(new Error("Failed to read blob as data URL"));
+        return;
+      }
+      const commaIndex = result.indexOf(",");
+      resolve(commaIndex === -1 ? result : result.slice(commaIndex + 1));
+    };
+    reader.onerror = () => {
+      reject(reader.error ?? new Error("Failed to read blob"));
+    };
+    reader.readAsDataURL(blob);
+  });
 
 const extractErrorMessage = (error: unknown): string => {
   if (error instanceof Error) {
@@ -40,6 +46,9 @@ const extractErrorMessage = (error: unknown): string => {
 };
 
 const isShareCancelledError = (error: unknown): boolean => {
+  if (error instanceof DOMException && error.name === "AbortError") {
+    return true;
+  }
   const message = extractErrorMessage(error).toLowerCase();
   return CANCELLED_ERROR_TOKENS.some((token) => message.includes(token));
 };
@@ -98,8 +107,15 @@ export const sharePngFile = async (
     typeof navigator.share === "function" &&
     navigator.canShare?.({ files: [file] })
   ) {
-    await navigator.share({ files: [file], title: "Fit" });
-    return "web-share";
+    try {
+      await navigator.share({ files: [file], title: "Fit" });
+      return "web-share";
+    } catch (error) {
+      if (isShareCancelledError(error)) {
+        return "web-cancelled";
+      }
+      throw error;
+    }
   }
 
   downloadInBrowser(filename, blob);
