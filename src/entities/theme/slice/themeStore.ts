@@ -14,7 +14,7 @@ interface ThemeActions {
 export const useThemeStore = create<ThemeState & ThemeActions>()(
   persist(
     (set) => ({
-      themeMode: "aggressive",
+      themeMode: "calm",
       setThemeMode: (mode) => set({ themeMode: mode }),
     }),
     {

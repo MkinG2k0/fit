@@ -7,6 +7,7 @@ import {
 export interface TonnageData {
   date: string;
   tonnage: number;
+  maxWeight: number;
 }
 
 export const calculateTonnageForExercise = (

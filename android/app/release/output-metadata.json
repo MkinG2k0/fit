@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.fit.myapp",
+  "applicationId": "com.aifit.fit",
   "variantName": "release",
   "elements": [
     {

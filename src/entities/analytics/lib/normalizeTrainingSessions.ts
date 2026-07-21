@@ -19,7 +19,10 @@ const calculateExerciseSessionStat = (
     (acc, set) => acc + calcSetVolumeKg(set.weight, set.reps),
     0,
   );
-  const maxWeight = sets.reduce((acc, set) => Math.max(acc, set.weight), 0);
+  const maxWeight = sets.reduce(
+    (acc, set) => (set.reps > 0 ? Math.max(acc, set.weight) : acc),
+    0,
+  );
 
   return {
     id: exerciseId,

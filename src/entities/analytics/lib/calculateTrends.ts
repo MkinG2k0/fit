@@ -52,12 +52,21 @@ export const calculateExerciseTonnageTrend = (
 ) => {
   return sessions
     .map((session) => {
-      const tonnage = session.exercises
-        .filter((exercise) => isExerciseTonnageMatch(exercise, refs))
-        .reduce((acc, exercise) => acc + exercise.tonnage, 0);
+      const matchedExercises = session.exercises.filter((exercise) =>
+        isExerciseTonnageMatch(exercise, refs),
+      );
+      const tonnage = matchedExercises.reduce(
+        (acc, exercise) => acc + exercise.tonnage,
+        0,
+      );
+      const maxWeight = matchedExercises.reduce(
+        (acc, exercise) => Math.max(acc, exercise.maxWeight),
+        0,
+      );
       return {
         date: session.dateKey,
         tonnage,
+        maxWeight,
       };
     })
     .filter((point) => point.tonnage > 0);

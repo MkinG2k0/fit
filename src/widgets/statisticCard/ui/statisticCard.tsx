@@ -3,6 +3,7 @@ import { ChartColumnBig } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
+import { useCalendarStore } from "@/entities/calendarDay";
 import {
   findCatalogExerciseById,
   useExerciseStore,
@@ -11,6 +12,7 @@ import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { Dialog, DialogContent } from "@/shared/ui/shadCNComponents/ui/dialog";
 import { readAllTrainingDaysFromStorage } from "@/shared/lib/analyticsStorage";
 import { calculateTonnageForExercise } from "../lib/calculateTonnage";
+import { MaxWeightChart } from "./MaxWeightChart";
 import { TonnageChart } from "./TonnageChart";
 
 interface StatisticCardProps {
@@ -37,6 +39,8 @@ export const StatisticCard = ({
   >([]);
   const [activeTab, setActiveTab] = useState<"stats" | "info">("stats");
   const catalogExercises = useExerciseStore((state) => state.exercises);
+  const selectedDate = useCalendarStore((state) => state.selectedDate);
+  const highlightDateKey = selectedDate.format("DD-MM-YYYY");
   const exerciseInfo = catalogExerciseId
     ? findCatalogExerciseById(catalogExercises, catalogExerciseId)
     : undefined;
@@ -123,7 +127,18 @@ export const StatisticCard = ({
                 </Button>
               </div>
               {activeTab === "stats" ? (
-                <TonnageChart exerciseName={exerciseName} data={chartData} />
+                <div className="space-y-3">
+                  <TonnageChart
+                    exerciseName={exerciseName}
+                    data={chartData}
+                    highlightDateKey={highlightDateKey}
+                  />
+                  <MaxWeightChart
+                    exerciseName={exerciseName}
+                    data={chartData}
+                    highlightDateKey={highlightDateKey}
+                  />
+                </div>
               ) : (
                 <div className="space-y-3 rounded-md border bg-card p-4 text-sm text-card-foreground">
                   {exerciseInfo?.photoDataUrls.length ? (

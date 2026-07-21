@@ -15,29 +15,29 @@ import {
 import type { TonnageData } from "../lib/calculateTonnage";
 
 const chartConfig = {
-  tonnage: {
+  maxWeight: {
     label: "КГ",
     color: "var(--color-chart-1)",
   },
 } satisfies ChartConfig;
 
-interface TonnageChartProps {
+interface MaxWeightChartProps {
   exerciseName: string;
   data: TonnageData[];
   highlightDateKey?: string;
 }
 
-export const TonnageChart = ({
+export const MaxWeightChart = ({
   exerciseName,
   data,
   highlightDateKey,
-}: TonnageChartProps) => {
+}: MaxWeightChartProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Тоннаж по упражнению: {exerciseName}</CardTitle>
+        <CardTitle>Макс. вес в упражнении: {exerciseName}</CardTitle>
         <CardDescription>
-          Общий тоннаж (вес × повторения) по датам
+          Максимальный рабочий вес по датам
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -60,14 +60,14 @@ export const TonnageChart = ({
               }}
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <Bar dataKey="tonnage" radius={4}>
+            <Bar dataKey="maxWeight" radius={4}>
               {data.map((entry) => (
                 <Cell
                   key={entry.date}
                   fill={
                     entry.date === highlightDateKey
                       ? "var(--color-chart-2)"
-                      : "var(--color-tonnage)"
+                      : "var(--color-maxWeight)"
                   }
                 />
               ))}
