@@ -27,9 +27,6 @@ export const AnalyticsDashboard = ({
   if (analytics.trends.length === 0) {
     return (
       <section className={cn("grid gap-3 sm:gap-4", className)}>
-        <div className="flex justify-end">
-          <ShareStatsButton days={days} defaultPeriod={period} />
-        </div>
         <AnalyticsCard>
           <p className="text-lg font-semibold text-foreground">
             Нет данных для аналитики
@@ -38,15 +35,13 @@ export const AnalyticsDashboard = ({
             Добавьте упражнения или измените фильтры для построения метрик.
           </p>
         </AnalyticsCard>
+        <ShareStatsButton days={days} defaultPeriod={period} />
       </section>
     );
   }
 
   return (
     <section className={cn("grid gap-3 sm:gap-4", className)}>
-      <div className="flex justify-end">
-        <ShareStatsButton days={days} defaultPeriod={period} />
-      </div>
       <AnalyticsHeroCard
         analytics={analytics}
         summary={analytics.summary}
@@ -65,6 +60,7 @@ export const AnalyticsDashboard = ({
           comparison={analytics.tonnageComparison}
         />
       </div>
+      <ShareStatsButton days={days} defaultPeriod={period} />
     </section>
   );
 };

@@ -18,7 +18,12 @@ export const ShareStatsButton = ({
 
   return (
     <>
-      <Button type="button" variant="outline" onClick={() => setOpen(true)}>
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full"
+        onClick={() => setOpen(true)}
+      >
         <Share2 aria-hidden="true" />
         Поделиться
       </Button>
