@@ -1,12 +1,30 @@
-import dayjs from "dayjs";
+import dayjs, { type Dayjs } from "dayjs";
 import type { AnalyticsPeriod, TrainingSessionStat } from "../model/types";
 import { parseDateKey } from "./dateKey";
 
-const PERIOD_TO_DAYS: Record<AnalyticsPeriod, number> = {
+export const PERIOD_TO_DAYS: Record<AnalyticsPeriod, number> = {
   "7d": 7,
   "30d": 30,
   "90d": 90,
+  "180d": 180,
   "365d": 365,
+};
+
+export const getPeriodDayCount = (period: AnalyticsPeriod) => PERIOD_TO_DAYS[period];
+
+export const getPeriodDateRange = (
+  period: AnalyticsPeriod,
+  baseDate: Dayjs = dayjs(),
+) => {
+  const periodInDays = PERIOD_TO_DAYS[period];
+  const end = baseDate.endOf("day");
+  const start = end.subtract(periodInDays - 1, "day").startOf("day");
+  return {
+    start,
+    end,
+    startDateKey: start.format("DD-MM-YYYY"),
+    endDateKey: end.format("DD-MM-YYYY"),
+  };
 };
 
 const isInRange = (targetDateKey: string, startDate: dayjs.Dayjs, endDate: dayjs.Dayjs) => {
@@ -26,11 +44,9 @@ export const selectSessionsByPeriod = (
   period: AnalyticsPeriod,
   baseDate = dayjs(),
 ) => {
-  const periodInDays = PERIOD_TO_DAYS[period];
-  const endDate = baseDate.endOf("day");
-  const startDate = endDate.subtract(periodInDays - 1, "day").startOf("day");
+  const { start, end } = getPeriodDateRange(period, baseDate);
 
-  return sessions.filter((session) => isInRange(session.dateKey, startDate, endDate));
+  return sessions.filter((session) => isInRange(session.dateKey, start, end));
 };
 
 export const selectPreviousSessionsByPeriod = (
@@ -38,11 +54,8 @@ export const selectPreviousSessionsByPeriod = (
   period: AnalyticsPeriod,
   baseDate = dayjs(),
 ) => {
+  const { start: currentStartDate } = getPeriodDateRange(period, baseDate);
   const periodInDays = PERIOD_TO_DAYS[period];
-  const currentStartDate = baseDate
-    .endOf("day")
-    .subtract(periodInDays - 1, "day")
-    .startOf("day");
   const previousEndDate = currentStartDate.subtract(1, "day").endOf("day");
   const previousStartDate = previousEndDate
     .subtract(periodInDays - 1, "day")
@@ -52,4 +65,3 @@ export const selectPreviousSessionsByPeriod = (
     isInRange(session.dateKey, previousStartDate, previousEndDate),
   );
 };
-

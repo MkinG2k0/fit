@@ -6,6 +6,7 @@ const PERIOD_TO_DAYS: Record<AnalyticsPeriod, number> = {
   "7d": 7,
   "30d": 30,
   "90d": 90,
+  "180d": 180,
   "365d": 365,
 };
 

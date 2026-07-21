@@ -5,6 +5,7 @@ const PERIOD_OPTIONS: Array<{ value: AnalyticsPeriod; label: string }> = [
   { value: "7d", label: "7д" },
   { value: "30d", label: "30д" },
   { value: "90d", label: "90д" },
+  { value: "180d", label: "180д" },
   { value: "365d", label: "1г" },
 ];
 

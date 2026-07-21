@@ -1,4 +1,4 @@
-export type AnalyticsPeriod = "7d" | "30d" | "90d" | "365d";
+export type AnalyticsPeriod = "7d" | "30d" | "90d" | "180d" | "365d";
 
 export interface DateRange {
   startDateKey: string;
