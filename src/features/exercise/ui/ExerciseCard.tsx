@@ -12,7 +12,6 @@ import {
   ChartColumnBig,
   ChevronDown,
   ChevronUp,
-  GripVertical,
   Trash2,
 } from "lucide-react";
 import { useCalendarStore } from "@/entities/calendarDay";
@@ -37,8 +36,8 @@ import { useWorkoutCaloriesUiEnabled } from "../lib/useWorkoutCaloriesUiEnabled"
 
 interface ExerciseCardProps {
   exercise: Exercise;
-  /** Pointer down на grip — старт вертикального Reorder (Motion). */
-  onReorderHandlePointerDown?: (event: ReactPointerEvent<HTMLButtonElement>) => void;
+  /** Pointer down — старт вертикального Reorder за всю карточку (Motion). */
+  onReorderHandlePointerDown?: (event: ReactPointerEvent<Element>) => void;
 }
 
 const SWIPE_DISTANCE_THRESHOLD = 100;
@@ -207,22 +206,15 @@ export const ExerciseCard = ({
           <ChartColumnBig className="text-muted-foreground" />
         </div>
         <div
-          className="relative flex w-full max-w-full self-stretch flex-col items-center justify-center rounded-xl border border-border bg-card text-card-foreground shadow-sm"
+          className={cn(
+            "relative flex w-full max-w-full self-stretch flex-col items-center justify-center rounded-xl border border-border bg-card text-card-foreground shadow-sm",
+            onReorderHandlePointerDown && "touch-none cursor-grab active:cursor-grabbing",
+          )}
           onClick={handleCardHeadClick}
+          onPointerDown={onReorderHandlePointerDown}
         >
           <div className="flex w-full min-w-0 items-center justify-between ">
             <div className="flex min-w-0 flex-1 flex-row items-center ">
-              {onReorderHandlePointerDown ? (
-                <button
-                  type="button"
-                  aria-label="Переместить упражнение"
-                  className="flex shrink-0 touch-none cursor-grab items-center self-stretch px-1.5 text-muted-foreground active:cursor-grabbing"
-                  onPointerDown={onReorderHandlePointerDown}
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  <GripVertical className="size-5" aria-hidden />
-                </button>
-              ) : null}
               <div className={cn("flex items-center justify-center p-2")}>
                 <ExerciseCategoryIcon
                   category={resolvedCategoryName}

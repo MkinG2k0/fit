@@ -21,10 +21,9 @@ const ReorderableExerciseItem = ({ exercise }: { exercise: Exercise }) => {
   const dragControls = useDragControls();
 
   const handleReorderPointerDown = (
-    event: ReactPointerEvent<HTMLButtonElement>,
+    event: ReactPointerEvent<Element>,
   ) => {
     event.preventDefault();
-    event.stopPropagation();
     dragControls.start(event);
   };
 
