@@ -140,7 +140,6 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
     setModalVisibility(false);
   };
 
-  const exerciseColor = `rgba(${exercise.presetColor?.r},${exercise.presetColor?.g},${exercise.presetColor?.b},${exercise.presetColor?.a}`;
   const resolvedCategoryName =
     (exercise.categoryId
       ? findExerciseCategoryById(allExercises, exercise.categoryId)?.category
@@ -190,8 +189,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
           <ChartColumnBig className="text-muted-foreground" />
         </div>
         <div
-          className="relative flex w-full max-w-full self-stretch flex-col items-center justify-center rounded-xl border bg-card text-card-foreground shadow-sm"
-          style={{ borderColor: exerciseColor }}
+          className="relative flex w-full max-w-full self-stretch flex-col items-center justify-center rounded-xl border border-border bg-card text-card-foreground shadow-sm"
           onClick={handleCardHeadClick}
         >
           <div className="flex w-full min-w-0 items-center justify-between ">

@@ -9,8 +9,6 @@ import {
   buildPresetId,
 } from "@/entities/exercise/lib/exerciseIds";
 
-const DEFAULT_PRESET_COLOR = { r: 255, g: 165, b: 0, a: 0.5 };
-
 const catalogExercise = (
   name: string,
   iconId: ExerciseIconId,
@@ -376,7 +374,6 @@ export const trainingPreset = [
       buildCatalogExerciseId("Руки", "Подъём гантелей на бицепс"),
       buildCatalogExerciseId("Руки", "Молотки"),
     ],
-    presetColor: DEFAULT_PRESET_COLOR,
   },
   {
     id: buildPresetId("Спина и трицепс"),
@@ -387,7 +384,6 @@ export const trainingPreset = [
       buildCatalogExerciseId("Спина", "Тяга штанги в наклоне"),
       buildCatalogExerciseId("Руки", "Разгибания на блоке"),
     ],
-    presetColor: DEFAULT_PRESET_COLOR,
   },
   {
     id: buildPresetId("Ноги и плечи"),
@@ -399,7 +395,6 @@ export const trainingPreset = [
       buildCatalogExerciseId("Плечи", "Армейский жим"),
       buildCatalogExerciseId("Плечи", "Махи в сторону"),
     ],
-    presetColor: DEFAULT_PRESET_COLOR,
   },
   {
     id: buildPresetId("Фулбоди для новичка"),
@@ -411,7 +406,6 @@ export const trainingPreset = [
       buildCatalogExerciseId("Пресс", "Планка"),
       buildCatalogExerciseId("Кардио", "Велотренажер"),
     ],
-    presetColor: DEFAULT_PRESET_COLOR,
   },
   {
     id: buildPresetId("Кардио и кор"),
@@ -422,7 +416,6 @@ export const trainingPreset = [
       buildCatalogExerciseId("Пресс", "Скручивания"),
       buildCatalogExerciseId("Пресс", "Планка"),
     ],
-    presetColor: DEFAULT_PRESET_COLOR,
   },
   {
     id: buildPresetId("Спина и бицепс"),
@@ -434,7 +427,6 @@ export const trainingPreset = [
       buildCatalogExerciseId("Руки", "Подъём штанги на бицепс"),
       buildCatalogExerciseId("Руки", "Молотки"),
     ],
-    presetColor: DEFAULT_PRESET_COLOR,
   },
   {
     id: buildPresetId("Ягодицы и ноги"),
@@ -446,7 +438,6 @@ export const trainingPreset = [
       buildCatalogExerciseId("Ноги", "Жим ногами"),
       buildCatalogExerciseId("Икры", "Подъемы на носки стоя"),
     ],
-    presetColor: DEFAULT_PRESET_COLOR,
   },
   {
     id: buildPresetId("Плечи и трицепс"),
@@ -458,7 +449,6 @@ export const trainingPreset = [
       buildCatalogExerciseId("Руки", "Разгибания на блоке"),
       buildCatalogExerciseId("Руки", "Французский жим"),
     ],
-    presetColor: DEFAULT_PRESET_COLOR,
   },
   {
     id: buildPresetId("Легкая восстановительная"),
@@ -470,6 +460,5 @@ export const trainingPreset = [
       buildCatalogExerciseId("Мобильность", "Растяжка грудных мышц"),
       buildCatalogExerciseId("Мобильность", "Мобилизация грудного отдела"),
     ],
-    presetColor: DEFAULT_PRESET_COLOR,
   },
 ];

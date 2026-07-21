@@ -1,6 +1,5 @@
 import type { CalendarDay } from "@/entities/calendarDay";
 import type { Exercise, ExerciseSet } from "@/entities/exercise";
-import type { RgbaColor } from "react-colorful";
 import { readAllWorkoutMonthBuckets } from "./storage";
 
 const isObjectRecord = (value: unknown): value is Record<string, unknown> => {
@@ -51,8 +50,6 @@ const parseExercise = (value: unknown): Exercise | null => {
     .map((set) => parseExerciseSet(set))
     .filter((set): set is ExerciseSet => set !== null);
 
-  const parsedPresetColor = parsePresetColor(value.presetColor);
-
   return {
     id,
     name,
@@ -62,26 +59,6 @@ const parseExercise = (value: unknown): Exercise | null => {
     sets,
     presetName:
       typeof value.presetName === "string" ? value.presetName : undefined,
-    presetColor: parsedPresetColor,
-  };
-};
-
-const parsePresetColor = (value: unknown): RgbaColor | undefined => {
-  if (
-    !isObjectRecord(value) ||
-    typeof value.r !== "number" ||
-    typeof value.g !== "number" ||
-    typeof value.b !== "number" ||
-    typeof value.a !== "number"
-  ) {
-    return undefined;
-  }
-
-  return {
-    r: value.r,
-    g: value.g,
-    b: value.b,
-    a: value.a,
   };
 };
 

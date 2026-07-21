@@ -142,16 +142,14 @@ export const reconcileTrainingPresets = (
       usedDefaultPresetIds.add(defaultPresetId);
 
       return {
-        ...preset,
         presetName: defaultPreset.presetName,
-        presetColor: defaultPreset.presetColor,
         exercises: normalizePresetExercises(defaultPreset.exercises, catalog),
         id: defaultPresetId,
       };
     }
 
     return {
-      ...preset,
+      presetName: preset.presetName,
       exercises: normalizePresetExercises(preset.exercises, catalog),
       id: presetId,
     };
@@ -165,7 +163,7 @@ export const reconcileTrainingPresets = (
     .map((preset) => {
       const presetId = preset.id ?? buildPresetId(preset.presetName);
       return {
-        ...preset,
+        presetName: preset.presetName,
         exercises: normalizePresetExercises(preset.exercises, catalog),
         id: presetId,
       };

@@ -4,7 +4,6 @@ import {
   type ExerciseIconId,
   type TrainingPreset,
 } from "@/entities/exercise";
-import type { RgbaColor } from "react-colorful";
 
 export const submitExercises = (
   selectedExerciseCheckboxes: string[],
@@ -15,7 +14,6 @@ export const submitExercises = (
     name: string,
     group: string,
     presetName?: string,
-    presetColor?: RgbaColor,
     iconId?: ExerciseIconId,
     catalogExerciseId?: string,
     categoryId?: string,
@@ -32,7 +30,6 @@ export const submitExercises = (
       addExercise(
         catalogEntry.name,
         category,
-        undefined,
         undefined,
         catalogEntry.iconId,
         catalogEntry.id,
@@ -56,7 +53,6 @@ export const submitExercises = (
             catalogEntry.name,
             category,
             preset.presetName,
-            preset.presetColor,
             catalogEntry.iconId,
             catalogEntry.id,
             categoryId,

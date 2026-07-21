@@ -1,5 +1,3 @@
-import type { RgbaColor } from "react-colorful";
-
 import type { ExerciseIconId } from "./exerciseIcons";
 
 export type SetCalorieSource = "heart_rate" | "met_fallback";
@@ -31,7 +29,6 @@ export interface Exercise {
   iconId?: ExerciseIconId;
   sets: ExerciseSet[];
   presetName?: string;
-  presetColor?: RgbaColor;
 }
 
 export interface CatalogExercise {
@@ -52,5 +49,4 @@ export interface TrainingPreset {
   id?: string;
   presetName: string;
   exercises: string[];
-  presetColor: RgbaColor;
 }

@@ -1,6 +1,5 @@
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
-import type { RgbaColor } from "react-colorful";
 import { create } from "zustand";
 import type { ExerciseOption } from "@/features/exercise";
 import type {
@@ -37,7 +36,6 @@ interface CalendarStore {
     name: string,
     group: string,
     presetName?: string,
-    presetColor?: RgbaColor,
     iconId?: ExerciseIconId,
     catalogExerciseId?: string,
     categoryId?: string,
@@ -104,7 +102,6 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
     name,
     group,
     presetName?,
-    presetColor?,
     iconId?,
     catalogExerciseId?,
     categoryId?,
@@ -122,7 +119,6 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
           name,
           group,
           presetName,
-          presetColor,
           iconId,
           catalogExerciseId,
           categoryId,

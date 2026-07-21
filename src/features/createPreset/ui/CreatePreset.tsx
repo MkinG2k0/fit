@@ -1,6 +1,5 @@
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { type ChangeEvent, useEffect, useState } from "react";
-import { type RgbaColor } from "react-colorful";
 import { type TrainingPreset, useExerciseStore } from "@/entities/exercise";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { Input } from "@/shared/ui/shadCNComponents/ui/input";
@@ -12,8 +11,6 @@ interface CreatePresetProps {
   initialExercises?: string[];
 }
 
-const DEFAULT_PRESET_COLOR: RgbaColor = { r: 255, g: 0, b: 0, a: 1 };
-
 const createInitialPreset = (
   editingPreset?: TrainingPreset,
   initialExercises: string[] = [],
@@ -22,14 +19,12 @@ const createInitialPreset = (
     return {
       presetName: "",
       exercises: [...initialExercises],
-      presetColor: DEFAULT_PRESET_COLOR,
     };
   }
 
   return {
     presetName: editingPreset.presetName,
     exercises: [...editingPreset.exercises],
-    presetColor: editingPreset.presetColor,
   };
 };
 
