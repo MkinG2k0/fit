@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { AnalyticsPeriod } from "@/entities/analytics";
 import type { CalendarDay } from "@/entities/calendarDay";
+import { parseDateKey } from "@/entities/analytics/lib/dateKey";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
   Drawer,
@@ -10,10 +11,14 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/shared/ui/shadCNComponents/ui/drawer";
+import { MultiSelect } from "@/shared/ui/shadCNComponents/ui/multi-select";
 import { cn } from "@/shared/ui/lib/utils";
-import { buildShareModel } from "../lib/buildShareModel";
 import {
-  listShareExerciseOptions,
+  buildShareModel,
+  listSharePeriodExercises,
+} from "../lib/buildShareModel";
+import {
+  listShareExercisesForDate,
   listShareWorkoutDateKeys,
 } from "../lib/listShareOptions";
 import { renderShareCardToPng } from "../lib/renderShareCardToPng";
@@ -24,6 +29,46 @@ import {
   type ShareSelection,
 } from "../model/types";
 import { ShareCard } from "./ShareCard";
+
+const DEFAULT_PERIOD_EXERCISE_COUNT = 5;
+
+const formatShareDateLabel = (dateKey: string) => {
+  const parsed = parseDateKey(dateKey);
+  if (!parsed) {
+    return dateKey;
+  }
+  return parsed.locale("ru").format("D MMMM YYYY");
+};
+
+const formatExerciseOptionLabel = (option: {
+  name: string;
+  category: string;
+  maxWeight?: number;
+}) => {
+  const base = option.category
+    ? `${option.name} · ${option.category}`
+    : option.name;
+  if (option.maxWeight === undefined || option.maxWeight <= 0) {
+    return base;
+  }
+  return `${base} · ${option.maxWeight.toLocaleString("ru-RU", {
+    maximumFractionDigits: 1,
+  })} кг`;
+};
+
+const formatPeriodExerciseOptionLabel = (option: {
+  name: string;
+  maxWeightFrom: number;
+  maxWeightTo: number;
+}) => {
+  const from = option.maxWeightFrom.toLocaleString("ru-RU", {
+    maximumFractionDigits: 1,
+  });
+  const to = option.maxWeightTo.toLocaleString("ru-RU", {
+    maximumFractionDigits: 1,
+  });
+  return `${option.name} · ${from} → ${to} кг`;
+};
 
 interface ShareStatsSheetProps {
   open: boolean;
@@ -49,28 +94,71 @@ export const ShareStatsSheet = ({
   defaultPeriod,
 }: ShareStatsSheetProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
-  const exerciseOptions = useMemo(() => listShareExerciseOptions(days), [days]);
   const workoutDateKeys = useMemo(() => listShareWorkoutDateKeys(days), [days]);
   const [scope, setScope] = useState<ShareScope>("period");
+  const [exerciseDateKey, setExerciseDateKey] = useState("");
   const [exerciseId, setExerciseId] = useState("");
   const [workoutDateKey, setWorkoutDateKey] = useState("");
   const [period, setPeriod] = useState<AnalyticsPeriod>(defaultPeriod);
+  const [periodExerciseIds, setPeriodExerciseIds] = useState<string[]>([]);
   const [status, setStatus] = useState<{
     variant: "error";
     text: string;
   } | null>(null);
   const [isSharing, setIsSharing] = useState(false);
 
+  const exerciseOptions = useMemo(
+    () => listShareExercisesForDate(days, exerciseDateKey),
+    [days, exerciseDateKey],
+  );
+
+  const periodExerciseOptions = useMemo(
+    () => listSharePeriodExercises(days, period),
+    [days, period],
+  );
+
+  const periodMultiSelectOptions = useMemo(
+    () =>
+      periodExerciseOptions.map((option) => ({
+        value: option.id,
+        label: formatPeriodExerciseOptionLabel(option),
+      })),
+    [periodExerciseOptions],
+  );
+
   useEffect(() => {
     if (!open) {
       return;
     }
 
+    const initialDateKey = workoutDateKeys[0] ?? "";
     setPeriod(defaultPeriod);
-    setExerciseId(exerciseOptions[0]?.id ?? "");
-    setWorkoutDateKey(workoutDateKeys[0] ?? "");
+    setExerciseDateKey(initialDateKey);
+    setWorkoutDateKey(initialDateKey);
     setStatus(null);
-  }, [defaultPeriod, exerciseOptions, open, workoutDateKeys]);
+  }, [defaultPeriod, open, workoutDateKeys]);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const defaultIds = periodExerciseOptions
+      .slice(0, DEFAULT_PERIOD_EXERCISE_COUNT)
+      .map((option) => option.id);
+    setPeriodExerciseIds(defaultIds);
+  }, [open, period, periodExerciseOptions]);
+
+  useEffect(() => {
+    if (!open || scope !== "exercise") {
+      return;
+    }
+
+    const stillValid = exerciseOptions.some((option) => option.id === exerciseId);
+    if (!stillValid) {
+      setExerciseId(exerciseOptions[0]?.id ?? "");
+    }
+  }, [exerciseId, exerciseOptions, open, scope]);
 
   const selection = useMemo<ShareSelection>(() => {
     if (scope === "exercise") {
@@ -79,8 +167,8 @@ export const ShareStatsSheet = ({
     if (scope === "workout") {
       return { scope, dateKey: workoutDateKey };
     }
-    return { scope, period };
-  }, [exerciseId, period, scope, workoutDateKey]);
+    return { scope, period, exerciseIds: periodExerciseIds };
+  }, [exerciseId, period, periodExerciseIds, scope, workoutDateKey]);
 
   const model = useMemo(
     () => buildShareModel(days, selection),
@@ -174,27 +262,66 @@ export const ShareStatsSheet = ({
             </div>
           )}
 
-          {scope === "exercise" && (
+          {scope === "period" && (
             <label className="grid gap-1.5 text-sm font-medium">
-              Упражнение
-              <select
-                value={exerciseId}
-                onChange={(event) => {
-                  setExerciseId(event.target.value);
+              Упражнения в списке
+              <MultiSelect
+                options={periodMultiSelectOptions}
+                selectedValues={periodExerciseIds}
+                placeholder="Выберите упражнения"
+                emptyText="Нет упражнений за период"
+                searchPlaceholder="Поиск упражнения..."
+                onSelectedValuesChange={(values) => {
+                  setPeriodExerciseIds(values);
                   setStatus(null);
                 }}
-                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-              >
-                {exerciseOptions.length === 0 && (
-                  <option value="">Нет упражнений</option>
-                )}
-                {exerciseOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.name} · {option.category}
-                  </option>
-                ))}
-              </select>
+              />
             </label>
+          )}
+
+          {scope === "exercise" && (
+            <div className="grid gap-3">
+              <label className="grid gap-1.5 text-sm font-medium">
+                День тренировки
+                <select
+                  value={exerciseDateKey}
+                  onChange={(event) => {
+                    setExerciseDateKey(event.target.value);
+                    setStatus(null);
+                  }}
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  {workoutDateKeys.length === 0 && (
+                    <option value="">Нет тренировок</option>
+                  )}
+                  {workoutDateKeys.map((dateKey) => (
+                    <option key={dateKey} value={dateKey}>
+                      {formatShareDateLabel(dateKey)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="grid gap-1.5 text-sm font-medium">
+                Упражнение в этот день
+                <select
+                  value={exerciseId}
+                  onChange={(event) => {
+                    setExerciseId(event.target.value);
+                    setStatus(null);
+                  }}
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  {exerciseOptions.length === 0 && (
+                    <option value="">Нет упражнений</option>
+                  )}
+                  {exerciseOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {formatExerciseOptionLabel(option)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
           )}
 
           {scope === "workout" && (
@@ -213,18 +340,18 @@ export const ShareStatsSheet = ({
                 )}
                 {workoutDateKeys.map((dateKey) => (
                   <option key={dateKey} value={dateKey}>
-                    {dateKey}
+                    {formatShareDateLabel(dateKey)}
                   </option>
                 ))}
               </select>
             </label>
           )}
 
-          <div className="mx-auto h-[50vh] max-h-[538px] w-full overflow-auto rounded-lg border border-border bg-muted/30">
-            <div className="relative mx-auto h-[538px] w-[302px] overflow-hidden">
+          <div className="mx-auto w-full overflow-hidden rounded-lg border border-border bg-muted/30 py-3">
+            <div className="relative mx-auto h-[653px] w-[367px] overflow-hidden">
               <ShareCard
                 model={model}
-                className="absolute left-0 top-0 origin-top-left scale-[0.28]"
+                className="absolute left-0 top-0 origin-top-left scale-[0.34]"
               />
             </div>
           </div>

@@ -1,148 +1,192 @@
-﻿### Task 2: Prompts + JSON parser
+### Task 2: Share model types + builders
 
 **Files:**
-- Create: `src/features/profileRingGoalsSettings/lib/buildRingGoalsAiPrompts.ts`
-- Create: `src/features/profileRingGoalsSettings/lib/parseRingGoalsAiResponse.ts`
+- Create: `src/features/shareStats/model/types.ts`
+- Create: `src/features/shareStats/lib/listShareOptions.ts`
+- Create: `src/features/shareStats/lib/buildShareModel.ts`
 
 **Interfaces:**
-- Consumes: `RingGoalsHistorySummary`, `MIN_RING_GOAL_VALUE` / `RingGoalsSettings` from `@/entities/user`
-- Produces:
-  - `getRingGoalsSystemPrompt(): string`
-  - `buildRingGoalsUserPrompt(summary: RingGoalsHistorySummary): string`
-  - `parseRingGoalsAiResponse(raw: string): RingGoalsSettings` (throws `Error` with Russian message)
+- Consumes: `CalendarDay`, `normalizeTrainingSessions`, `selectSessionsByPeriod`, `getPeriodDateRange`, `calculateSummaryMetrics` (import from entity lib path if not exported — prefer exporting `calculateSummaryMetrics` from entity index only if already public; otherwise call `buildDashboardAnalytics` for period scope)
+- Produces: types + `listShareExerciseOptions`, `listShareWorkoutDateKeys`, `buildShareModel`
 
-- [ ] **Step 1: Implement prompts**
+- [ ] **Step 1: Add types**
+
+`src/features/shareStats/model/types.ts`:
 
 ```ts
-import type { RingGoalsHistorySummary } from "./buildRingGoalsHistorySummary";
+import type { AnalyticsPeriod } from "@/entities/analytics";
 
-export const getRingGoalsSystemPrompt = (): string =>
-  [
-    "РўС‹ РїРѕРјРѕРіР°РµС€СЊ РЅР°СЃС‚СЂРѕРёС‚СЊ С†РµР»Рё РґРЅРµРІРЅС‹С… РєРѕР»РµС† РїСЂРѕРіСЂРµСЃСЃР° РІ РїСЂРёР»РѕР¶РµРЅРёРё СѓС‡С‘С‚Р° С‚СЂРµРЅРёСЂРѕРІРѕРє.",
-    "fullSetCount вЂ” С‡РёСЃР»Рѕ РїРѕРґС…РѕРґРѕРІ РґР»СЏ 100% РІРЅРµС€РЅРµРіРѕ РєРѕР»СЊС†Р° Р·Р° РґРµРЅСЊ.",
-    "fullVolume вЂ” РѕР±СЉС‘Рј (СЃСѓРјРјР° РІРµСЃГ—РїРѕРІС‚РѕСЂС‹ СЃ РїСЂР°РІРёР»РѕРј bodyweight) РґР»СЏ 100% РІРЅСѓС‚СЂРµРЅРЅРµРіРѕ РєРѕР»СЊС†Р°.",
-    "Р¦РµР»СЊ РґРѕР»Р¶РЅР° Р±С‹С‚СЊ С‡СѓС‚СЊ РІС‹С€Рµ С‚РёРїРёС‡РЅРѕРіРѕ С‚СЂРµРЅРёСЂРѕРІРѕС‡РЅРѕРіРѕ РґРЅСЏ РїРѕ СЃРІРѕРґРєРµ (Р»С‘РіРєРёР№ РІС‹Р·РѕРІ): РІС‹С€Рµ РјРµРґРёР°РЅС‹, РЅРѕ РѕР±С‹С‡РЅРѕ РЅРёР¶Рµ Р»СѓС‡С€РµРіРѕ РґРЅСЏ; РѕСЂРёРµРЅС‚РёСЂ РѕРєРѕР»Рѕ p75 РґРѕРїСѓСЃС‚РёРј.",
-    "РћС‚РІРµС‚СЊ РўРћР›Р¬РљРћ РІР°Р»РёРґРЅС‹Рј JSON Р±РµР· markdown Рё Р±РµР· РїРѕСЏСЃРЅРµРЅРёР№:",
-    '{"fullSetCount": <С†РµР»РѕРµ >= 1>, "fullVolume": <С†РµР»РѕРµ >= 1>}',
-  ].join(" ");
+export type ShareScope = "exercise" | "workout" | "period";
 
-export const buildRingGoalsUserPrompt = (
-  summary: RingGoalsHistorySummary,
-): string => {
-  const lines = [
-    "РЎРІРѕРґРєР° С‚СЂРµРЅРёСЂРѕРІРѕС‡РЅС‹С… РґРЅРµР№ Р·Р° РїРѕСЃР»РµРґРЅРёРµ 90 РєР°Р»РµРЅРґР°СЂРЅС‹С… РґРЅРµР№:",
-    `trainingDays: ${summary.trainingDays}`,
-    `sets mean/median/p75/best: ${summary.meanSetCount} / ${summary.medianSetCount} / ${summary.p75SetCount} / ${summary.bestSetCount}`,
-    `volume mean/median/p75/best: ${summary.meanVolume} / ${summary.medianVolume} / ${summary.p75Volume} / ${summary.bestVolume}`,
-    "Р•СЃР»Рё trainingDays = 0, РїСЂРµРґР»РѕР¶Рё СЂР°Р·СѓРјРЅС‹Рµ СЃС‚Р°СЂС‚РѕРІС‹Рµ С†РµР»Рё РґР»СЏ РЅРѕРІРёС‡РєР° (Р±Р»РёР·РєРѕ Рє 20 РїРѕРґС…РѕРґРѕРІ Рё 6000 РѕР±СЉС‘РјР°, РјРѕР¶РЅРѕ С‡СѓС‚СЊ СЃРєРѕСЂСЂРµРєС‚РёСЂРѕРІР°С‚СЊ).",
-    "Р’РµСЂРЅРё JSON СЃ fullSetCount Рё fullVolume.",
-  ];
-  return lines.join("\n");
+export type ShareSelection =
+  | { scope: "exercise"; exerciseId: string; period: AnalyticsPeriod }
+  | { scope: "workout"; dateKey: string }
+  | { scope: "period"; period: AnalyticsPeriod };
+
+export interface ShareSparkPoint {
+  dateKey: string;
+  value: number;
+}
+
+export interface ShareExerciseModel {
+  kind: "exercise";
+  title: string;
+  category: string;
+  periodLabel: string;
+  dateRangeLabel: string;
+  maxWeightFrom: number | null;
+  maxWeightTo: number;
+  tonnageKg: number;
+  sessionCount: number;
+  sparkline: ShareSparkPoint[];
+}
+
+export interface ShareWorkoutExerciseLine {
+  name: string;
+  setsSummary: string;
+  tonnageKg: number;
+}
+
+export interface ShareWorkoutModel {
+  kind: "workout";
+  dateKey: string;
+  dateLabel: string;
+  exercises: ShareWorkoutExerciseLine[];
+  tonnageKg: number;
+  exerciseCount: number;
+}
+
+export interface SharePeriodTopExercise {
+  name: string;
+  tonnageKg: number;
+}
+
+export interface SharePeriodModel {
+  kind: "period";
+  periodLabel: string;
+  dateRangeLabel: string;
+  trainingDays: number;
+  tonnageKg: number;
+  streakDays: number | null;
+  topExercises: SharePeriodTopExercise[];
+}
+
+export interface ShareEmptyModel {
+  kind: "empty";
+  message: string;
+}
+
+export type ShareModel =
+  | ShareEmptyModel
+  | ShareExerciseModel
+  | ShareWorkoutModel
+  | SharePeriodModel;
+
+export interface ShareExerciseOption {
+  id: string;
+  name: string;
+  category: string;
+}
+
+export const SHARE_PERIOD_LABELS: Record<AnalyticsPeriod, string> = {
+  "7d": "7 дней",
+  "30d": "30 дней",
+  "90d": "90 дней",
+  "180d": "6 месяцев",
+  "365d": "1 год",
 };
 ```
 
-- [ ] **Step 2: Implement parser**
+- [ ] **Step 2: Implement pick-list helpers**
 
-Mirror extract strategy from `src/features/aiRecommendations/lib/parseAiFillSets.ts` (direct JSON в†’ fence в†’ object slice), then validate:
+`src/features/shareStats/lib/listShareOptions.ts`:
 
 ```ts
+import type { CalendarDay } from "@/entities/calendarDay";
 import {
-  MIN_RING_GOAL_VALUE,
-  type RingGoalsSettings,
-} from "@/entities/user";
+  normalizeTrainingSessions,
+  type AnalyticsFilters,
+} from "@/entities/analytics";
+import type { ShareExerciseOption } from "../model/types";
 
-const EXTRACT_ERROR =
-  "РќРµ СѓРґР°Р»РѕСЃСЊ СЂР°Р·РѕР±СЂР°С‚СЊ РѕС‚РІРµС‚ РР. РџРѕРїСЂРѕР±СѓР№С‚Рµ РµС‰С‘ СЂР°Р·.";
-
-const extractJsonPayload = (raw: string): unknown => {
-  const trimmed = raw.trim();
-  if (!trimmed) {
-    throw new Error(EXTRACT_ERROR);
-  }
-
-  const tryParse = (text: string): unknown | null => {
-    try {
-      return JSON.parse(text) as unknown;
-    } catch {
-      return null;
-    }
-  };
-
-  const direct = tryParse(trimmed);
-  if (direct !== null) {
-    return direct;
-  }
-
-  const fenceMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
-  if (fenceMatch?.[1]) {
-    const fenced = tryParse(fenceMatch[1].trim());
-    if (fenced !== null) {
-      return fenced;
-    }
-  }
-
-  const objectStart = trimmed.indexOf("{");
-  const objectEnd = trimmed.lastIndexOf("}");
-  if (objectStart !== -1 && objectEnd > objectStart) {
-    const objectSlice = tryParse(trimmed.slice(objectStart, objectEnd + 1));
-    if (objectSlice !== null) {
-      return objectSlice;
-    }
-  }
-
-  throw new Error(EXTRACT_ERROR);
+const EMPTY_FILTERS: AnalyticsFilters = {
+  period: "365d",
+  exerciseId: "",
+  category: "",
 };
 
-const parseGoalInteger = (value: unknown): number | null => {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    const rounded = Math.round(value);
-    if (Number.isSafeInteger(rounded) && rounded >= MIN_RING_GOAL_VALUE) {
-      return rounded;
+export const listShareExerciseOptions = (
+  days: Record<string, CalendarDay>,
+): ShareExerciseOption[] => {
+  const sessions = normalizeTrainingSessions(days, EMPTY_FILTERS);
+  const byId = new Map<string, ShareExerciseOption>();
+  for (const session of sessions) {
+    for (const exercise of session.exercises) {
+      if (!byId.has(exercise.id)) {
+        byId.set(exercise.id, {
+          id: exercise.id,
+          name: exercise.name,
+          category: exercise.category,
+        });
+      }
     }
-    return null;
   }
-  if (typeof value === "string" && /^\d+$/.test(value.trim())) {
-    const parsed = Number(value.trim());
-    if (Number.isSafeInteger(parsed) && parsed >= MIN_RING_GOAL_VALUE) {
-      return parsed;
-    }
-  }
-  return null;
+  return [...byId.values()].sort((a, b) => a.name.localeCompare(b.name, "ru"));
 };
 
-export const parseRingGoalsAiResponse = (raw: string): RingGoalsSettings => {
-  const payload = extractJsonPayload(raw);
-  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
-    throw new Error(EXTRACT_ERROR);
-  }
-  const record = payload as { fullSetCount?: unknown; fullVolume?: unknown };
-  const fullSetCount = parseGoalInteger(record.fullSetCount);
-  const fullVolume = parseGoalInteger(record.fullVolume);
-  if (fullSetCount === null || fullVolume === null) {
-    throw new Error(EXTRACT_ERROR);
-  }
-  return { fullSetCount, fullVolume };
+export const listShareWorkoutDateKeys = (
+  days: Record<string, CalendarDay>,
+): string[] => {
+  const sessions = normalizeTrainingSessions(days, EMPTY_FILTERS);
+  return sessions
+    .filter((session) => session.exercises.length > 0)
+    .map((session) => session.dateKey)
+    .sort((a, b) => compareDateKeysAsc(b, a)); // newest first
 };
 ```
 
-- [ ] **Step 3: Sanity-check parser mentally / in console**
+Import `compareDateKeysAsc` from `@/entities/analytics/lib/dateKey` (or re-export it from the analytics barrel if you prefer a public path).
 
-Expected mappings:
-- `'{"fullSetCount":24,"fullVolume":7200}'` в†’ `{ fullSetCount: 24, fullVolume: 7200 }`
-- `'```json\n{"fullSetCount":10,"fullVolume":100}\n```'` в†’ ok
-- `'{"fullSetCount":0,"fullVolume":100}'` в†’ throws
-- `'not json'` в†’ throws
+- [ ] **Step 3: Implement `buildShareModel`**
+
+`src/features/shareStats/lib/buildShareModel.ts` — behavior:
+
+1. `normalizeTrainingSessions(days, { period, exerciseId: "", category: "" })` then filter by selection.
+2. **exercise:** `selectSessionsByPeriod` for `selection.period`, keep only matching `exercise.id`; if no sessions → empty.  
+   - `maxWeightFrom` = first session’s `maxWeight` (chronological), `maxWeightTo` = last; if one session, `maxWeightFrom = null`.  
+   - `tonnageKg` = sum of exercise tonnage in window.  
+   - `sparkline` = `{ dateKey, value: maxWeight }` per session ascending.  
+   - Labels via `SHARE_PERIOD_LABELS` + `getPeriodDateRange`.
+3. **workout:** find session by `dateKey`; if missing/empty → empty.  
+   - For each exercise, `setsSummary` from raw `CalendarDay` sets: `${sets.length}×${reps}` modal or `N подх.` — prefer: if all sets share same reps and weight, `NxR @ Wкг`, else `${sets.length} подх.`.  
+   - Use `calcSetVolumeKg` for day tonnage from raw sets.
+4. **period:** `selectSessionsByPeriod` + reuse summary from `buildDashboardAnalytics(days, { period, exerciseId: "", category: "" })` for `trainingDays`, `totalTonnage`, `currentStreakDays` (set `streakDays` only if `> 0`, else `null`). Top 3 exercises by tonnage across sessions in window.
+5. Empty message: `"Недостаточно данных"`.
+
+Export:
+
+```ts
+export const buildShareModel = (
+  days: Record<string, CalendarDay>,
+  selection: ShareSelection,
+  baseDate?: Dayjs,
+): ShareModel
+```
 
 - [ ] **Step 4: Typecheck**
 
 Run: `pnpm exec tsc --noEmit -p tsconfig.app.json`  
-Expected: clean for new files.
+Expected: PASS.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/features/profileRingGoalsSettings/lib/buildRingGoalsAiPrompts.ts src/features/profileRingGoalsSettings/lib/parseRingGoalsAiResponse.ts
-git commit -m "feat: add ring goals AI prompts and response parser"
+git add src/features/shareStats
+git commit -m "$(cat <<'EOF'
+feat(shareStats): add share model builders for exercise, workout, period
+
+EOF
+)"
 ```
 
 ---

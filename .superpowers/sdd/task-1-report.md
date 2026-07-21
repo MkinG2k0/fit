@@ -1,47 +1,30 @@
-# Task 1 Report: History summary builder
+# Task 1 Report: Extend AnalyticsPeriod with 180d
 
 ## Status
 
-**DONE**
+**DONE_WITH_CONCERNS**
 
 ## Summary
 
-Implemented the 90-day workout history summary builder for AI ring goals under `src/features/profileRingGoalsSettings/lib/`. Two new files provide the constant window size and a pure function that aggregates logged sets/volume per training day within the calendar window.
+Extended `AnalyticsPeriod` union with `"180d"`, centralized period day counts and date-range helpers in `selectSessionsByPeriod.ts`, updated local `PERIOD_TO_DAYS` maps in heatmap/exercise-row calculators, and added 180d options to analytics filter and segmented-control UI. Exported `PERIOD_TO_DAYS`, `getPeriodDayCount`, and `getPeriodDateRange` from the analytics entity public API.
 
-## Files Created
+## Commits
 
-| File | Purpose |
-|------|---------|
-| `src/features/profileRingGoalsSettings/lib/ringGoalsAiConstants.ts` | Exports `RING_GOALS_AI_HISTORY_DAYS = 90` |
-| `src/features/profileRingGoalsSettings/lib/buildRingGoalsHistorySummary.ts` | Exports `RingGoalsHistorySummary` interface and `buildRingGoalsHistorySummary()` |
+| SHA | Subject |
+|-----|---------|
+| `e4d26e2` | feat(analytics): add 180d period for share and filters |
 
-## Implementation Details
+## Files Changed (committed)
 
-### Constants
-
-- `RING_GOALS_AI_HISTORY_DAYS = 90` — inclusive calendar window ending on `now` (today by default).
-
-### `buildRingGoalsHistorySummary(days, now?)`
-
-- **Input:** `Record<string, CalendarDay>` keyed by `DD-MM-YYYY`; optional `now` (defaults to `dayjs()`).
-- **Window:** `[now - 89 days, now]` inclusive (90 calendar days).
-- **Day filtering:** Skips invalid date keys and days outside the window.
-- **Logged set detection:** `reps > 0 || weight > 0`.
-- **Volume:** Uses existing `calcSetVolumeKg(weight, reps)` from `@/shared/lib/calcSetVolumeKg`.
-- **Training day:** A day with at least one logged set (non-null `getDayTotals`).
-- **Aggregates per metric (set count & volume):**
-  - `trainingDays` — count of training days
-  - `mean*` — arithmetic mean
-  - `median*` — standard median (even-length average of middle two)
-  - `p75*` — nearest-rank percentile on sorted ascending values
-  - `best*` — maximum (last element after sort)
-- **Empty history:** All numeric fields return `0`.
-
-### Dependencies Verified
-
-- `CalendarDay` from `@/entities/calendarDay` — `{ exercises: Exercise[] }` with `sets[].weight/reps`.
-- `calcSetVolumeKg` — handles zero-weight bodyweight sets (multiplier 1).
-- `dayjs` + `customParseFormat` — strict parse of `DD-MM-YYYY` keys.
+| File | Change |
+|------|--------|
+| `src/entities/analytics/model/types.ts` | Added `"180d"` to `AnalyticsPeriod` union |
+| `src/entities/analytics/lib/selectSessionsByPeriod.ts` | Exported `PERIOD_TO_DAYS`, `getPeriodDayCount`, `getPeriodDateRange`; refactored `selectSessionsByPeriod` / `selectPreviousSessionsByPeriod` to use helpers |
+| `src/entities/analytics/lib/calculateActivityHeatmap.ts` | Added `"180d": 180` to local map |
+| `src/entities/analytics/lib/calculateExerciseRows.ts` | Added `"180d": 180` to local map |
+| `src/entities/analytics/index.ts` | Re-exported new helpers |
+| `src/features/analyticsFilters/model/types.ts` | Added `{ value: "180d", label: "180 дней" }` between 90d and 365d |
+| `src/widgets/analyticsDashboard/ui/AnalyticsPeriodSegmentedControl.tsx` | Added `{ value: "180d", label: "180д" }` between 90d and 365d |
 
 ## Verification
 
@@ -49,39 +32,36 @@ Implemented the 90-day workout history summary builder for AI ring goals under `
 pnpm exec tsc --noEmit -p tsconfig.app.json
 ```
 
-**Result:** Exit code 2 — **4 pre-existing errors** in `src/entities/exercise/lib/normalizeExerciseCategories.ts` (TS2352). **No errors in new files.**
+**Analytics-related:** PASS — no errors in modified analytics files or `AnalyticsPeriod` consumers after local fix to `formatPeriodComparison.ts`.
 
-## Commit
-
-| SHA | Subject |
-|-----|---------|
-| `3bb87e8` | feat: add ring goals AI history summary |
+**Full project:** FAIL (pre-existing) — 4 errors in `src/entities/exercise/lib/normalizeExerciseCategories.ts` (TS2352 cast issues, unrelated to this task).
 
 ## Self-Review
 
 ### Correctness
 
-- Window math (`RING_GOALS_AI_HISTORY_DAYS - 1` subtracted from end) correctly yields 90 inclusive days.
-- Invalid keys silently skipped — matches plan; no throw on malformed storage keys.
-- `isLoggedSet` + `getDayTotals` null check ensures empty days excluded from `trainingDays`.
-- Percentile uses nearest-rank on sorted copy — consistent with plan comment.
+- `180d` uses 180 inclusive rolling days ending today, consistent with existing `7d`/`30d`/`90d`/`365d` behavior via `getPeriodDateRange`.
+- `selectPreviousSessionsByPeriod` preserves prior-window logic: previous period ends the day before current start, same length.
+- UI order: 7d → 30d → 90d → **180d** → 365d in both filter options and segmented control.
 
-### Scope Adherence
+### Scope adherence
 
-- Only the two specified files created; no UI, prompts, or barrel exports added (not required by brief).
-- No changes to `index.ts` — downstream tasks can import from lib path directly.
+- Did not touch `newsEntries.ts`, docs, or unrelated dirty files.
+- Committed only files listed in task brief.
 
-### Minor Notes
+### Concerns
 
-1. **Comment encoding:** Brief contained mojibake for the Russian JSDoc in constants file; implemented with correct UTF-8: «Календарное окно истории для ИИ-цели колец (включая сегодня).»
-2. **No runtime tests:** Repo has no vitest; verification limited to typecheck as specified.
-3. **Pre-existing tsc errors:** Unrelated to this task; new modules type-check cleanly.
+1. **`formatPeriodComparison.ts` not committed** — TypeScript requires `"180d"` in `PERIOD_LABEL: Record<AnalyticsPeriod, string>`. Fixed locally (`"180d": "180 дней"`) but left uncommitted per brief commit scope. **Next task should commit this one-line addition** or the committed state will fail exhaustive `Record<AnalyticsPeriod, …>` check once that file is typechecked in isolation.
 
-## Concerns
+2. **Pre-existing tsc failures** — `normalizeExerciseCategories.ts` errors existed before this task; full `tsc` does not pass on `master` regardless of this change.
 
-None blocking. Optional follow-up for later tasks: add barrel re-exports in `profileRingGoalsSettings/index.ts` if consumers prefer feature-level imports.
+## Unblocks
 
-## Next Steps (for downstream tasks)
+- Share Stats period picker can import `AnalyticsPeriod` with `180d`.
+- Downstream tasks can use `getPeriodDayCount` / `getPeriodDateRange` from `@/entities/analytics`.
 
-- Wire `buildRingGoalsHistorySummary` into AI prompt builder.
-- Pass persisted calendar days from storage/store into the builder.
+## Fix follow-up
+
+- **Commit:** `05c94c2` — `fix(analytics): add 180d label to period comparison`
+- **File:** `src/features/analyticsPeriodCompare/model/formatPeriodComparison.ts` — added `"180d": "180 дней"` to `PERIOD_LABEL` for `AnalyticsPeriod` exhaustiveness.
+- **Scope:** Only the above file was staged and committed. Did not touch `newsEntries.ts`, docs, or other `.superpowers` files.

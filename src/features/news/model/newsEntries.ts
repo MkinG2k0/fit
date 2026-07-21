@@ -6,6 +6,13 @@ import type { NewsEntry } from "./types";
  */
 export const newsEntries: NewsEntry[] = [
   {
+    id: "exercise-card-reorder",
+    date: "2026-07-21",
+    title: "Перестановка упражнений",
+    summary:
+      "Можно менять порядок карточек на главной перетаскиванием вверх-вниз. Включается в настройках карточки упражнения и по умолчанию выключено.",
+  },
+  {
     id: "timer-notifications",
     date: "2026-07-21",
     title: "Уведомления о конце отдыха",

@@ -33,23 +33,33 @@ const formatDateRangeLabel = (period: AnalyticsPeriod, baseDate?: Dayjs) => {
 const formatWorkoutDateLabel = (dateKey: string) =>
   parseDateKey(dateKey)?.locale("ru").format("D MMMM YYYY") ?? dateKey;
 
+const formatSetWeight = (weight: number): string =>
+  weight.toLocaleString("ru-RU", { maximumFractionDigits: 1 });
+
 const formatSetsSummary = (
   sets: Array<{ weight: number; reps: number }>,
 ): string => {
   if (sets.length === 0) {
-    return "0 подх.";
+    return "Нет подходов";
   }
 
-  const [firstSet] = sets;
-  const areSetsEqual = sets.every(
+  const loggedSets = sets.filter((set) => set.reps > 0 || set.weight > 0);
+  if (loggedSets.length === 0) {
+    return "Нет подходов";
+  }
+
+  const [firstSet] = loggedSets;
+  const areSetsEqual = loggedSets.every(
     (set) => set.reps === firstSet.reps && set.weight === firstSet.weight,
   );
 
   if (areSetsEqual) {
-    return `${sets.length}x${firstSet.reps} @ ${firstSet.weight}кг`;
+    return `${loggedSets.length}×${firstSet.reps} @ ${formatSetWeight(firstSet.weight)} кг`;
   }
 
-  return `${sets.length} подх.`;
+  return loggedSets
+    .map((set) => `${formatSetWeight(set.weight)} кг × ${set.reps}`)
+    .join(" · ");
 };
 
 const buildWorkoutLines = (day: CalendarDay): ShareWorkoutExerciseLine[] =>
@@ -77,26 +87,111 @@ const buildWorkoutLines = (day: CalendarDay): ShareWorkoutExerciseLine[] =>
     })
     .filter((line): line is NonNullable<typeof line> => line !== null);
 
-const buildTopExercises = (
+export interface SharePeriodExerciseOption {
+  id: string;
+  name: string;
+  maxWeightFrom: number;
+  maxWeightTo: number;
+  delta: number;
+}
+
+const rankPeriodExercises = (
   sessions: TrainingSessionStat[],
-): SharePeriodTopExercise[] => {
-  const totalsById = new Map<string, SharePeriodTopExercise>();
+): SharePeriodExerciseOption[] => {
+  type ExerciseProgress = {
+    name: string;
+    firstMaxWeight: number;
+    lastMaxWeight: number;
+  };
+
+  const byId = new Map<string, ExerciseProgress>();
 
   for (const session of sessions) {
+    const dayAggregates = new Map<
+      string,
+      { name: string; maxWeight: number }
+    >();
+
     for (const exercise of session.exercises) {
-      const current = totalsById.get(exercise.id);
-      totalsById.set(exercise.id, {
+      const current = dayAggregates.get(exercise.id);
+      if (!current) {
+        dayAggregates.set(exercise.id, {
+          name: exercise.name,
+          maxWeight: exercise.maxWeight,
+        });
+        continue;
+      }
+      dayAggregates.set(exercise.id, {
         name: exercise.name,
-        tonnageKg: (current?.tonnageKg ?? 0) + exercise.tonnage,
+        maxWeight: Math.max(current.maxWeight, exercise.maxWeight),
+      });
+    }
+
+    for (const [id, dayExercise] of dayAggregates) {
+      const current = byId.get(id);
+      if (!current) {
+        byId.set(id, {
+          name: dayExercise.name,
+          firstMaxWeight: dayExercise.maxWeight,
+          lastMaxWeight: dayExercise.maxWeight,
+        });
+        continue;
+      }
+
+      byId.set(id, {
+        ...current,
+        lastMaxWeight: dayExercise.maxWeight,
       });
     }
   }
 
-  return [...totalsById.values()]
+  return [...byId.entries()]
+    .map(([id, exercise]) => ({
+      id,
+      name: exercise.name,
+      maxWeightFrom: exercise.firstMaxWeight,
+      maxWeightTo: exercise.lastMaxWeight,
+      delta: exercise.lastMaxWeight - exercise.firstMaxWeight,
+    }))
     .sort(
-      (a, b) => b.tonnageKg - a.tonnageKg || a.name.localeCompare(b.name, "ru"),
-    )
-    .slice(0, 3);
+      (a, b) =>
+        b.delta - a.delta ||
+        b.maxWeightTo - a.maxWeightTo ||
+        a.name.localeCompare(b.name, "ru"),
+    );
+};
+
+/** Ranked exercises trained in the period (for multi-select defaults). */
+export const listSharePeriodExercises = (
+  days: Record<string, CalendarDay>,
+  period: AnalyticsPeriod,
+  baseDate?: Dayjs,
+): SharePeriodExerciseOption[] => {
+  const sessions = selectSessionsByPeriod(
+    normalizeTrainingSessions(days, {
+      period,
+      exerciseId: "",
+      category: "",
+    }),
+    period,
+    baseDate,
+  );
+  return rankPeriodExercises(sessions);
+};
+
+const pickPeriodExercises = (
+  ranked: SharePeriodExerciseOption[],
+  exerciseIds: string[],
+): SharePeriodTopExercise[] => {
+  const selected = new Set(exerciseIds);
+  return ranked
+    .filter((exercise) => selected.has(exercise.id))
+    .map(({ id, name, maxWeightFrom, maxWeightTo }) => ({
+      id,
+      name,
+      maxWeightFrom,
+      maxWeightTo,
+    }));
 };
 
 export const buildShareModel = (
@@ -219,7 +314,7 @@ export const buildShareModel = (
   const summary = baseDate
     ? calculateSummaryMetrics(periodSessions)
     : dashboard.summary;
-  const streakDays = summary.frequency.currentStreakDays;
+  const rankedExercises = rankPeriodExercises(periodSessions);
 
   return {
     kind: "period",
@@ -227,7 +322,6 @@ export const buildShareModel = (
     dateRangeLabel: formatDateRangeLabel(selection.period, baseDate),
     trainingDays: summary.frequency.trainingDays,
     tonnageKg: summary.volume.totalTonnage,
-    streakDays: streakDays > 0 ? streakDays : null,
-    topExercises: buildTopExercises(periodSessions),
+    topExercises: pickPeriodExercises(rankedExercises, selection.exerciseIds),
   };
 };

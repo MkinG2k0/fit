@@ -1,53 +1,78 @@
-﻿### Task 3: Orchestration helper
+### Task 3: PNG render + share helpers
 
 **Files:**
-- Create: `src/features/profileRingGoalsSettings/lib/suggestRingGoalsFromHistory.ts`
+- Create: `src/features/shareStats/lib/renderShareCardToPng.ts`
+- Create: `src/features/shareStats/lib/sharePngFile.ts`
+- Modify: `package.json` / lockfile via `pnpm add`
 
 **Interfaces:**
-- Consumes: `createChatCompletion` from `@/shared/api`, summary/prompts/parser helpers, `CalendarDay`, `RingGoalsSettings`
-- Produces: `export const suggestRingGoalsFromHistory = async (days: Record<string, CalendarDay>) => Promise<RingGoalsSettings>`
+- Consumes: `html-to-image`, Capacitor Share/Filesystem (same cancel detection as `downloadTextFile`)
+- Produces:
+  - `renderShareCardToPng(element: HTMLElement): Promise<Blob>`
+  - `sharePngFile(filename: string, blob: Blob): Promise<"native-share" | "native-cancelled" | "web-share" | "browser-download">`
 
-- [ ] **Step 1: Implement orchestrator**
+- [ ] **Step 1: Install dependency**
+
+```bash
+pnpm add html-to-image
+```
+
+- [ ] **Step 2: Render helper**
 
 ```ts
-import type { CalendarDay } from "@/entities/calendarDay";
-import type { RingGoalsSettings } from "@/entities/user";
-import { createChatCompletion } from "@/shared/api";
-import { buildRingGoalsHistorySummary } from "./buildRingGoalsHistorySummary";
-import {
-  buildRingGoalsUserPrompt,
-  getRingGoalsSystemPrompt,
-} from "./buildRingGoalsAiPrompts";
-import { parseRingGoalsAiResponse } from "./parseRingGoalsAiResponse";
+import { toBlob } from "html-to-image";
 
-export const suggestRingGoalsFromHistory = async (
-  days: Record<string, CalendarDay>,
-): Promise<RingGoalsSettings> => {
-  const summary = buildRingGoalsHistorySummary(days);
-  const response = await createChatCompletion([
-    { role: "system", content: getRingGoalsSystemPrompt() },
-    { role: "user", content: buildRingGoalsUserPrompt(summary) },
-  ]);
-
-  const content = response.choices?.[0]?.message?.content?.trim();
-  if (!content) {
-    throw new Error("РЁР»СЋР· РІРµСЂРЅСѓР» РїСѓСЃС‚РѕР№ РѕС‚РІРµС‚. РџРѕРїСЂРѕР±СѓР№С‚Рµ РµС‰С‘ СЂР°Р·.");
+export const renderShareCardToPng = async (
+  element: HTMLElement,
+): Promise<Blob> => {
+  const blob = await toBlob(element, {
+    cacheBust: true,
+    pixelRatio: 2,
+    backgroundColor: undefined,
+  });
+  if (!blob) {
+    throw new Error("Не удалось создать изображение.");
   }
-
-  return parseRingGoalsAiResponse(content);
+  return blob;
 };
 ```
 
-- [ ] **Step 2: Typecheck**
+- [ ] **Step 3: Share helper**
+
+Mirror `downloadTextFile` but for binary PNG:
+
+- Native: write base64 to `Directory.Cache` via `Filesystem.writeFile`, then `Share.share({ title, url: uri, dialogTitle })`. Detect cancel tokens `cancel|canceled|cancelled`.
+- Web: if `navigator.canShare?.({ files: [file] })`, `navigator.share({ files: [file], title: "Fit" })`; else create object URL + `<a download>`.
+
+```ts
+export type SharePngResult =
+  | "native-share"
+  | "native-cancelled"
+  | "web-share"
+  | "browser-download";
+
+export const sharePngFile = async (
+  filename: string,
+  blob: Blob,
+): Promise<SharePngResult> => { /* ... */ };
+```
+
+Convert blob → base64 for Capacitor Filesystem (FileReader or `arrayBuffer` + btoa chunk loop).
+
+- [ ] **Step 4: Typecheck**
 
 Run: `pnpm exec tsc --noEmit -p tsconfig.app.json`  
-Expected: exit 0 for new code.
+Expected: PASS.
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 5: Commit**
 
 ```bash
-git add src/features/profileRingGoalsSettings/lib/suggestRingGoalsFromHistory.ts
-git commit -m "feat: orchestrate AI ring goal suggestion from history"
+git add package.json pnpm-lock.yaml src/features/shareStats/lib/renderShareCardToPng.ts src/features/shareStats/lib/sharePngFile.ts
+git commit -m "$(cat <<'EOF'
+feat(shareStats): add PNG render and native/web share helpers
+
+EOF
+)"
 ```
 
 ---

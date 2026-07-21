@@ -72,13 +72,6 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
           className,
         )}
       >
-        <header className="flex items-center justify-between border-b border-border pb-10">
-          <p className="text-4xl font-extrabold tracking-tight">Fit</p>
-          <p className="text-2xl font-semibold uppercase tracking-widest text-muted-foreground">
-            Мой прогресс
-          </p>
-        </header>
-
         {model.kind === "empty" && (
           <div className="flex flex-1 items-center justify-center">
             <p className="max-w-3xl text-center text-5xl font-semibold leading-tight text-muted-foreground">
@@ -88,7 +81,7 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
         )}
 
         {model.kind === "exercise" && tonnage && (
-          <main className="flex flex-1 flex-col pt-20">
+          <main className="flex flex-1 flex-col">
             <div>
               <p className="text-3xl font-semibold text-primary">
                 {model.category}
@@ -150,16 +143,16 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                         ? "График изменения тоннажа"
                         : "График изменения максимального веса"
                     }
-                    className="h-80 w-full overflow-visible"
+                    className="h-80 w-full text-primary"
                     preserveAspectRatio="none"
                   >
                     <polyline
                       points={buildSparklinePoints(model.sparkline)}
-                      className="fill-none stroke-primary"
-                      strokeWidth="10"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={10}
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      vectorEffect="non-scaling-stroke"
                     />
                   </svg>
                 ) : (
@@ -195,7 +188,7 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
         )}
 
         {model.kind === "workout" && tonnage && (
-          <main className="flex flex-1 flex-col pt-20">
+          <main className="flex flex-1 flex-col">
             <div>
               <p className="text-3xl font-semibold text-primary">Тренировка</p>
               <h1 className="mt-5 text-8xl font-extrabold leading-none tracking-tight">
@@ -217,10 +210,6 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                 )}
               >
                 {visibleWorkoutExercises.map((exercise) => {
-                  const exerciseTonnage = formatTonnageParts(
-                    exercise.tonnageKg,
-                  );
-
                   return (
                     <article
                       key={
@@ -228,42 +217,29 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                         `${exercise.name}-${exercise.setsSummary}-${exercise.tonnageKg}`
                       }
                       className={cn(
-                        "grid grid-cols-[1fr_auto] items-center gap-8 rounded-3xl border border-border bg-card px-10",
+                        "rounded-3xl border border-border bg-card px-10",
                         model.exercises.length > 5 ? "py-4" : "py-8",
                       )}
                     >
-                      <div className="min-w-0">
-                        <h3
-                          className={cn(
-                            "truncate font-bold",
-                            model.exercises.length > 5
-                              ? "text-3xl"
-                              : "text-4xl",
-                          )}
-                        >
-                          {exercise.name}
-                        </h3>
-                        <p
-                          className={cn(
-                            "font-medium text-muted-foreground",
-                            model.exercises.length > 5
-                              ? "mt-1 text-xl"
-                              : "mt-3 text-2xl",
-                          )}
-                        >
-                          {exercise.setsSummary}
-                        </p>
-                      </div>
-                      <p
+                      <h3
                         className={cn(
-                          "font-extrabold tabular-nums text-primary",
-                          model.exercises.length > 5 ? "text-3xl" : "text-4xl",
+                          "font-bold",
+                          model.exercises.length > 5
+                            ? "text-3xl"
+                            : "text-4xl",
                         )}
                       >
-                        {exerciseTonnage.value}
-                        <span className="ml-2 text-2xl font-semibold">
-                          {exerciseTonnage.unit}
-                        </span>
+                        {exercise.name}
+                      </h3>
+                      <p
+                        className={cn(
+                          "font-medium leading-snug text-muted-foreground",
+                          model.exercises.length > 5
+                            ? "mt-1 text-xl"
+                            : "mt-3 text-2xl",
+                        )}
+                      >
+                        {exercise.setsSummary}
                       </p>
                     </article>
                   );
@@ -296,7 +272,7 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
         )}
 
         {model.kind === "period" && tonnage && (
-          <main className="flex flex-1 flex-col pt-20">
+          <main className="flex flex-1 flex-col">
             <div>
               <p className="text-3xl font-semibold text-primary">
                 Итоги периода
@@ -309,82 +285,74 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               </p>
             </div>
 
-            <section className="mt-20 rounded-3xl border border-border bg-card p-12">
-              <p className="text-3xl font-semibold text-muted-foreground">
-                Общий тоннаж
-              </p>
-              <p className="mt-6 text-9xl font-extrabold tabular-nums text-primary">
-                {tonnage.value}
-                <span className="ml-4 text-4xl font-semibold">
-                  {tonnage.unit}
-                </span>
-              </p>
-            </section>
-
-            <section
-              className={cn(
-                "mt-6 grid gap-6",
-                model.streakDays === null ? "grid-cols-1" : "grid-cols-2",
-              )}
-            >
+            <section className="mt-20 grid grid-cols-2 gap-6">
+              <div className="rounded-3xl border border-border bg-card p-10">
+                <p className="text-2xl font-semibold text-muted-foreground">
+                  Общий тоннаж
+                </p>
+                <p className="mt-5 text-6xl font-extrabold tabular-nums text-primary">
+                  {tonnage.value}
+                  <span className="ml-3 text-3xl font-semibold">
+                    {tonnage.unit}
+                  </span>
+                </p>
+              </div>
               <div className="rounded-3xl border border-border bg-card p-10">
                 <p className="text-2xl font-semibold text-muted-foreground">
                   Дней с тренировками
                 </p>
-                <p className="mt-5 text-7xl font-extrabold tabular-nums">
+                <p className="mt-5 text-6xl font-extrabold tabular-nums">
                   {model.trainingDays}
                 </p>
               </div>
-              {model.streakDays !== null && (
-                <div className="rounded-3xl border border-border bg-card p-10">
-                  <p className="text-2xl font-semibold text-muted-foreground">
-                    Серия
-                  </p>
-                  <p className="mt-5 text-7xl font-extrabold tabular-nums">
-                    {model.streakDays}
-                    <span className="ml-3 text-3xl font-semibold text-muted-foreground">
-                      дн.
-                    </span>
-                  </p>
-                </div>
-              )}
             </section>
 
-            <section className="mt-20">
-              <div className="flex items-end justify-between border-b border-border pb-6">
-                <div>
-                  <p className="text-2xl font-semibold uppercase tracking-widest text-muted-foreground">
-                    Топ 3
-                  </p>
-                  <h2 className="mt-3 text-5xl font-bold">Упражнения</h2>
-                </div>
-                <p className="text-2xl font-semibold text-muted-foreground">
-                  по тоннажу
+            <section className="mt-16">
+              <div className="border-b border-border pb-6">
+                <p className="text-2xl font-semibold uppercase tracking-widest text-muted-foreground">
+                  Упражнения
+                </p>
+                <h2 className="mt-3 text-5xl font-bold">
+                  {model.topExercises.length > 0
+                    ? `${model.topExercises.length} в списке`
+                    : "Нет выбранных"}
+                </h2>
+                <p className="mt-4 text-2xl font-medium text-muted-foreground">
+                  Макс. вес в начале периода → в конце
                 </p>
               </div>
-              <ol className="mt-6 grid gap-2">
-                {model.topExercises.slice(0, 3).map((exercise, index) => {
-                  const exerciseTonnage = formatTonnageParts(
-                    exercise.tonnageKg,
-                  );
-
+              <ol className="mt-6 grid gap-1">
+                {model.topExercises.map((exercise, index) => {
                   return (
                     <li
-                      key={exercise.name}
-                      className="grid grid-cols-[auto_1fr_auto] items-center gap-8 border-b border-border py-8"
+                      key={exercise.id}
+                      className="grid grid-cols-[auto_1fr_auto] items-center gap-6 border-b border-border py-6"
                     >
-                      <span className="text-4xl font-extrabold tabular-nums text-primary">
+                      <span className="text-3xl font-extrabold tabular-nums text-primary">
                         {index + 1}
                       </span>
-                      <span className="truncate text-4xl font-bold">
+                      <span className="min-w-0 truncate text-3xl font-bold">
                         {exercise.name}
                       </span>
-                      <span className="text-4xl font-extrabold tabular-nums">
-                        {exerciseTonnage.value}
-                        <span className="ml-2 text-2xl font-semibold text-muted-foreground">
-                          {exerciseTonnage.unit}
-                        </span>
-                      </span>
+                      <div className="text-right tabular-nums">
+                        <p className="flex items-baseline justify-end gap-3">
+                          <span className="text-2xl font-bold text-muted-foreground">
+                            {formatWeight(exercise.maxWeightFrom)}
+                          </span>
+                          <span
+                            className="text-2xl text-primary"
+                            aria-hidden="true"
+                          >
+                            →
+                          </span>
+                          <span className="text-3xl font-extrabold text-primary">
+                            {formatWeight(exercise.maxWeightTo)}
+                            <span className="ml-2 text-xl font-semibold text-muted-foreground">
+                              кг
+                            </span>
+                          </span>
+                        </p>
+                      </div>
                     </li>
                   );
                 })}

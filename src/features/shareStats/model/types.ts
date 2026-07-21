@@ -5,7 +5,7 @@ export type ShareScope = "exercise" | "workout" | "period";
 export type ShareSelection =
   | { scope: "exercise"; exerciseId: string; period: AnalyticsPeriod }
   | { scope: "workout"; dateKey: string }
-  | { scope: "period"; period: AnalyticsPeriod };
+  | { scope: "period"; period: AnalyticsPeriod; exerciseIds: string[] };
 
 export interface ShareSparkPoint {
   dateKey: string;
@@ -43,8 +43,12 @@ export interface ShareWorkoutModel {
 }
 
 export interface SharePeriodTopExercise {
+  id: string;
   name: string;
-  tonnageKg: number;
+  /** Max weight on first training day with this exercise in the period. */
+  maxWeightFrom: number;
+  /** Max weight on last training day with this exercise in the period. */
+  maxWeightTo: number;
 }
 
 export interface SharePeriodModel {
@@ -53,7 +57,6 @@ export interface SharePeriodModel {
   dateRangeLabel: string;
   trainingDays: number;
   tonnageKg: number;
-  streakDays: number | null;
   topExercises: SharePeriodTopExercise[];
 }
 
@@ -72,6 +75,8 @@ export interface ShareExerciseOption {
   id: string;
   name: string;
   category: string;
+  /** Max weight on the selected day — helps disambiguate same-name rows. */
+  maxWeight?: number;
 }
 
 export const SHARE_PERIOD_LABELS: Record<AnalyticsPeriod, string> = {
