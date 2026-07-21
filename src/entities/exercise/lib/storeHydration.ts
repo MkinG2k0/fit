@@ -128,46 +128,22 @@ export const reconcileTrainingPresets = (
     defaultPresetByName.set(preset.presetName.trim().toLowerCase(), preset);
   });
 
-  const usedDefaultPresetIds = new Set<string>();
-
-  const normalizedPresets = presets.map((preset) => {
+  // Normalize persisted presets only. Do not re-seed missing defaults —
+  // deletions and edits must survive reload (persisted state is source of truth).
+  return presets.map((preset) => {
     const presetId = preset.id ?? buildPresetId(preset.presetName);
     const defaultPreset =
       defaultPresetById.get(presetId) ??
       defaultPresetByName.get(preset.presetName.trim().toLowerCase());
 
-    if (defaultPreset) {
-      const defaultPresetId =
-        defaultPreset.id ?? buildPresetId(defaultPreset.presetName);
-      usedDefaultPresetIds.add(defaultPresetId);
-
-      return {
-        presetName: defaultPreset.presetName,
-        exercises: normalizePresetExercises(defaultPreset.exercises, catalog),
-        id: defaultPresetId,
-      };
-    }
+    const stableId = defaultPreset
+      ? (defaultPreset.id ?? buildPresetId(defaultPreset.presetName))
+      : presetId;
 
     return {
       presetName: preset.presetName,
       exercises: normalizePresetExercises(preset.exercises, catalog),
-      id: presetId,
+      id: stableId,
     };
   });
-
-  const missingDefaultPresets = trainingPreset
-    .filter((preset) => {
-      const presetId = preset.id ?? buildPresetId(preset.presetName);
-      return !usedDefaultPresetIds.has(presetId);
-    })
-    .map((preset) => {
-      const presetId = preset.id ?? buildPresetId(preset.presetName);
-      return {
-        presetName: preset.presetName,
-        exercises: normalizePresetExercises(preset.exercises, catalog),
-        id: presetId,
-      };
-    });
-
-  return [...normalizedPresets, ...missingDefaultPresets];
 };
