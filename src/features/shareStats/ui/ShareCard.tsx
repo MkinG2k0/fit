@@ -10,6 +10,7 @@ interface ShareCardProps {
 const SPARKLINE_WIDTH = 952;
 const SPARKLINE_HEIGHT = 320;
 const SPARKLINE_VERTICAL_PADDING = 24;
+const MAX_VISIBLE_WORKOUT_EXERCISES = 8;
 
 const formatWeight = (value: number): string => {
   return value.toLocaleString("ru-RU", {
@@ -54,6 +55,14 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
   ({ model, className }, ref) => {
     const tonnage =
       model.kind === "empty" ? null : formatTonnageParts(model.tonnageKg);
+    const visibleWorkoutExercises =
+      model.kind === "workout"
+        ? model.exercises.slice(0, MAX_VISIBLE_WORKOUT_EXERCISES)
+        : [];
+    const omittedWorkoutExerciseCount =
+      model.kind === "workout"
+        ? model.exercises.length - visibleWorkoutExercises.length
+        : 0;
 
     return (
       <div
@@ -119,7 +128,9 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               <div className="flex items-end justify-between">
                 <div>
                   <p className="text-3xl font-semibold text-muted-foreground">
-                    Динамика веса
+                    {model.sparklineMetric === "tonnage"
+                      ? "Динамика тоннажа"
+                      : "Динамика веса"}
                   </p>
                   <p className="mt-3 text-2xl text-muted-foreground">
                     {model.sparkline.length} точек прогресса
@@ -134,7 +145,11 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                   <svg
                     viewBox={`0 0 ${SPARKLINE_WIDTH} ${SPARKLINE_HEIGHT}`}
                     role="img"
-                    aria-label="График изменения максимального веса"
+                    aria-label={
+                      model.sparklineMetric === "tonnage"
+                        ? "График изменения тоннажа"
+                        : "График изменения максимального веса"
+                    }
                     className="h-80 w-full overflow-visible"
                     preserveAspectRatio="none"
                   >
@@ -195,26 +210,56 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                   {model.exerciseCount}
                 </p>
               </div>
-              <div className="mt-8 grid gap-5">
-                {model.exercises.map((exercise) => {
+              <div
+                className={cn(
+                  "mt-8 grid",
+                  model.exercises.length > 5 ? "gap-3" : "gap-5",
+                )}
+              >
+                {visibleWorkoutExercises.map((exercise) => {
                   const exerciseTonnage = formatTonnageParts(
                     exercise.tonnageKg,
                   );
 
                   return (
                     <article
-                      key={exercise.name}
-                      className="grid grid-cols-[1fr_auto] items-center gap-8 rounded-3xl border border-border bg-card px-10 py-8"
+                      key={
+                        exercise.id ??
+                        `${exercise.name}-${exercise.setsSummary}-${exercise.tonnageKg}`
+                      }
+                      className={cn(
+                        "grid grid-cols-[1fr_auto] items-center gap-8 rounded-3xl border border-border bg-card px-10",
+                        model.exercises.length > 5 ? "py-4" : "py-8",
+                      )}
                     >
                       <div className="min-w-0">
-                        <h3 className="truncate text-4xl font-bold">
+                        <h3
+                          className={cn(
+                            "truncate font-bold",
+                            model.exercises.length > 5
+                              ? "text-3xl"
+                              : "text-4xl",
+                          )}
+                        >
                           {exercise.name}
                         </h3>
-                        <p className="mt-3 text-2xl font-medium text-muted-foreground">
+                        <p
+                          className={cn(
+                            "font-medium text-muted-foreground",
+                            model.exercises.length > 5
+                              ? "mt-1 text-xl"
+                              : "mt-3 text-2xl",
+                          )}
+                        >
                           {exercise.setsSummary}
                         </p>
                       </div>
-                      <p className="text-4xl font-extrabold tabular-nums text-primary">
+                      <p
+                        className={cn(
+                          "font-extrabold tabular-nums text-primary",
+                          model.exercises.length > 5 ? "text-3xl" : "text-4xl",
+                        )}
+                      >
                         {exerciseTonnage.value}
                         <span className="ml-2 text-2xl font-semibold">
                           {exerciseTonnage.unit}
@@ -223,6 +268,11 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                     </article>
                   );
                 })}
+                {omittedWorkoutExerciseCount > 0 && (
+                  <p className="py-2 text-center text-3xl font-semibold text-muted-foreground">
+                    +{omittedWorkoutExerciseCount} ещё
+                  </p>
+                )}
               </div>
             </section>
 
@@ -271,7 +321,12 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               </p>
             </section>
 
-            <section className="mt-6 grid grid-cols-2 gap-6">
+            <section
+              className={cn(
+                "mt-6 grid gap-6",
+                model.streakDays === null ? "grid-cols-1" : "grid-cols-2",
+              )}
+            >
               <div className="rounded-3xl border border-border bg-card p-10">
                 <p className="text-2xl font-semibold text-muted-foreground">
                   Дней с тренировками
@@ -280,19 +335,19 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                   {model.trainingDays}
                 </p>
               </div>
-              <div className="rounded-3xl border border-border bg-card p-10">
-                <p className="text-2xl font-semibold text-muted-foreground">
-                  Серия
-                </p>
-                <p className="mt-5 text-7xl font-extrabold tabular-nums">
-                  {model.streakDays ?? "—"}
-                  {model.streakDays !== null && (
+              {model.streakDays !== null && (
+                <div className="rounded-3xl border border-border bg-card p-10">
+                  <p className="text-2xl font-semibold text-muted-foreground">
+                    Серия
+                  </p>
+                  <p className="mt-5 text-7xl font-extrabold tabular-nums">
+                    {model.streakDays}
                     <span className="ml-3 text-3xl font-semibold text-muted-foreground">
                       дн.
                     </span>
-                  )}
-                </p>
-              </div>
+                  </p>
+                </div>
+              )}
             </section>
 
             <section className="mt-20">

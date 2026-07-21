@@ -22,10 +22,12 @@ export interface ShareExerciseModel {
   maxWeightTo: number;
   tonnageKg: number;
   sessionCount: number;
+  sparklineMetric: "maxWeight" | "tonnage";
   sparkline: ShareSparkPoint[];
 }
 
 export interface ShareWorkoutExerciseLine {
+  id?: string;
   name: string;
   setsSummary: string;
   tonnageKg: number;

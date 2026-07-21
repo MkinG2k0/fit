@@ -69,12 +69,13 @@ const buildWorkoutLines = (day: CalendarDay): ShareWorkoutExerciseLine[] =>
       }
 
       return {
+        id: exercise.catalogExerciseId ?? exercise.id,
         name: exercise.name,
         setsSummary: formatSetsSummary(exercise.sets),
         tonnageKg,
       };
     })
-    .filter((line): line is ShareWorkoutExerciseLine => line !== null);
+    .filter((line): line is NonNullable<typeof line> => line !== null);
 
 const buildTopExercises = (
   sessions: TrainingSessionStat[],
@@ -142,6 +143,13 @@ export const buildShareModel = (
 
     const firstSession = exerciseSessions[0];
     const lastSession = exerciseSessions[exerciseSessions.length - 1];
+    const maxWeightValues = exerciseSessions.map(
+      (session) => session.exercise.maxWeight,
+    );
+    const shouldUseTonnage =
+      maxWeightValues.every((value) => value === 0) ||
+      maxWeightValues.every((value) => value === maxWeightValues[0]);
+    const sparklineMetric = shouldUseTonnage ? "tonnage" : "maxWeight";
 
     return {
       kind: "exercise",
@@ -157,9 +165,13 @@ export const buildShareModel = (
         0,
       ),
       sessionCount: exerciseSessions.length,
+      sparklineMetric,
       sparkline: exerciseSessions.map((session) => ({
         dateKey: session.dateKey,
-        value: session.exercise.maxWeight,
+        value:
+          sparklineMetric === "tonnage"
+            ? session.exercise.tonnage
+            : session.exercise.maxWeight,
       })),
     };
   }
