@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useState, type ChangeEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ChangeEvent,
+} from "react";
 import { Target } from "lucide-react";
 import {
   DEFAULT_RING_GOALS,
@@ -52,6 +58,7 @@ export const ProfileRingGoalsSettingsCard = ({
   const [validationMessage, setValidationMessage] = useState("");
   const [isSuggesting, setIsSuggesting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const aiSuggestionGenerationRef = useRef(0);
 
   useEffect(() => {
     setSetCountGoalInput(String(ringGoals.fullSetCount));
@@ -81,6 +88,7 @@ export const ProfileRingGoalsSettingsCard = ({
   };
 
   const handleSaveRingGoals = () => {
+    aiSuggestionGenerationRef.current += 1;
     setSuccessMessage("");
     const parsedSetGoal = parseGoalValue(setCountGoalInput);
     const parsedVolumeGoal = parseGoalValue(volumeGoalInput);
@@ -98,6 +106,7 @@ export const ProfileRingGoalsSettingsCard = ({
   };
 
   const handleResetRingGoals = () => {
+    aiSuggestionGenerationRef.current += 1;
     setRingGoals(DEFAULT_RING_GOALS);
     setValidationMessage("");
     setSuccessMessage("");
@@ -108,6 +117,8 @@ export const ProfileRingGoalsSettingsCard = ({
       return;
     }
 
+    const suggestionGeneration = aiSuggestionGenerationRef.current + 1;
+    aiSuggestionGenerationRef.current = suggestionGeneration;
     setIsSuggesting(true);
     setValidationMessage("");
     setSuccessMessage("");
@@ -115,9 +126,15 @@ export const ProfileRingGoalsSettingsCard = ({
     try {
       const days = await readAllTrainingDaysFromStorage();
       const goals = await suggestRingGoalsFromHistory(days);
+      if (suggestionGeneration !== aiSuggestionGenerationRef.current) {
+        return;
+      }
       setRingGoals(goals);
       setSuccessMessage("Цель сохранена по истории за 3 месяца");
     } catch (error) {
+      if (suggestionGeneration !== aiSuggestionGenerationRef.current) {
+        return;
+      }
       if (error instanceof AiGatewayError) {
         setValidationMessage(error.message);
       } else if (error instanceof Error && error.message.trim()) {
