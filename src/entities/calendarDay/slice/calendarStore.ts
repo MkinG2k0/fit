@@ -76,6 +76,8 @@ interface CalendarStore {
     sets: Array<{ weight: number; reps: number }>,
   ) => void;
   deleteExercise: (exercise: Exercise) => void;
+  /** Переставляет упражнения выбранного дня по порядку id. */
+  reorderExercises: (orderedIds: string[]) => void;
   deleteSet: (exercise: Exercise, exerciseSet: ExerciseSet) => void;
   /** In-memory remap catalogExerciseId source → target; D-01: две карточки в дне остаются. */
   remapCatalogExerciseId: (
@@ -367,6 +369,48 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
         state.days,
         dateKey,
         newExercises,
+      );
+      return { days: newDays };
+    }),
+
+  reorderExercises: (orderedIds) =>
+    set((state) => {
+      const { dateKey, oldExercises } = getDateKeyAndOldExercises(
+        state.selectedDate,
+        state.days,
+      );
+      if (oldExercises.length === 0 || orderedIds.length === 0) {
+        return state;
+      }
+
+      const byId = new Map(oldExercises.map((exercise) => [exercise.id, exercise]));
+      const reordered: Exercise[] = [];
+
+      for (const id of orderedIds) {
+        const exercise = byId.get(id);
+        if (!exercise) {
+          continue;
+        }
+        reordered.push(exercise);
+        byId.delete(id);
+      }
+
+      for (const exercise of byId.values()) {
+        reordered.push(exercise);
+      }
+
+      if (
+        reordered.length !== oldExercises.length ||
+        reordered.every((exercise, index) => exercise.id === oldExercises[index]?.id)
+      ) {
+        return state;
+      }
+
+      const newDays = replaceExercises(
+        state.selectedDate,
+        state.days,
+        dateKey,
+        reordered,
       );
       return { days: newDays };
     }),

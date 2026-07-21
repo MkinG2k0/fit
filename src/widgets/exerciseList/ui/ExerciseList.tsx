@@ -1,14 +1,45 @@
-import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useMemo } from "react";
+import { AnimatePresence, Reorder, useDragControls } from "motion/react";
+import { useEffect, useMemo, type PointerEvent as ReactPointerEvent } from "react";
 import { AddExercise } from "@/features/addExercise";
 import { ExerciseCard } from "@/features/exercise";
 import { useWorkoutCaloriesUiEnabled } from "@/features/exercise/lib/useWorkoutCaloriesUiEnabled";
 import { useCalendarStore } from "@/entities/calendarDay";
+import type { Exercise } from "@/entities/exercise";
 import { useUserStore } from "@/entities/user";
-import { cn } from "@shared/lib";
 import { calcSetVolumeKg } from "@/shared/lib/calcSetVolumeKg";
 import { FixedBottomBar } from "@shared/ui";
 import { WorkoutSummaryCard } from "./WorkoutSummaryCard";
+
+const ReorderableExerciseItem = ({ exercise }: { exercise: Exercise }) => {
+  const dragControls = useDragControls();
+
+  const handleReorderPointerDown = (
+    event: ReactPointerEvent<HTMLButtonElement>,
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+    dragControls.start(event);
+  };
+
+  return (
+    <Reorder.Item
+      as="div"
+      value={exercise.id}
+      dragListener={false}
+      dragControls={dragControls}
+      initial={{ height: 0, opacity: 0 }}
+      animate={{ height: "auto", opacity: 1 }}
+      exit={{ height: 0, opacity: 0 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="relative"
+    >
+      <ExerciseCard
+        exercise={exercise}
+        onReorderHandlePointerDown={handleReorderPointerDown}
+      />
+    </Reorder.Item>
+  );
+};
 
 export const ExerciseList = () => {
   const showCaloriesUi = useWorkoutCaloriesUiEnabled();
@@ -20,10 +51,16 @@ export const ExerciseList = () => {
   const loadDaysFromLocalStorage = useCalendarStore(
     (state) => state.loadDaysFromLocalStorage,
   );
+  const reorderExercises = useCalendarStore((state) => state.reorderExercises);
   const observableDate = useCalendarStore((state) => state.observableDate);
   const exerciseArray = useMemo(() => {
     return days[selectedDate.format("DD-MM-YYYY")]?.exercises ?? [];
   }, [days, selectedDate]);
+
+  const exerciseIds = useMemo(
+    () => exerciseArray.map((exercise) => exercise.id),
+    [exerciseArray],
+  );
 
   const workoutSummary = useMemo(() => {
     return exerciseArray.reduce(
@@ -70,20 +107,19 @@ export const ExerciseList = () => {
             workoutSummary={workoutSummary}
           />
         ) : null}
-        <AnimatePresence>
-          {exerciseArray.map((ex, index, array) => (
-            <motion.div
-              key={ex.id}
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className={cn("", index === array.length ? "mb-8" : "")}
-            >
-              <ExerciseCard key={ex.id} exercise={ex} />
-            </motion.div>
-          ))}
-        </AnimatePresence>
+        <Reorder.Group
+          as="div"
+          axis="y"
+          values={exerciseIds}
+          onReorder={reorderExercises}
+          className="flex flex-col gap-2"
+        >
+          <AnimatePresence>
+            {exerciseArray.map((ex) => (
+              <ReorderableExerciseItem key={ex.id} exercise={ex} />
+            ))}
+          </AnimatePresence>
+        </Reorder.Group>
       </div>
       <FixedBottomBar>
         <AddExercise />
