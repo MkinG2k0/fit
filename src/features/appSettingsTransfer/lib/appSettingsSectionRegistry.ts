@@ -95,6 +95,7 @@ const isUserProfileExport = (
   workoutListShowDaySummary?: boolean;
   restBetweenSetsEnabled?: boolean;
   restBetweenSetsSec?: number;
+  timerCompleteNotificationsEnabled?: boolean;
   aiFillEnabled?: boolean;
 } => {
   if (!isPlainObject(value)) {
@@ -161,6 +162,12 @@ const isUserProfileExport = (
   ) {
     return false;
   }
+  if (
+    "timerCompleteNotificationsEnabled" in value &&
+    typeof value.timerCompleteNotificationsEnabled !== "boolean"
+  ) {
+    return false;
+  }
   if ("aiFillEnabled" in value && typeof value.aiFillEnabled !== "boolean") {
     return false;
   }
@@ -221,6 +228,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         workoutListShowDaySummary?: boolean;
         restBetweenSetsEnabled?: boolean;
         restBetweenSetsSec?: number;
+        timerCompleteNotificationsEnabled?: boolean;
         aiFillEnabled?: boolean;
       };
       return {
@@ -242,6 +250,8 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         restBetweenSetsSec: clampExportedRestBetweenSetsSec(
           state.restBetweenSetsSec,
         ),
+        timerCompleteNotificationsEnabled:
+          state.timerCompleteNotificationsEnabled ?? true,
         aiFillEnabled: state.aiFillEnabled ?? false,
       };
     },
@@ -268,6 +278,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
             workoutListShowDaySummary?: boolean;
             restBetweenSetsEnabled?: boolean;
             restBetweenSetsSec?: number;
+            timerCompleteNotificationsEnabled?: boolean;
             aiFillEnabled?: boolean;
           };
           const next = {
@@ -304,6 +315,10 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
               restBetweenSetsSec: clampExportedRestBetweenSetsSec(
                 payload.restBetweenSetsSec ?? prevState.restBetweenSetsSec,
               ),
+              timerCompleteNotificationsEnabled:
+                payload.timerCompleteNotificationsEnabled ??
+                prevState.timerCompleteNotificationsEnabled ??
+                true,
               aiFillEnabled:
                 payload.aiFillEnabled ?? prevState.aiFillEnabled ?? false,
             },
@@ -336,6 +351,8 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
             restBetweenSetsSec: clampExportedRestBetweenSetsSec(
               payload.restBetweenSetsSec,
             ),
+            timerCompleteNotificationsEnabled:
+              payload.timerCompleteNotificationsEnabled ?? true,
             aiFillEnabled: payload.aiFillEnabled ?? false,
             accessToken: "",
           },

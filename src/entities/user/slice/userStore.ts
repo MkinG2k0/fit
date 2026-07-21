@@ -56,6 +56,8 @@ interface UserState {
   restBetweenSetsEnabled: boolean;
   /** Длительность отдыха между подходами (сек). По умолчанию 120. */
   restBetweenSetsSec: number;
+  /** Звук, вибрация и системное уведомление при завершении таймера отдыха. */
+  timerCompleteNotificationsEnabled: boolean;
   /** Экспериментальное ИИ-заполнение подходов. По умолчанию выкл. */
   aiFillEnabled: boolean;
 }
@@ -75,6 +77,7 @@ interface ActionsState {
   setWorkoutListShowDaySummary: (enabled: boolean) => void;
   setRestBetweenSetsEnabled: (enabled: boolean) => void;
   setRestBetweenSetsSec: (sec: number) => void;
+  setTimerCompleteNotificationsEnabled: (enabled: boolean) => void;
   setAiFillEnabled: (enabled: boolean) => void;
   setAccessToken: (token: string) => void;
   deleteUserData: () => void;
@@ -98,6 +101,7 @@ export const useUserStore = create<UserState & ActionsState>()(
       workoutListShowDaySummary: true,
       restBetweenSetsEnabled: true,
       restBetweenSetsSec: DEFAULT_REST_BETWEEN_SETS_SEC,
+      timerCompleteNotificationsEnabled: true,
       aiFillEnabled: false,
       accessToken: "",
 
@@ -175,6 +179,11 @@ export const useUserStore = create<UserState & ActionsState>()(
           restBetweenSetsSec: clampRestBetweenSetsSec(sec),
         })),
 
+      setTimerCompleteNotificationsEnabled: (enabled) =>
+        set(() => ({
+          timerCompleteNotificationsEnabled: enabled,
+        })),
+
       setAiFillEnabled: (enabled) =>
         set(() => ({
           aiFillEnabled: enabled,
@@ -244,6 +253,10 @@ export const useUserStore = create<UserState & ActionsState>()(
             Number.isFinite(p.restBetweenSetsSec)
               ? clampRestBetweenSetsSec(p.restBetweenSetsSec)
               : current.restBetweenSetsSec,
+          timerCompleteNotificationsEnabled:
+            typeof p.timerCompleteNotificationsEnabled === "boolean"
+              ? p.timerCompleteNotificationsEnabled
+              : current.timerCompleteNotificationsEnabled,
           aiFillEnabled:
             typeof p.aiFillEnabled === "boolean"
               ? p.aiFillEnabled

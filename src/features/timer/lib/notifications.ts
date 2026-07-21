@@ -1,39 +1,130 @@
+import { useUserStore } from "@/entities/user";
+
+const VIBRATE_PATTERN = [200, 100, 200, 100, 400];
+
+const areTimerNotificationsEnabled = (): boolean =>
+  useUserStore.getState().timerCompleteNotificationsEnabled ?? true;
+
+export const vibrateDevice = () => {
+  if (typeof navigator === "undefined" || !("vibrate" in navigator)) {
+    return;
+  }
+  try {
+    navigator.vibrate(VIBRATE_PATTERN);
+  } catch (error) {
+    console.error("Ошибка вибрации:", error);
+  }
+};
+
 export const playNotificationSound = () => {
-  const audioContext = new window.AudioContext();
-  const oscillator = audioContext.createOscillator();
-  const gainNode = audioContext.createGain();
+  try {
+    const audioContext = new window.AudioContext();
+    const playBeep = (startAt: number, frequency: number, duration: number) => {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
 
-  oscillator.connect(gainNode);
-  gainNode.connect(audioContext.destination);
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
 
-  oscillator.frequency.value = 800;
-  gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(
-    0.01,
-    audioContext.currentTime + 1,
-  );
+      oscillator.frequency.value = frequency;
+      gainNode.gain.setValueAtTime(0.0001, startAt);
+      gainNode.gain.exponentialRampToValueAtTime(0.35, startAt + 0.02);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
 
-  oscillator.start(audioContext.currentTime);
-  oscillator.stop(audioContext.currentTime + 1);
+      oscillator.start(startAt);
+      oscillator.stop(startAt + duration);
+    };
+
+    void audioContext.resume().then(() => {
+      const now = audioContext.currentTime;
+      playBeep(now, 880, 0.25);
+      playBeep(now + 0.35, 880, 0.25);
+      playBeep(now + 0.7, 1175, 0.45);
+    });
+  } catch (error) {
+    console.error("Ошибка воспроизведения звука:", error);
+  }
+};
+
+const showLocalNotification = (title: string, body: string, url: string) => {
+  if (!("Notification" in window) || Notification.permission !== "granted") {
+    return;
+  }
+
+  const notification = new Notification(title, {
+    body,
+    icon: "/logo.svg",
+    badge: "/logo.svg",
+    tag: "timer-complete",
+    requireInteraction: true,
+    // Chrome Android supports vibration on Notification options
+    vibrate: VIBRATE_PATTERN,
+    data: { url },
+  } as NotificationOptions);
+
+  notification.onclick = () => {
+    window.focus();
+    notification.close();
+  };
 };
 
 export const sendPushNotification = async () => {
-  if ("serviceWorker" in navigator && "PushManager" in window) {
-    try {
-      const permission = await Notification.requestPermission();
-      if (permission === "granted") {
-        const registration = await navigator.serviceWorker.getRegistration();
-        if (registration) {
-          registration.active?.postMessage({
-            type: "SHOW_NOTIFICATION",
-            title: "Таймер завершен!",
-            body: "Ваш таймер Fit завершился. Время для следующего упражнения!",
-            url: "/timer",
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Ошибка при отправке push-уведомления:", error);
-    }
+  if (!("Notification" in window)) {
+    return;
   }
+
+  try {
+    const permission =
+      Notification.permission === "default"
+        ? await Notification.requestPermission()
+        : Notification.permission;
+
+    if (permission !== "granted") {
+      return;
+    }
+
+    const title = "Таймер завершен!";
+    const body = "Ваш таймер Fit завершился. Время для следующего упражнения!";
+    const url = "/timer";
+
+    if ("serviceWorker" in navigator) {
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (registration?.active) {
+        registration.active.postMessage({
+          type: "SHOW_NOTIFICATION",
+          title,
+          body,
+          url,
+          vibrate: VIBRATE_PATTERN,
+        });
+        return;
+      }
+    }
+
+    showLocalNotification(title, body, url);
+  } catch (error) {
+    console.error("Ошибка при отправке уведомления:", error);
+  }
+};
+
+/** Call on Start (user gesture) so permission prompt is allowed. */
+export const ensureNotificationPermission = () => {
+  if (!areTimerNotificationsEnabled()) {
+    return;
+  }
+  if (!("Notification" in window)) {
+    return;
+  }
+  if (Notification.permission === "default") {
+    void Notification.requestPermission();
+  }
+};
+
+export const notifyTimerComplete = () => {
+  if (!areTimerNotificationsEnabled()) {
+    return;
+  }
+  vibrateDevice();
+  playNotificationSound();
+  void sendPushNotification();
 };

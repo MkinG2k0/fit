@@ -8,13 +8,7 @@ import {
   WorkoutCaloriesSettingsCard,
   WorkoutSummaryDisplaySettingsCard,
 } from "@/features/exercise";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/shared/ui/shadCNComponents/ui/card";
+import { TimerNotificationsSettingsCard } from "@/features/timer";
 
 export const SettingsPage = () => {
   return (
@@ -37,17 +31,7 @@ export const SettingsPage = () => {
 
       <DefaultExercisesSettingsCard />
 
-      <Card className="gap-3 py-4">
-        <CardHeader className="px-4">
-          <CardTitle>Уведомления</CardTitle>
-          <CardDescription>
-            Здесь появятся напоминания о тренировках и завершении таймера
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="px-4">
-          <p className="text-sm text-muted-foreground">Статус: скоро</p>
-        </CardContent>
-      </Card>
+      <TimerNotificationsSettingsCard />
 
       <SettingsTransferCard />
     </div>

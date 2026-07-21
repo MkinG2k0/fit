@@ -1,5 +1,6 @@
 import { type ReactNode } from "react";
 import { useLocation } from "react-router-dom";
+import { RestTimerExpiryWatcher } from "@/features/timer";
 import { Header } from "@/widgets";
 
 interface AppLayoutProps {
@@ -47,6 +48,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     pb-[max(1rem,env(safe-area-inset-bottom,0px))]
     pl-[max(0.5rem,env(safe-area-inset-left,0px))]"
     >
+      <RestTimerExpiryWatcher />
       <Header date={!isHomePage} title={pageTitle} navigateBack={isHomePage} />
       {children}
     </div>

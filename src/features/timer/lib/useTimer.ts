@@ -5,7 +5,8 @@ import {
   getRemainingMs,
   useRestTimerStore,
 } from "../slice/restTimerStore";
-import { playNotificationSound, sendPushNotification } from "./notifications";
+import { completeRestTimer } from "./completeRestTimer";
+import { ensureNotificationPermission } from "./notifications";
 
 const idleExpiry = () => new Date(Date.now() + 60_000);
 
@@ -19,21 +20,17 @@ export const useTimer = () => {
   const storeResume = useRestTimerStore((s) => s.resume);
   const storeSetDurationSec = useRestTimerStore((s) => s.setDurationSec);
 
-  const expireFiredRef = useRef(false);
   const restartRef = useRef<(expiry: Date, autoStart?: boolean) => void>(
     () => undefined,
   );
   const pauseLibRef = useRef<() => void>(() => undefined);
 
   const handleExpire = useCallback(() => {
-    if (expireFiredRef.current) {
-      return;
+    const currentEndAt = useRestTimerStore.getState().endAt;
+    if (currentEndAt != null) {
+      completeRestTimer(currentEndAt);
     }
-    expireFiredRef.current = true;
-    playNotificationSound();
-    void sendPushNotification();
-    storeClear();
-  }, [storeClear]);
+  }, []);
 
   const initialExpiry =
     endAt != null
@@ -59,7 +56,6 @@ export const useTimer = () => {
 
   useEffect(() => {
     if (endAt != null) {
-      expireFiredRef.current = false;
       restartRef.current(new Date(endAt), true);
       return;
     }
@@ -89,14 +85,15 @@ export const useTimer = () => {
       return;
     }
     if (pausedRemainingMs != null) {
+      ensureNotificationPermission();
       storeResume();
       return;
     }
+    ensureNotificationPermission();
     storeStart(durationSec);
   }, [durationSec, endAt, pausedRemainingMs, storePause, storeResume, storeStart]);
 
   const resetTimer = useCallback(() => {
-    expireFiredRef.current = false;
     storeClear();
     restartRef.current(idleExpiry(), false);
   }, [storeClear]);

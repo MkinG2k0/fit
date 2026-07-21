@@ -66,7 +66,7 @@ self.addEventListener("notificationclick", (event) => {
 
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SHOW_NOTIFICATION") {
-    const { title, body, url } = event.data;
+    const { title, body, url, vibrate } = event.data;
 
     const options = {
       body: body,
@@ -75,6 +75,7 @@ self.addEventListener("message", (event) => {
       data: url || "/",
       tag: "timer-complete",
       requireInteraction: true,
+      vibrate: vibrate || [200, 100, 200, 100, 400],
     };
 
     event.waitUntil(self.registration.showNotification(title, options));

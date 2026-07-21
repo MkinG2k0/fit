@@ -24,6 +24,7 @@ import { getPlanSetsForWeek, useLoadTableStore } from "@/entities/loadTable";
 import { useUserStore } from "@/entities/user";
 import {
   DEFAULT_REST_DURATION_SEC,
+  ensureNotificationPermission,
   useRestTimerStore,
 } from "@/features/timer";
 import { StatisticCard } from "@/widgets/statisticCard";
@@ -62,6 +63,7 @@ const startRestBetweenSetsIfEnabled = () => {
   if (!restBetweenSetsEnabled) {
     return;
   }
+  ensureNotificationPermission();
   useRestTimerStore
     .getState()
     .start(restBetweenSetsSec ?? DEFAULT_REST_DURATION_SEC);

@@ -1,5 +1,7 @@
 export { Timer } from "./ui/timer.tsx";
 export { RestCountdownBadge } from "./ui/RestCountdownBadge";
+export { RestTimerExpiryWatcher } from "./ui/RestTimerExpiryWatcher";
+export { TimerNotificationsSettingsCard } from "./ui/TimerNotificationsSettingsCard";
 export {
   useRestTimerStore,
   getRemainingMs,
@@ -9,3 +11,4 @@ export {
   MAX_REST_DURATION_SEC,
 } from "./slice/restTimerStore";
 export { useTimer } from "./lib/useTimer";
+export { ensureNotificationPermission } from "./lib/notifications";
