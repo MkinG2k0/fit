@@ -5,6 +5,8 @@ import {
   MIN_RING_GOAL_VALUE,
   useUserStore,
 } from "@/entities/user";
+import { AiGatewayError } from "@/shared/api";
+import { readAllTrainingDaysFromStorage } from "@/shared/lib/analyticsStorage";
 import { cn } from "@/shared/lib/classMerge";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
@@ -16,6 +18,7 @@ import {
 } from "@/shared/ui/shadCNComponents/ui/card";
 import { Input } from "@/shared/ui/shadCNComponents/ui/input";
 import { Label } from "@/shared/ui/shadCNComponents/ui/label";
+import { suggestRingGoalsFromHistory } from "../lib/suggestRingGoalsFromHistory";
 
 interface ProfileRingGoalsSettingsCardProps {
   className?: string;
@@ -47,6 +50,8 @@ export const ProfileRingGoalsSettingsCard = ({
     String(ringGoals.fullVolume),
   );
   const [validationMessage, setValidationMessage] = useState("");
+  const [isSuggesting, setIsSuggesting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     setSetCountGoalInput(String(ringGoals.fullSetCount));
@@ -76,6 +81,7 @@ export const ProfileRingGoalsSettingsCard = ({
   };
 
   const handleSaveRingGoals = () => {
+    setSuccessMessage("");
     const parsedSetGoal = parseGoalValue(setCountGoalInput);
     const parsedVolumeGoal = parseGoalValue(volumeGoalInput);
 
@@ -94,6 +100,34 @@ export const ProfileRingGoalsSettingsCard = ({
   const handleResetRingGoals = () => {
     setRingGoals(DEFAULT_RING_GOALS);
     setValidationMessage("");
+    setSuccessMessage("");
+  };
+
+  const handleSuggestAiRingGoals = async () => {
+    if (isSuggesting) {
+      return;
+    }
+
+    setIsSuggesting(true);
+    setValidationMessage("");
+    setSuccessMessage("");
+
+    try {
+      const days = await readAllTrainingDaysFromStorage();
+      const goals = await suggestRingGoalsFromHistory(days);
+      setRingGoals(goals);
+      setSuccessMessage("Цель сохранена по истории за 3 месяца");
+    } catch (error) {
+      if (error instanceof AiGatewayError) {
+        setValidationMessage(error.message);
+      } else if (error instanceof Error && error.message.trim()) {
+        setValidationMessage(error.message);
+      } else {
+        setValidationMessage("Не удалось получить ИИ-цель. Попробуйте позже.");
+      }
+    } finally {
+      setIsSuggesting(false);
+    }
   };
 
   return (
@@ -151,8 +185,23 @@ export const ProfileRingGoalsSettingsCard = ({
           >
             Сбросить по умолчанию
           </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              void handleSuggestAiRingGoals();
+            }}
+            disabled={isSuggesting}
+          >
+            {isSuggesting ? "Считаем…" : "ИИ цель"}
+          </Button>
         </div>
 
+        {successMessage ? (
+          <p className="mt-2 text-sm text-muted-foreground">
+            {successMessage}
+          </p>
+        ) : null}
         {validationMessage ? (
           <p className="mt-2 text-sm text-destructive">{validationMessage}</p>
         ) : null}
