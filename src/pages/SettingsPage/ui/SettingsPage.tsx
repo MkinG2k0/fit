@@ -4,6 +4,7 @@ import { ProfileRingGoalsSettingsCard } from "@/features/profileRingGoalsSetting
 import {
   DefaultExercisesSettingsCard,
   ExerciseCardDisplaySettingsCard,
+  MeasurementTypeSettingsCard,
   RestBetweenSetsSettingsCard,
   WorkoutCaloriesSettingsCard,
   WorkoutSummaryDisplaySettingsCard,
@@ -30,6 +31,8 @@ export const SettingsPage = () => {
       <ExerciseCardDisplaySettingsCard />
 
       <DefaultExercisesSettingsCard />
+
+      <MeasurementTypeSettingsCard />
 
       <TimerNotificationsSettingsCard />
 

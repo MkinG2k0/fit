@@ -6,6 +6,7 @@ import {
   defaultIconIdForCategory,
   useExerciseStore,
   type ExerciseIconId,
+  type MeasurementType,
   type TargetExerciseMeta,
 } from "@/entities/exercise";
 import { useCalendarStore } from "@/entities/calendarDay";
@@ -16,6 +17,7 @@ import { CreateExerciseCategorySection } from "./CreateExerciseCategorySection";
 import { CreateExerciseDescriptionField } from "./CreateExerciseDescriptionField";
 import { CreateExerciseFooter } from "./CreateExerciseFooter";
 import { CreateExerciseIconSection } from "./CreateExerciseIconSection";
+import { CreateExerciseMeasurementSection } from "./CreateExerciseMeasurementSection";
 import { CreateExerciseNameField } from "./CreateExerciseNameField";
 import { CreateExercisePhotosSection } from "./CreateExercisePhotosSection";
 import { MergeExerciseDialog } from "./MergeExerciseDialog";
@@ -111,6 +113,34 @@ export const CreateExercise = ({
   const handleIconSelect = (iconId: ExerciseIconId) => {
     setNewExercise((prevState) => ({ ...prevState, iconId }));
   };
+
+  const handleMeasurementTypeChange = (measurementType: MeasurementType) => {
+    setNewExercise((prevState) => ({
+      ...prevState,
+      measurementType,
+    }));
+  };
+
+  const handleMeasurementStepChange = (measurementStep: number | undefined) => {
+    setNewExercise((prevState) => {
+      if (measurementStep === undefined) {
+        return {
+          category: prevState.category,
+          name: prevState.name,
+          iconId: prevState.iconId,
+          description: prevState.description,
+          photoDataUrls: prevState.photoDataUrls,
+          measurementType: prevState.measurementType,
+        };
+      }
+      return { ...prevState, measurementStep };
+    });
+  };
+
+  const isMeasurementTypeLocked =
+    isEditing &&
+    Boolean(editingExercise) &&
+    editingExercise!.measurementType !== FREE_WEIGHT_MEASUREMENT_TYPE;
 
   const normalizeName = (name: string) => name.trim();
 
@@ -454,6 +484,13 @@ export const CreateExercise = ({
             categories={allExercises}
             selectedCategory={newExercise.category}
             onSelectCategory={handleCategorySelect}
+          />
+          <CreateExerciseMeasurementSection
+            value={newExercise.measurementType}
+            step={newExercise.measurementStep}
+            disabled={isMeasurementTypeLocked}
+            onTypeChange={handleMeasurementTypeChange}
+            onStepChange={handleMeasurementStepChange}
           />
           <CreateExerciseIconSection
             selectedIconId={newExercise.iconId}
