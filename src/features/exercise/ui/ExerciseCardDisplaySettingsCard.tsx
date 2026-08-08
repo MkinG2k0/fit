@@ -27,6 +27,12 @@ export const ExerciseCardDisplaySettingsCard = ({
   const setExerciseCardShowLastSessionResult = useUserStore(
     (s) => s.setExerciseCardShowLastSessionResult,
   );
+  const lastSessionFillButtonEnabled = useUserStore(
+    (s) => s.lastSessionFillButtonEnabled ?? false,
+  );
+  const setLastSessionFillButtonEnabled = useUserStore(
+    (s) => s.setLastSessionFillButtonEnabled,
+  );
   const exerciseCardShowKcalInHeader = useUserStore(
     (s) => s.exerciseCardShowKcalInHeader ?? false,
   );
@@ -53,6 +59,13 @@ export const ExerciseCardDisplaySettingsCard = ({
       setExerciseCardShowLastSessionResult(value === true);
     },
     [setExerciseCardShowLastSessionResult],
+  );
+
+  const handleLastSessionFillCheckedChange = useCallback(
+    (value: boolean | "indeterminate") => {
+      setLastSessionFillButtonEnabled(value === true);
+    },
+    [setLastSessionFillButtonEnabled],
   );
 
   const handleKcalHeaderCheckedChange = useCallback(
@@ -166,10 +179,39 @@ export const ExerciseCardDisplaySettingsCard = ({
               id="exercise-card-last-session-hint"
               className="text-xs text-muted-foreground"
             >
-              Показывает результат прошлой тренировки в свёрнутой карточке и при
-              раскрытии. Первый подход и каждый новый по кнопке «Добавить подход»
-              подставляют повторения и вес из соответствующего подхода прошлой
-              тренировки (если подходов было меньше — берётся последний).
+              Показывает результат прошлой тренировки в раскрытой карточке
+              упражнения.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-start gap-3 rounded-md border border-border p-3">
+          <Checkbox
+            id="exercise-card-last-session-fill"
+            checked={lastSessionFillButtonEnabled}
+            onCheckedChange={handleLastSessionFillCheckedChange}
+            disabled={!exerciseCardShowLastSessionResult}
+            aria-describedby="exercise-card-last-session-fill-hint"
+          />
+          <div className="grid min-w-0 gap-1">
+            <Label
+              htmlFor="exercise-card-last-session-fill"
+              className={cn(
+                "text-sm font-medium leading-none",
+                exerciseCardShowLastSessionResult
+                  ? "cursor-pointer"
+                  : "cursor-not-allowed",
+              )}
+            >
+              Подставлять подходы из прошлой тренировки
+            </Label>
+            <p
+              id="exercise-card-last-session-fill-hint"
+              className="text-xs text-muted-foreground"
+            >
+              {exerciseCardShowLastSessionResult
+                ? "Кнопка «Добавить подход» по очереди берёт вес и повторы из соответствующей попытки прошлой сессии. Когда подходы прошлой закончатся — продолжает текущий вес и повторы."
+                : "Сначала включите «Показывать результат прошлой тренировки»."}
             </p>
           </div>
         </div>

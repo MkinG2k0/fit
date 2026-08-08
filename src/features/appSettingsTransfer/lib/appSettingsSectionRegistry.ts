@@ -90,6 +90,7 @@ const isUserProfileExport = (
   workoutCaloriesEnabled?: boolean;
   defaultSetDurationSec?: number;
   exerciseCardShowLastSessionResult?: boolean;
+  lastSessionFillButtonEnabled?: boolean;
   exerciseCardShowKcalInHeader?: boolean;
   exerciseCardShowTotalVolumeInHeader?: boolean;
   exerciseCardReorderEnabled?: boolean;
@@ -128,6 +129,12 @@ const isUserProfileExport = (
   if (
     "exerciseCardShowLastSessionResult" in value &&
     typeof value.exerciseCardShowLastSessionResult !== "boolean"
+  ) {
+    return false;
+  }
+  if (
+    "lastSessionFillButtonEnabled" in value &&
+    typeof value.lastSessionFillButtonEnabled !== "boolean"
   ) {
     return false;
   }
@@ -230,6 +237,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         workoutCaloriesEnabled?: boolean;
         defaultSetDurationSec?: number;
         exerciseCardShowLastSessionResult?: boolean;
+        lastSessionFillButtonEnabled?: boolean;
         exerciseCardShowKcalInHeader?: boolean;
         exerciseCardShowTotalVolumeInHeader?: boolean;
         exerciseCardReorderEnabled?: boolean;
@@ -249,6 +257,8 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         ),
         exerciseCardShowLastSessionResult:
           state.exerciseCardShowLastSessionResult ?? false,
+        lastSessionFillButtonEnabled:
+          state.lastSessionFillButtonEnabled ?? false,
         exerciseCardShowKcalInHeader:
           state.exerciseCardShowKcalInHeader ?? false,
         exerciseCardShowTotalVolumeInHeader:
@@ -282,6 +292,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
           const prevState = existing.state as {
             defaultSetDurationSec?: number;
             exerciseCardShowLastSessionResult?: boolean;
+            lastSessionFillButtonEnabled?: boolean;
             exerciseCardShowKcalInHeader?: boolean;
             exerciseCardShowTotalVolumeInHeader?: boolean;
             exerciseCardReorderEnabled?: boolean;
@@ -305,6 +316,10 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
               exerciseCardShowLastSessionResult:
                 payload.exerciseCardShowLastSessionResult ??
                 prevState.exerciseCardShowLastSessionResult ??
+                false,
+              lastSessionFillButtonEnabled:
+                payload.lastSessionFillButtonEnabled ??
+                prevState.lastSessionFillButtonEnabled ??
                 false,
               exerciseCardShowKcalInHeader:
                 payload.exerciseCardShowKcalInHeader ??
@@ -355,6 +370,8 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
             ),
             exerciseCardShowLastSessionResult:
               payload.exerciseCardShowLastSessionResult ?? false,
+            lastSessionFillButtonEnabled:
+              payload.lastSessionFillButtonEnabled ?? false,
             exerciseCardShowKcalInHeader:
               payload.exerciseCardShowKcalInHeader ?? false,
             exerciseCardShowTotalVolumeInHeader:

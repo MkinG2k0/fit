@@ -46,6 +46,8 @@ interface UserState {
   workoutCalorieProfileOnboarding: WorkoutCalorieProfileOnboardingStatus;
   /** Подсказка прошлой тренировки в свёрнутой карточке упражнения. */
   exerciseCardShowLastSessionResult: boolean;
+  /** Кнопка добавления всех подходов прошлой тренировки. По умолчанию выкл. */
+  lastSessionFillButtonEnabled: boolean;
   /** Ккал в шапке карточки (имеет смысл при включённом учёте ккал в нативном приложении). */
   exerciseCardShowKcalInHeader: boolean;
   /** Суммарный объём (повторы × вес) в шапке карточки. */
@@ -74,6 +76,7 @@ interface ActionsState {
     status: WorkoutCalorieProfileOnboardingStatus,
   ) => void;
   setExerciseCardShowLastSessionResult: (enabled: boolean) => void;
+  setLastSessionFillButtonEnabled: (enabled: boolean) => void;
   setExerciseCardShowKcalInHeader: (enabled: boolean) => void;
   setExerciseCardShowTotalVolumeInHeader: (enabled: boolean) => void;
   setExerciseCardReorderEnabled: (enabled: boolean) => void;
@@ -99,6 +102,7 @@ export const useUserStore = create<UserState & ActionsState>()(
       defaultSetDurationSec: 60,
       workoutCalorieProfileOnboarding: "pending",
       exerciseCardShowLastSessionResult: false,
+      lastSessionFillButtonEnabled: false,
       exerciseCardShowKcalInHeader: false,
       exerciseCardShowTotalVolumeInHeader: true,
       exerciseCardReorderEnabled: false,
@@ -156,6 +160,13 @@ export const useUserStore = create<UserState & ActionsState>()(
       setExerciseCardShowLastSessionResult: (enabled) =>
         set(() => ({
           exerciseCardShowLastSessionResult: enabled,
+          ...(enabled ? {} : { lastSessionFillButtonEnabled: false }),
+        })),
+
+      setLastSessionFillButtonEnabled: (enabled) =>
+        set((state) => ({
+          lastSessionFillButtonEnabled:
+            enabled && state.exerciseCardShowLastSessionResult,
         })),
 
       setExerciseCardShowKcalInHeader: (enabled) =>
@@ -241,6 +252,17 @@ export const useUserStore = create<UserState & ActionsState>()(
             typeof p.exerciseCardShowLastSessionResult === "boolean"
               ? p.exerciseCardShowLastSessionResult
               : current.exerciseCardShowLastSessionResult,
+          lastSessionFillButtonEnabled: (() => {
+            const showLast =
+              typeof p.exerciseCardShowLastSessionResult === "boolean"
+                ? p.exerciseCardShowLastSessionResult
+                : current.exerciseCardShowLastSessionResult;
+            const fillEnabled =
+              typeof p.lastSessionFillButtonEnabled === "boolean"
+                ? p.lastSessionFillButtonEnabled
+                : current.lastSessionFillButtonEnabled;
+            return showLast && fillEnabled;
+          })(),
           exerciseCardShowKcalInHeader:
             typeof p.exerciseCardShowKcalInHeader === "boolean"
               ? p.exerciseCardShowKcalInHeader

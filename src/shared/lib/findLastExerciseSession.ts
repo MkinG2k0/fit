@@ -76,7 +76,7 @@ export interface LastExerciseSession {
   sets: LastExerciseSessionSetValues[];
 }
 
-/** Значения подхода по индексу; при нехватке подходов — последний из прошлой сессии. */
+/** Значения подхода по индексу прошлой сессии; вне диапазона — нули (без fallback). */
 export const getSetPrefillFromLastSession = (
   lastSets: LastExerciseSessionSetValues[] | undefined,
   targetIndex: number,
@@ -84,7 +84,7 @@ export const getSetPrefillFromLastSession = (
   if (!lastSets?.length) {
     return { reps: 0, weight: 0 };
   }
-  return lastSets[targetIndex] ?? lastSets[lastSets.length - 1]!;
+  return lastSets[targetIndex] ?? { reps: 0, weight: 0 };
 };
 
 const pickExerciseOnDay = (

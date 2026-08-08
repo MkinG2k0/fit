@@ -4,7 +4,6 @@ import * as motion from "motion/react-client";
 import {
   type ChangeEvent,
   useCallback,
-  useEffect,
   useRef,
   useState,
 } from "react";
@@ -116,8 +115,11 @@ export const ExerciseBody = ({
     };
   })();
   const showCaloriesUi = useWorkoutCaloriesUiEnabled();
-  const prefillFromLastSession = useUserStore(
+  const showLastSessionResult = useUserStore(
     (s) => s.exerciseCardShowLastSessionResult ?? false,
+  );
+  const lastSessionFillEnabled = useUserStore(
+    (s) => s.lastSessionFillButtonEnabled ?? false,
   );
   const aiFillEnabled = useUserStore((s) => s.aiFillEnabled ?? false);
 
@@ -125,7 +127,6 @@ export const ExerciseBody = ({
   const addSetToExercise = useCalendarStore((store) => store.addSetToExercise);
   const addSetGuardRef = useRef(false);
   const aiFillGuardRef = useRef(false);
-  const firstSetPrefillAttemptedRef = useRef<string | null>(null);
   const [aiFillLoading, setAiFillLoading] = useState(false);
   const [aiFillError, setAiFillError] = useState<string | null>(null);
   const [aiFillEmptyMessage, setAiFillEmptyMessage] = useState<string | null>(
@@ -153,6 +154,33 @@ export const ExerciseBody = ({
     addSetGuardRef.current = true;
     try {
       const lastSet = exercise.sets.at(-1);
+      const catalogExerciseId = exercise.catalogExerciseId?.trim();
+      const loadTableEntryForAdd = catalogExerciseId
+        ? useLoadTableStore
+            .getState()
+            .exercises.find((item) => item.catalogExerciseId === catalogExerciseId)
+        : undefined;
+
+      const lastSets =
+        lastSessionFillEnabled && !loadTableEntryForAdd
+          ? lastSession?.sets
+          : undefined;
+      const firstSet = exercise.sets[0];
+      const onlyEmptyPlaceholder =
+        exercise.sets.length === 1 &&
+        firstSet != null &&
+        firstSet.reps === 0 &&
+        firstSet.weight === 0;
+
+      // Пустой стартовый подход: заполняем из прошлой сессии вместо добавления нового.
+      if (onlyEmptyPlaceholder && firstSet && lastSets?.length) {
+        const prefill = getSetPrefillFromLastSession(lastSets, 0);
+        onChangeHandler(String(prefill.reps), "reps", firstSet.id, exercise);
+        onChangeHandler(String(prefill.weight), "weight", firstSet.id, exercise);
+        startRestBetweenSetsIfEnabled();
+        return;
+      }
+
       const previousEnd =
         lastSet?.endTime !== undefined && lastSet.endTime !== ""
           ? new Date(lastSet.endTime)
@@ -171,13 +199,6 @@ export const ExerciseBody = ({
       let weight = lastSet?.weight ?? 0;
       let reps = lastSet?.reps ?? 0;
 
-      const catalogExerciseId = exercise.catalogExerciseId?.trim();
-      const loadTableEntryForAdd = catalogExerciseId
-        ? useLoadTableStore
-            .getState()
-            .exercises.find((item) => item.catalogExerciseId === catalogExerciseId)
-        : undefined;
-
       if (loadTableEntryForAdd) {
         const planSets = getPlanSetsForWeek(
           loadTableEntryForAdd.maxKg,
@@ -188,14 +209,14 @@ export const ExerciseBody = ({
           weight = planSet.weight;
           reps = planSet.reps;
         }
-      } else if (prefillFromLastSession) {
+      } else if (lastSets?.length) {
         const nextSetIndex = exercise.sets.length;
-        const prefill = getSetPrefillFromLastSession(
-          lastSession?.sets,
-          nextSetIndex,
-        );
-        weight = prefill.weight;
-        reps = prefill.reps;
+        if (nextSetIndex < lastSets.length) {
+          const prefill = getSetPrefillFromLastSession(lastSets, nextSetIndex);
+          weight = prefill.weight;
+          reps = prefill.reps;
+        }
+        // За пределами прошлой сессии оставляем weight/reps из текущего lastSet.
       }
 
       addSetToExercise(exercise, {
@@ -212,7 +233,8 @@ export const ExerciseBody = ({
     addSetToExercise,
     exercise,
     lastSession?.sets,
-    prefillFromLastSession,
+    lastSessionFillEnabled,
+    onChangeHandler,
   ]);
 
   const handleAiFill = useCallback(async () => {
@@ -320,51 +342,12 @@ export const ExerciseBody = ({
     }
   }, [addSetToExercise, aiFillLoading, exercise]);
 
-  useEffect(() => {
-    if (!prefillFromLastSession || !lastSession?.sets.length) {
-      return;
-    }
-    if (firstSetPrefillAttemptedRef.current === exercise.id) {
-      return;
-    }
-
-    const catalogExerciseId = exercise.catalogExerciseId?.trim();
-    const isInLoadTable = catalogExerciseId
-      ? useLoadTableStore
-          .getState()
-          .exercises.some((item) => item.catalogExerciseId === catalogExerciseId)
-      : false;
-    if (isInLoadTable) {
-      firstSetPrefillAttemptedRef.current = exercise.id;
-      return;
-    }
-
-    const firstSet = exercise.sets[0];
-    if (exercise.sets.length !== 1 || !firstSet) {
-      return;
-    }
-    if (firstSet.reps !== 0 || firstSet.weight !== 0) {
-      firstSetPrefillAttemptedRef.current = exercise.id;
-      return;
-    }
-
-    const prefill = getSetPrefillFromLastSession(lastSession.sets, 0);
-    firstSetPrefillAttemptedRef.current = exercise.id;
-    onChangeHandler(String(prefill.reps), "reps", firstSet.id, exercise);
-    onChangeHandler(String(prefill.weight), "weight", firstSet.id, exercise);
-  }, [
-    exercise,
-    lastSession?.sets,
-    onChangeHandler,
-    prefillFromLastSession,
-  ]);
-
   return (
     <div
       className="flex flex-col w-full gap-2 p-4 pt-0 max-w-[800px]"
       onClick={(event) => event.stopPropagation()}
     >
-      {lastSession !== null ? (
+      {showLastSessionResult && lastSession !== null ? (
         <p
           className="w-full px-4 text-center text-xs leading-snug text-muted-foreground"
           role="note"
