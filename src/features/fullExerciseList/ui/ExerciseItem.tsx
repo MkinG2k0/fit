@@ -1,6 +1,6 @@
 import { memo, type MouseEvent } from "react";
 import { Pencil, Trash2 } from "lucide-react";
-import type { ExerciseIconId } from "@/entities/exercise";
+import type { ExerciseIconId, MeasurementType } from "@/entities/exercise";
 import { cn } from "@/shared/lib";
 import { ExerciseIconGraphic } from "@/shared/ui";
 import { Checkbox } from "@/shared/ui/shadCNComponents/ui/checkbox";
@@ -14,6 +14,8 @@ interface ExerciseItemProps {
   iconId: ExerciseIconId;
   description: string;
   photoDataUrls: string[];
+  measurementType: MeasurementType;
+  measurementStep?: number;
   checkable: "checkbox" | "radio" | false;
   deletable: boolean;
   /** Показывать корзину в строке списка (удаление из экрана редактирования — отдельно). */
@@ -28,6 +30,8 @@ interface ExerciseItemProps {
     iconId: ExerciseIconId;
     description: string;
     photoDataUrls: string[];
+    measurementType: MeasurementType;
+    measurementStep?: number;
   }) => void;
   category: string;
 }
@@ -38,6 +42,8 @@ export const ExerciseItem = memo(({
   iconId,
   description,
   photoDataUrls,
+  measurementType,
+  measurementStep,
   checkable,
   deletable,
   allowListDelete = true,
@@ -54,7 +60,16 @@ export const ExerciseItem = memo(({
 
   const handleEditClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    onEdit?.({ id, name, category, iconId, description, photoDataUrls });
+    onEdit?.({
+      id,
+      name,
+      category,
+      iconId,
+      description,
+      photoDataUrls,
+      measurementType,
+      ...(measurementStep !== undefined ? { measurementStep } : {}),
+    });
   };
 
   return (

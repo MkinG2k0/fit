@@ -15,6 +15,12 @@ import {
   resolveCatalogExerciseId,
 } from "../lib/storeHydration";
 import type { ExerciseIconId } from "../model/exerciseIcons";
+import {
+  FREE_WEIGHT_MEASUREMENT_TYPE,
+  normalizeMeasurementStep,
+  normalizeMeasurementType,
+  type MeasurementType,
+} from "../model/measurementTypes";
 import type { ExerciseCategory, TrainingPreset } from "../model/types";
 
 dayjs.locale("ru");
@@ -32,6 +38,8 @@ interface ExerciseStore {
     iconId: ExerciseIconId;
     description: string;
     photoDataUrls: string[];
+    measurementType?: MeasurementType;
+    measurementStep?: number;
   }) => void;
   createCategory: (categoryName: string) => void;
   renameCategory: (categoryId: string, newCategoryName: string) => void;
@@ -51,6 +59,8 @@ interface ExerciseStore {
     iconId: ExerciseIconId;
     description: string;
     photoDataUrls: string[];
+    measurementType?: MeasurementType;
+    measurementStep?: number;
   }) => void;
   deleteTrainingPreset: (presetId: string) => void;
 }
@@ -95,6 +105,13 @@ export const useExerciseStore = create<ExerciseStore>()(
       },
       createExercise: (newExercise) =>
         set((state) => {
+          const measurementType = normalizeMeasurementType(
+            newExercise.measurementType ?? FREE_WEIGHT_MEASUREMENT_TYPE,
+          );
+          const measurementStep = normalizeMeasurementStep(
+            measurementType,
+            newExercise.measurementStep,
+          );
           const newExerciseArray = state.exercises.map((exerciseGroup) =>
             exerciseGroup.category === newExercise.category
               ? {
@@ -109,6 +126,10 @@ export const useExerciseStore = create<ExerciseStore>()(
                       photoDataUrls: newExercise.photoDataUrls
                         .map((photoDataUrl) => photoDataUrl.trim())
                         .filter((photoDataUrl) => photoDataUrl.length > 0),
+                      measurementType,
+                      ...(measurementStep !== undefined
+                        ? { measurementStep }
+                        : {}),
                     },
                   ],
                 }
@@ -274,6 +295,8 @@ export const useExerciseStore = create<ExerciseStore>()(
         iconId,
         description,
         photoDataUrls,
+        measurementType: measurementTypeRaw,
+        measurementStep: measurementStepRaw,
       }) =>
         set((state) => {
           const normalizedName = name.trim();
@@ -282,6 +305,13 @@ export const useExerciseStore = create<ExerciseStore>()(
           const normalizedPhotoDataUrls = photoDataUrls
             .map((photoDataUrl) => photoDataUrl.trim())
             .filter((photoDataUrl) => photoDataUrl.length > 0);
+          const measurementType = normalizeMeasurementType(
+            measurementTypeRaw ?? FREE_WEIGHT_MEASUREMENT_TYPE,
+          );
+          const measurementStep = normalizeMeasurementStep(
+            measurementType,
+            measurementStepRaw,
+          );
           if (!normalizedName || !normalizedCategory) {
             return state;
           }
@@ -325,6 +355,10 @@ export const useExerciseStore = create<ExerciseStore>()(
                       iconId,
                       description: normalizedDescription,
                       photoDataUrls: normalizedPhotoDataUrls,
+                      measurementType,
+                      ...(measurementStep !== undefined
+                        ? { measurementStep }
+                        : {}),
                     },
                   ],
                 }

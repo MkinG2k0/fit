@@ -21,6 +21,10 @@ const findEditingExercise = (
         iconId: exercise.iconId,
         description: exercise.description,
         photoDataUrls: exercise.photoDataUrls,
+        measurementType: exercise.measurementType,
+        ...(exercise.measurementStep !== undefined
+          ? { measurementStep: exercise.measurementStep }
+          : {}),
       };
     }
   }
@@ -55,6 +59,10 @@ export const CreateExercisePage = () => {
           iconId: exercise.iconId,
           description: exercise.description,
           photoDataUrls: exercise.photoDataUrls,
+          measurementType: exercise.measurementType,
+          ...(exercise.measurementStep !== undefined
+            ? { measurementStep: exercise.measurementStep }
+            : {}),
         };
       }
     }

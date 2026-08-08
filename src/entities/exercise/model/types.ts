@@ -1,6 +1,8 @@
 import type { ExerciseIconId } from "./exerciseIcons";
+import type { MeasurementType } from "./measurementTypes";
 
 export type SetCalorieSource = "heart_rate" | "met_fallback";
+export type { MeasurementType } from "./measurementTypes";
 
 export interface SetCalories {
   kcal: number;
@@ -37,6 +39,10 @@ export interface CatalogExercise {
   iconId: ExerciseIconId;
   description: string;
   photoDataUrls: string[];
+  /** How set weight/reps are interpreted in the logging UI. */
+  measurementType: MeasurementType;
+  /** Step for stack_kg / stack_lbs; omitted for free_weight and time. */
+  measurementStep?: number;
 }
 
 export interface ExerciseCategory {

@@ -3,6 +3,7 @@ export type {
   Exercise,
   ExerciseSet,
   ExerciseCategory,
+  MeasurementType,
   SetCalories,
   SetCalorieSource,
   TrainingPreset,
@@ -15,6 +16,16 @@ export {
   defaultIconIdForCategory,
   normalizeExerciseIconId,
 } from "./model/exerciseIcons";
+export {
+  FREE_WEIGHT_MEASUREMENT_TYPE,
+  defaultMeasurementStep,
+  formatSecondsAsMmSs,
+  isStackMeasurementType,
+  isTimeMeasurementType,
+  normalizeMeasurementStep,
+  normalizeMeasurementType,
+  parseMmSsToSeconds,
+} from "./model/measurementTypes";
 export { findCatalogExerciseById, findExerciseCategoryById } from "./lib/catalogLookup";
 export { buildCatalogExerciseId, buildCategoryId, buildPresetId } from "./lib/exerciseIds";
 export {

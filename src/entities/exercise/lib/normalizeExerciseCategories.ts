@@ -4,6 +4,11 @@ import {
   normalizeExerciseIconId,
   type ExerciseIconId,
 } from "../model/exerciseIcons";
+import {
+  FREE_WEIGHT_MEASUREMENT_TYPE,
+  normalizeMeasurementStep,
+  normalizeMeasurementType,
+} from "../model/measurementTypes";
 import { buildCatalogExerciseId, buildCategoryId } from "./exerciseIds";
 import type { CatalogExercise, ExerciseCategory } from "../model/types";
 
@@ -34,6 +39,20 @@ const buildBuiltinExerciseIconMap = (): ReadonlyMap<
 const builtinExerciseIconKey = (category: string, name: string): string =>
   `${category.trim().toLowerCase()}${BUILTIN_ICON_KEY_SEPARATOR}${name.trim().toLowerCase()}`;
 
+const resolveMeasurementFields = (
+  raw: { measurementType?: unknown; measurementStep?: unknown } | undefined,
+): Pick<CatalogExercise, "measurementType" | "measurementStep"> => {
+  const measurementType = normalizeMeasurementType(raw?.measurementType);
+  const measurementStep = normalizeMeasurementStep(
+    measurementType,
+    raw?.measurementStep,
+  );
+
+  return measurementStep === undefined
+    ? { measurementType }
+    : { measurementType, measurementStep };
+};
+
 const normalizeCatalogEntry = (
   raw: unknown,
   category: string,
@@ -50,15 +69,26 @@ const normalizeCatalogEntry = (
         defaultIconIdForCategory(category),
       description: "",
       photoDataUrls: [],
+      measurementType: FREE_WEIGHT_MEASUREMENT_TYPE,
     };
   }
 
   if (raw && typeof raw === "object" && "name" in raw) {
-    const name = String((raw as { name: unknown }).name);
-    const iconRaw = (raw as { iconId?: unknown }).iconId;
-    const descriptionRaw = (raw as { description?: unknown }).description;
-    const photoDataUrlsRaw = (raw as { photoDataUrls?: unknown }).photoDataUrls;
-    const photoDataUrlLegacyRaw = (raw as { photoDataUrl?: unknown }).photoDataUrl;
+    const entry = raw as {
+      id?: unknown;
+      name: unknown;
+      iconId?: unknown;
+      description?: unknown;
+      photoDataUrls?: unknown;
+      photoDataUrl?: unknown;
+      measurementType?: unknown;
+      measurementStep?: unknown;
+    };
+    const name = String(entry.name);
+    const iconRaw = entry.iconId;
+    const descriptionRaw = entry.description;
+    const photoDataUrlsRaw = entry.photoDataUrls;
+    const photoDataUrlLegacyRaw = entry.photoDataUrl;
     const description =
       typeof descriptionRaw === "string" ? descriptionRaw.trim() : "";
     const photoDataUrls = Array.isArray(photoDataUrlsRaw)
@@ -73,18 +103,20 @@ const normalizeCatalogEntry = (
     const fromBuiltin = builtinIcons.get(
       builtinExerciseIconKey(category, name),
     );
+    const measurementFields = resolveMeasurementFields(entry);
+    const id =
+      typeof entry.id === "string" && entry.id.trim().length > 0
+        ? entry.id
+        : buildCatalogExerciseId(category, name);
 
     if (fromBuiltin !== undefined) {
       return {
-        id:
-          typeof (raw as { id?: unknown }).id === "string" &&
-          (raw as { id: string }).id.trim().length > 0
-            ? (raw as { id: string }).id
-            : buildCatalogExerciseId(category, name),
+        id,
         name,
         iconId: fromBuiltin,
         description,
         photoDataUrls,
+        ...measurementFields,
       };
     }
 
@@ -94,15 +126,12 @@ const normalizeCatalogEntry = (
         : normalizeExerciseIconId(iconRaw);
 
     return {
-      id:
-        typeof (raw as { id?: unknown }).id === "string" &&
-        (raw as { id: string }).id.trim().length > 0
-          ? (raw as { id: string }).id
-          : buildCatalogExerciseId(category, name),
+      id,
       name,
       iconId,
       description,
       photoDataUrls,
+      ...measurementFields,
     };
   }
 
@@ -112,6 +141,7 @@ const normalizeCatalogEntry = (
     iconId: defaultIconIdForCategory(category),
     description: "",
     photoDataUrls: [],
+    measurementType: FREE_WEIGHT_MEASUREMENT_TYPE,
   };
 };
 

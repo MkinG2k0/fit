@@ -1,4 +1,4 @@
-import type { ExerciseIconId } from "@/entities/exercise";
+import type { ExerciseIconId, MeasurementType } from "@/entities/exercise";
 
 export interface NewExercise {
   category: string;
@@ -6,6 +6,8 @@ export interface NewExercise {
   iconId: ExerciseIconId;
   description: string;
   photoDataUrls: string[];
+  measurementType: MeasurementType;
+  measurementStep?: number;
 }
 
 /** Исходное упражнение в каталоге при открытии диалога редактирования. */
@@ -16,4 +18,6 @@ export interface CatalogExerciseEditSource {
   iconId: ExerciseIconId;
   description: string;
   photoDataUrls: string[];
+  measurementType: MeasurementType;
+  measurementStep?: number;
 }

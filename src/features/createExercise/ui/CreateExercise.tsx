@@ -2,6 +2,7 @@ import { Camera, MediaTypeSelection } from "@capacitor/camera";
 import { useEffect, useState } from "react";
 import {
   DEFAULT_EXERCISE_ICON_ID,
+  FREE_WEIGHT_MEASUREMENT_TYPE,
   defaultIconIdForCategory,
   useExerciseStore,
   type ExerciseIconId,
@@ -28,6 +29,7 @@ const buildResetExerciseState = (): NewExercise => ({
   iconId: DEFAULT_EXERCISE_ICON_ID,
   description: "",
   photoDataUrls: [],
+  measurementType: FREE_WEIGHT_MEASUREMENT_TYPE,
 });
 
 const buildInitialExerciseState = (
@@ -41,6 +43,10 @@ const buildInitialExerciseState = (
       iconId: editingExercise.iconId,
       description: editingExercise.description,
       photoDataUrls: editingExercise.photoDataUrls,
+      measurementType: editingExercise.measurementType,
+      ...(editingExercise.measurementStep !== undefined
+        ? { measurementStep: editingExercise.measurementStep }
+        : {}),
     };
   }
 
@@ -50,6 +56,7 @@ const buildInitialExerciseState = (
     iconId: defaultIconIdForCategory(defaultCategory ?? ""),
     description: "",
     photoDataUrls: [],
+    measurementType: FREE_WEIGHT_MEASUREMENT_TYPE,
   };
 };
 
@@ -151,6 +158,10 @@ export const CreateExercise = ({
       iconId: newExercise.iconId,
       description: newExercise.description,
       photoDataUrls: newExercise.photoDataUrls,
+      measurementType: newExercise.measurementType,
+      ...(newExercise.measurementStep !== undefined
+        ? { measurementStep: newExercise.measurementStep }
+        : {}),
     };
   };
 

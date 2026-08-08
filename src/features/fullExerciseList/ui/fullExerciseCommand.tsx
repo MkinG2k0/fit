@@ -10,6 +10,7 @@ import {
 import {
   type ExerciseCategory,
   type ExerciseIconId,
+  type MeasurementType,
   type TrainingPreset,
   useExerciseStore,
 } from "@/entities/exercise";
@@ -36,6 +37,8 @@ interface BaseProps {
     iconId: ExerciseIconId;
     description: string;
     photoDataUrls: string[];
+    measurementType: MeasurementType;
+    measurementStep?: number;
   }) => void;
   onEditPreset?: (preset: TrainingPreset) => void;
 }
@@ -211,6 +214,8 @@ export const FullExerciseCommand = ({
     iconId: ExerciseIconId;
     description: string;
     photoDataUrls: string[];
+    measurementType: MeasurementType;
+    measurementStep?: number;
   }) => {
     onEditExercise?.(payload);
   };
@@ -343,6 +348,8 @@ export const FullExerciseCommand = ({
                           iconId={entry.iconId}
                           description={entry.description}
                           photoDataUrls={entry.photoDataUrls}
+                          measurementType={entry.measurementType}
+                          measurementStep={entry.measurementStep}
                           category={group.category}
                           checkable={checkable}
                           deletable={deletable}
