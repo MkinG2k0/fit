@@ -1,8 +1,17 @@
 import { type ChangeEvent, useCallback, useState } from "react";
-import { X } from "lucide-react";
+import { Minus, Plus, X } from "lucide-react";
 import { Input } from "@/shared/ui/shadCNComponents/ui/input";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
-import type { Exercise, ExerciseSet } from "@/entities/exercise";
+import {
+  FREE_WEIGHT_MEASUREMENT_TYPE,
+  formatSecondsAsMmSs,
+  isStackMeasurementType,
+  isTimeMeasurementType,
+  parseMmSsToSeconds,
+  type Exercise,
+  type ExerciseSet,
+  type MeasurementType,
+} from "@/entities/exercise";
 import { useCalendarStore } from "@/entities/calendarDay";
 import type { SetRowCalorieDisplay } from "../calories";
 import { cn } from "@/shared/lib/classMerge";
@@ -12,6 +21,8 @@ interface ExerciseSetRowProps {
   exercise: Exercise;
   set: ExerciseSet;
   index: number;
+  measurementType?: MeasurementType;
+  measurementStep?: number;
   /** На web колонка ккал скрыта — Health недоступен. */
   showKcalColumn: boolean;
   calorieDisplay: SetRowCalorieDisplay;
@@ -21,8 +32,12 @@ interface ExerciseSetRowProps {
   ) => void;
 }
 
-const isSetEmpty = (setItem: ExerciseSet) =>
-  setItem.reps === 0 && setItem.weight === 0;
+const isSetEmpty = (setItem: ExerciseSet, measurementType: MeasurementType) => {
+  if (isTimeMeasurementType(measurementType)) {
+    return setItem.weight === 0;
+  }
+  return setItem.reps === 0 && setItem.weight === 0;
+};
 
 /** Digits + at most one `.`; rejects other characters. Returns null if invalid. */
 const sanitizeDecimalDraft = (raw: string): string | null => {
@@ -54,27 +69,44 @@ const commitDecimalDraft = (draft: string): string => {
   return value;
 };
 
+const snapToStep = (value: number, step: number): number => {
+  if (!Number.isFinite(value) || !Number.isFinite(step) || step <= 0) {
+    return Math.max(0, value);
+  }
+  return Math.max(0, Math.round(value / step) * step);
+};
+
 export const ExerciseSetRow = ({
   exercise,
   set,
   index,
+  measurementType = FREE_WEIGHT_MEASUREMENT_TYPE,
+  measurementStep,
   showKcalColumn,
   calorieDisplay,
   onInputChange,
 }: ExerciseSetRowProps) => {
   const deleteSet = useCalendarStore((s) => s.deleteSet);
-  const isEmptySet = isSetEmpty(set);
+  const isEmptySet = isSetEmpty(set, measurementType);
+  const isStack = isStackMeasurementType(measurementType);
+  const isTime = isTimeMeasurementType(measurementType);
+  const step = measurementStep ?? (measurementType === "stack_lbs" ? 10 : 5);
+  const weightPlaceholder =
+    measurementType === "stack_lbs" ? "lbs" : "Кг";
+
   const [isWeightFocused, setIsWeightFocused] = useState(false);
   const [weightDraft, setWeightDraft] = useState("");
+  const [isTimeFocused, setIsTimeFocused] = useState(false);
+  const [timeDraft, setTimeDraft] = useState("");
 
   const handleDelete = useCallback(() => {
     deleteSet(exercise, set);
   }, [deleteSet, exercise, set]);
 
-  const emitWeightChange = useCallback(
-    (value: string, setItem: ExerciseSet) => {
+  const emitFieldChange = useCallback(
+    (name: "weight" | "reps", value: string, setItem: ExerciseSet) => {
       const syntheticEvent = {
-        target: { name: "weight", value },
+        target: { name, value },
       } as ChangeEvent<HTMLInputElement>;
       onInputChange(syntheticEvent, setItem);
     },
@@ -104,20 +136,69 @@ export const ExerciseSetRow = ({
       }
       setWeightDraft(sanitized);
       if (isCompleteDecimalDraft(sanitized)) {
-        emitWeightChange(sanitized, setItem);
+        if (isStack) {
+          const snapped = snapToStep(Number(sanitized || 0), step);
+          setWeightDraft(String(snapped));
+          emitFieldChange("weight", String(snapped), setItem);
+          return;
+        }
+        emitFieldChange("weight", sanitized, setItem);
       }
     },
-    [emitWeightChange],
+    [emitFieldChange, isStack, step],
   );
 
   const handleWeightBlur = useCallback(
     (setItem: ExerciseSet) => {
       const committed = commitDecimalDraft(weightDraft);
-      emitWeightChange(committed, setItem);
+      if (isStack) {
+        const snapped = snapToStep(Number(committed || 0), step);
+        emitFieldChange("weight", String(snapped), setItem);
+      } else {
+        emitFieldChange("weight", committed, setItem);
+      }
       setIsWeightFocused(false);
       setWeightDraft("");
     },
-    [emitWeightChange, weightDraft],
+    [emitFieldChange, isStack, step, weightDraft],
+  );
+
+  const handleStackStep = useCallback(
+    (direction: -1 | 1, setItem: ExerciseSet) => {
+      const next = snapToStep(setItem.weight + direction * step, step);
+      emitFieldChange("weight", String(next), setItem);
+    },
+    [emitFieldChange, step],
+  );
+
+  const handleTimeFocus = useCallback(() => {
+    setIsTimeFocused(true);
+    setTimeDraft(isEmptySet ? "" : formatSecondsAsMmSs(set.weight));
+  }, [isEmptySet, set.weight]);
+
+  const handleTimeChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setTimeDraft(event.target.value);
+    },
+    [],
+  );
+
+  const handleTimeBlur = useCallback(
+    (setItem: ExerciseSet) => {
+      const parsed = parseMmSsToSeconds(timeDraft);
+      if (parsed === null) {
+        setIsTimeFocused(false);
+        setTimeDraft("");
+        return;
+      }
+      emitFieldChange("weight", String(parsed), setItem);
+      if (setItem.reps !== 0) {
+        emitFieldChange("reps", "0", setItem);
+      }
+      setIsTimeFocused(false);
+      setTimeDraft("");
+    },
+    [emitFieldChange, timeDraft],
   );
 
   const weightValue = isWeightFocused
@@ -126,15 +207,22 @@ export const ExerciseSetRow = ({
       ? ""
       : String(set.weight);
 
+  const timeValue = isTimeFocused
+    ? timeDraft
+    : isEmptySet
+      ? ""
+      : formatSecondsAsMmSs(set.weight);
+
+  const gridClassName = isTime
+    ? showKcalColumn
+      ? "grid-cols-[2.25rem_minmax(0,1fr)_3rem_2.25rem]"
+      : "grid-cols-[2.25rem_minmax(0,1fr)_2.25rem]"
+    : showKcalColumn
+      ? "grid-cols-[2.25rem_minmax(0,1fr)_minmax(0,1fr)_3rem_2.25rem]"
+      : "grid-cols-[2.25rem_minmax(0,1fr)_minmax(0,1fr)_2.25rem]";
+
   return (
-    <div
-      className={cn(
-        "grid w-full items-center gap-3 max-w-[800px]",
-        showKcalColumn
-          ? "grid-cols-[2.25rem_minmax(0,1fr)_minmax(0,1fr)_3rem_2.25rem]"
-          : "grid-cols-[2.25rem_minmax(0,1fr)_minmax(0,1fr)_2.25rem]",
-      )}
-    >
+    <div className={cn("grid w-full items-center gap-3 max-w-[800px]", gridClassName)}>
       <Button
         variant="outline"
         size="icon"
@@ -142,44 +230,100 @@ export const ExerciseSetRow = ({
       >
         {index + 1}
       </Button>
-      <div className="w-full rounded-full bg-muted">
-        <Input
-          className={cn(
-            "h-12 w-full rounded-md border-primary bg-background text-center text-2xl text-foreground font-numeric shadow-none ring-0 outline-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0",
-            "text-primary",
-          )}
-          type="text"
-          inputMode="numeric"
-          autoComplete="off"
-          placeholder="Кол-во"
-          name="reps"
-          value={isEmptySet ? "" : String(set.reps)}
-          onChange={(e) => {
-            handleRepsChange(e, set);
-          }}
-        />
-      </div>
-      <div className="w-full rounded-full bg-muted">
-        <Input
-          className={cn(
-            "h-12 w-full rounded-md border-primary bg-background text-center text-2xl text-foreground font-numeric shadow-none ring-0 outline-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0",
-            "text-primary",
-          )}
-          type="text"
-          inputMode="decimal"
-          autoComplete="off"
-          placeholder="Кг"
-          name="weight"
-          value={weightValue}
-          onFocus={handleWeightFocus}
-          onChange={(e) => {
-            handleWeightChange(e, set);
-          }}
-          onBlur={() => {
-            handleWeightBlur(set);
-          }}
-        />
-      </div>
+
+      {isTime ? (
+        <div className="w-full rounded-full bg-muted">
+          <Input
+            className={cn(
+              "h-12 w-full rounded-md border-primary bg-background text-center text-2xl text-foreground font-numeric shadow-none ring-0 outline-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0",
+              "text-primary",
+            )}
+            type="text"
+            inputMode="numeric"
+            autoComplete="off"
+            placeholder="мм:сс"
+            name="weight"
+            value={timeValue}
+            onFocus={handleTimeFocus}
+            onChange={handleTimeChange}
+            onBlur={() => {
+              handleTimeBlur(set);
+            }}
+          />
+        </div>
+      ) : (
+        <>
+          <div className="w-full rounded-full bg-muted">
+            <Input
+              className={cn(
+                "h-12 w-full rounded-md border-primary bg-background text-center text-2xl text-foreground font-numeric shadow-none ring-0 outline-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0",
+                "text-primary",
+              )}
+              type="text"
+              inputMode="numeric"
+              autoComplete="off"
+              placeholder="Кол-во"
+              name="reps"
+              value={isEmptySet ? "" : String(set.reps)}
+              onChange={(e) => {
+                handleRepsChange(e, set);
+              }}
+            />
+          </div>
+          <div className="flex w-full items-center gap-1">
+            {isStack ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="h-12 w-10 shrink-0"
+                aria-label="Уменьшить вес"
+                onClick={() => {
+                  handleStackStep(-1, set);
+                }}
+              >
+                <Minus />
+              </Button>
+            ) : null}
+            <div className="min-w-0 flex-1 rounded-full bg-muted">
+              <Input
+                className={cn(
+                  "h-12 w-full rounded-md border-primary bg-background text-center text-2xl text-foreground font-numeric shadow-none ring-0 outline-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0",
+                  "text-primary",
+                )}
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
+                placeholder={weightPlaceholder}
+                name="weight"
+                value={weightValue}
+                onFocus={handleWeightFocus}
+                onChange={(e) => {
+                  handleWeightChange(e, set);
+                }}
+                onBlur={() => {
+                  handleWeightBlur(set);
+                }}
+              />
+            </div>
+            {isStack ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="h-12 w-10 shrink-0"
+                aria-label="Увеличить вес"
+                onClick={() => {
+                  handleStackStep(1, set);
+                }}
+              >
+                <Plus />
+              </Button>
+            ) : null}
+          </div>
+        </>
+      )}
+
       {showKcalColumn ? (
         <ExerciseSetKcalCell calorieDisplay={calorieDisplay} />
       ) : null}

@@ -19,7 +19,14 @@ import {
 } from "@/features/aiRecommendations";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { useCalendarStore } from "@/entities/calendarDay";
-import type { Exercise, ExerciseSet } from "@/entities/exercise";
+import {
+  FREE_WEIGHT_MEASUREMENT_TYPE,
+  findCatalogExerciseById,
+  isTimeMeasurementType,
+  useExerciseStore,
+  type Exercise,
+  type ExerciseSet,
+} from "@/entities/exercise";
 import { getPlanSetsForWeek, useLoadTableStore } from "@/entities/loadTable";
 import { useUserStore } from "@/entities/user";
 import {
@@ -50,13 +57,6 @@ interface ExerciseBodyProps {
   onDeleteRequested: () => void;
 }
 
-const isExerciseCardEmpty = (sets: ExerciseSet[]) => {
-  if (sets.length === 0) {
-    return true;
-  }
-  return sets.every((set) => set.reps === 0 && set.weight === 0);
-};
-
 const startRestBetweenSetsIfEnabled = () => {
   const { restBetweenSetsEnabled, restBetweenSetsSec } =
     useUserStore.getState();
@@ -77,6 +77,15 @@ export const ExerciseBody = ({
     exercise.name,
     exercise.catalogExerciseId,
   );
+  const catalogExercises = useExerciseStore((store) => store.exercises);
+  const catalogEntry = findCatalogExerciseById(
+    catalogExercises,
+    exercise.catalogExerciseId ?? "",
+  );
+  const measurementType =
+    catalogEntry?.measurementType ?? FREE_WEIGHT_MEASUREMENT_TYPE;
+  const measurementStep = catalogEntry?.measurementStep;
+  const isTimeExercise = isTimeMeasurementType(measurementType);
   const selectedDate = useCalendarStore((store) => store.selectedDate);
   const isSelectedDateToday = selectedDate.isSame(new Date(), "day");
   const loadTableEntry = useLoadTableStore((state) => {
@@ -114,9 +123,6 @@ export const ExerciseBody = ({
 
   const onChangeHandler = useCalendarStore((store) => store.setExerciseValues);
   const addSetToExercise = useCalendarStore((store) => store.addSetToExercise);
-  const syncExerciseSetsFromPlan = useCalendarStore(
-    (store) => store.syncExerciseSetsFromPlan,
-  );
   const addSetGuardRef = useRef(false);
   const aiFillGuardRef = useRef(false);
   const firstSetPrefillAttemptedRef = useRef<string | null>(null);
@@ -166,25 +172,18 @@ export const ExerciseBody = ({
       let reps = lastSet?.reps ?? 0;
 
       const catalogExerciseId = exercise.catalogExerciseId?.trim();
-      const loadTableEntry = catalogExerciseId
+      const loadTableEntryForAdd = catalogExerciseId
         ? useLoadTableStore
             .getState()
             .exercises.find((item) => item.catalogExerciseId === catalogExerciseId)
         : undefined;
 
-      if (loadTableEntry) {
+      if (loadTableEntryForAdd) {
         const planSets = getPlanSetsForWeek(
-          loadTableEntry.maxKg,
-          loadTableEntry.currentWeek,
+          loadTableEntryForAdd.maxKg,
+          loadTableEntryForAdd.currentWeek,
         );
-
-        // Пустая карточка (нет подходов или все без значений) — сразу все подходы из таблицы.
-        if (isExerciseCardEmpty(exercise.sets) && planSets.length > 0) {
-          syncExerciseSetsFromPlan(exercise, planSets);
-          return;
-        }
-
-        const planSet = planSets[0];
+        const planSet = planSets[exercise.sets.length] ?? planSets[0];
         if (planSet) {
           weight = planSet.weight;
           reps = planSet.reps;
@@ -214,7 +213,6 @@ export const ExerciseBody = ({
     exercise,
     lastSession?.sets,
     prefillFromLastSession,
-    syncExerciseSetsFromPlan,
   ]);
 
   const handleAiFill = useCallback(async () => {
@@ -389,18 +387,30 @@ export const ExerciseBody = ({
         <div
           className={cn(
             "grid w-full items-center gap-2",
-            showCaloriesUi
-              ? "grid-cols-[2.25rem_minmax(0,1fr)_minmax(0,1fr)_3rem_2.25rem]"
-              : "grid-cols-[2.25rem_minmax(0,1fr)_minmax(0,1fr)_2.25rem]",
+            isTimeExercise
+              ? showCaloriesUi
+                ? "grid-cols-[2.25rem_minmax(0,1fr)_3rem_2.25rem]"
+                : "grid-cols-[2.25rem_minmax(0,1fr)_2.25rem]"
+              : showCaloriesUi
+                ? "grid-cols-[2.25rem_minmax(0,1fr)_minmax(0,1fr)_3rem_2.25rem]"
+                : "grid-cols-[2.25rem_minmax(0,1fr)_minmax(0,1fr)_2.25rem]",
           )}
         >
           <span className="w-1" />
-          <span className="min-w-0 text-center text-xs font-semibold leading-tight text-muted-foreground">
-            Повторений
-          </span>
-          <span className="min-w-0 text-center text-xs font-semibold leading-tight text-muted-foreground">
-            Кг
-          </span>
+          {isTimeExercise ? (
+            <span className="min-w-0 text-center text-xs font-semibold leading-tight text-muted-foreground">
+              Время
+            </span>
+          ) : (
+            <>
+              <span className="min-w-0 text-center text-xs font-semibold leading-tight text-muted-foreground">
+                Повторений
+              </span>
+              <span className="min-w-0 text-center text-xs font-semibold leading-tight text-muted-foreground">
+                {measurementType === "stack_lbs" ? "lbs" : "Кг"}
+              </span>
+            </>
+          )}
           {showCaloriesUi ? (
             <span className="min-w-0 text-center text-xs font-semibold leading-tight text-muted-foreground">
               Ккал
@@ -426,6 +436,8 @@ export const ExerciseBody = ({
                 exercise={exercise}
                 set={set}
                 index={idx}
+                measurementType={measurementType}
+                measurementStep={measurementStep}
                 showKcalColumn={showCaloriesUi}
                 calorieDisplay={calorieDisplay}
                 onInputChange={inputHandler}

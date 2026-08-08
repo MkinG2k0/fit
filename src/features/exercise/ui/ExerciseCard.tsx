@@ -18,6 +18,7 @@ import { useCalendarStore } from "@/entities/calendarDay";
 import {
   findCatalogExerciseById,
   findExerciseCategoryById,
+  isTimeMeasurementType,
   type Exercise,
   useExerciseStore,
 } from "@/entities/exercise";
@@ -163,11 +164,19 @@ export const ExerciseCard = ({
       : undefined) ?? exercise.category;
 
   const totalLiftedKg = useMemo(() => {
+    const catalogEntry = findCatalogExerciseById(
+      allExercises,
+      exercise.catalogExerciseId ?? "",
+    );
+    if (catalogEntry && isTimeMeasurementType(catalogEntry.measurementType)) {
+      return 0;
+    }
+
     return exercise.sets.reduce(
       (sum, set) => sum + calcSetVolumeKg(set.weight, set.reps),
       0,
     );
-  }, [exercise.sets]);
+  }, [allExercises, exercise.catalogExerciseId, exercise.sets]);
 
   const totalLifted = formatTonnageParts(totalLiftedKg);
 

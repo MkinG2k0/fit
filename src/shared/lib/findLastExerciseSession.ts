@@ -1,7 +1,12 @@
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
 import type { CalendarDay } from "@/entities/calendarDay";
-import type { Exercise, ExerciseSet } from "@/entities/exercise";
+import {
+  formatSecondsAsMmSs,
+  type Exercise,
+  type ExerciseSet,
+  type MeasurementType,
+} from "@/entities/exercise";
 import { readWorkoutMonthBucketsForKeys } from "./storage";
 
 dayjs.locale("ru");
@@ -30,9 +35,21 @@ const setHasLoggedValues = (set: ExerciseSet): boolean =>
 const exerciseHasLoggedSets = (exercise: Exercise): boolean =>
   exercise.sets.some(setHasLoggedValues);
 
-const formatSetCompact = (set: ExerciseSet): string => {
+const formatSetCompact = (
+  set: ExerciseSet,
+  measurementType?: MeasurementType,
+): string => {
+  if (measurementType === "time") {
+    if (set.weight <= 0) {
+      return "";
+    }
+    return formatSecondsAsMmSs(set.weight);
+  }
+
   const hasReps = set.reps > 0;
   const hasWeight = set.weight > 0;
+  const weightSuffix = measurementType === "stack_lbs" ? " lbs" : " кг";
+
   if (hasReps && hasWeight) {
     return `${set.reps}${REPS_WEIGHT_SEPARATOR}${set.weight}`;
   }
@@ -40,7 +57,7 @@ const formatSetCompact = (set: ExerciseSet): string => {
     return `${set.reps} повт.`;
   }
   if (hasWeight) {
-    return `${set.weight} кг`;
+    return `${set.weight}${weightSuffix}`;
   }
   return "";
 };
@@ -129,9 +146,10 @@ const lookbackDaysNewestFirst = (
 const toLastSessionOrSkip = (
   day: dayjs.Dayjs,
   exercise: Exercise,
+  measurementType?: MeasurementType,
 ): LastExerciseSession | null => {
   const summaryParts = exercise.sets
-    .map(formatSetCompact)
+    .map((set) => formatSetCompact(set, measurementType))
     .filter((part) => part.length > 0);
 
   if (summaryParts.length === 0) {
@@ -152,6 +170,7 @@ export const findLastExerciseSession = async (
   exerciseName: string,
   beforeDate: dayjs.Dayjs,
   catalogExerciseId?: string,
+  measurementType?: MeasurementType,
 ): Promise<LastExerciseSession | null> => {
   const normalizedTargetName = normalizeExerciseName(exerciseName);
   if (!normalizedTargetName && !catalogExerciseId) {
@@ -187,7 +206,7 @@ export const findLastExerciseSession = async (
       continue;
     }
 
-    const session = toLastSessionOrSkip(day, exercise);
+    const session = toLastSessionOrSkip(day, exercise, measurementType);
     if (session) {
       return session;
     }
