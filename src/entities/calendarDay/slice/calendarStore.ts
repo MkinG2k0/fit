@@ -67,14 +67,6 @@ interface CalendarStore {
     exercise: Exercise,
     payload: { weight: number; reps: number; startTime: string; endTime: string },
   ) => string;
-  /**
-   * Синхронизирует подходы упражнения на выбранном дне с планом (ровно длина sets).
-   * Не создаёт новую карточку, если упражнения нет в дне.
-   */
-  syncExerciseSetsFromPlan: (
-    exercise: Exercise,
-    sets: Array<{ weight: number; reps: number }>,
-  ) => void;
   deleteExercise: (exercise: Exercise) => void;
   /** Переставляет упражнения выбранного дня по порядку id. */
   reorderExercises: (orderedIds: string[]) => void;
@@ -310,52 +302,6 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
     });
     return newSetId;
   },
-
-  syncExerciseSetsFromPlan: (exercise, sets) =>
-    set((state) => {
-      const { dateKey, oldExercises } = getDateKeyAndOldExercises(
-        state.selectedDate,
-        state.days,
-      );
-      const targetExists = oldExercises.some((ex) => ex.id === exercise.id);
-      if (!targetExists) {
-        return state;
-      }
-
-      const newExercises = oldExercises.map((ex) => {
-        if (ex.id !== exercise.id) return ex;
-
-        const nextSets: ExerciseSet[] = sets.map((planSet, index) => {
-          const existing = ex.sets[index];
-          if (existing) {
-            return {
-              ...existing,
-              weight: planSet.weight,
-              reps: planSet.reps,
-              calories: undefined,
-            };
-          }
-          return {
-            id: createRandomUuid(),
-            weight: planSet.weight,
-            reps: planSet.reps,
-          };
-        });
-
-        return {
-          ...ex,
-          sets: nextSets,
-        };
-      });
-
-      const newDays = replaceExercises(
-        state.selectedDate,
-        state.days,
-        dateKey,
-        newExercises,
-      );
-      return { days: newDays };
-    }),
 
   deleteExercise: (exercise) =>
     set((state) => {
