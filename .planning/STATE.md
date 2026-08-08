@@ -5,9 +5,10 @@ milestone_name: milestone
 current_phase: 1
 current_phase_name: Quick Logging Core & Local Persistence
 status: ready
-stopped_at: Completed 260715-vrc decimal weight draft-string
-last_updated: "2026-07-15T20:01:00.000Z"
-last_activity: "2026-07-15 - Quick task 260715-vrc: draft-string decimal weight/MAX inputs"
+stopped_at: Completed 260808-khe measurement types (free_weight/stack/time)
+last_updated: "2026-08-08T11:55:39.954Z"
+last_activity: 2026-08-08
+last_activity_desc: "Completed quick task 260808-khe: measurement types free_weight/stack/time"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -30,7 +31,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-14)
 Phase: 1 of 5 (Quick Logging Core & Local Persistence)
 Plan: 0 of 0 in current phase
 Status: Ready to execute
-Last activity: 2026-07-15 - Completed quick task 260715-vrc: draft-string decimal weight/MAX
+Last activity: 2026-08-08 - Completed quick task 260808-khe: measurement types
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -75,6 +76,7 @@ Recent decisions affecting current work:
 - [260715-18z] Load-table sessions match via resolved catalog id or name; detail refetches currentWeek on revisit/show.
 - [260715-3fn] Rest timer uses persisted endAt deadline + react-timer-hook; rest-between-sets default 120s auto-starts after add set.
 - [260715-3t7] AI fill gated by aiFillEnabled (default false); Settings card + transfer; button hidden when off.
+- [260808-khe] Catalog measurementType (free_weight/stack_kg/stack_lbs/time); duration in set.weight seconds; settings change only from free_weight.
 
 ### Pending Todos
 
@@ -125,10 +127,12 @@ None yet.
 | 260715-3t7 | Фича-флаг «ИИ-заполнение» в настройках (default OFF) | 2026-07-15 | 3efff2c | [260715-3t7-ai-fill-feature-flag](./quick/260715-3t7-ai-fill-feature-flag/) |
 | 260715-40l | Страница «Новости» с changelog по ISO-неделям | 2026-07-15 | 3f17e64 | [260715-40l-news-page](./quick/260715-40l-news-page/) |
 | 260715-vrc | Дробный вес: draft-string пока фокус (12. / 12.5) | 2026-07-15 | e1e308d | [260715-vrc-12-5](./quick/260715-vrc-12-5/) |
+| 260808-khe | Типы замера: свободный вес / стек / время мм:сс | 2026-08-08 | 1ee153d | [260808-khe-lbs-default](./quick/260808-khe-lbs-default/) |
 | fast | Кнопка ИИ-заполнения: текст → иконка Sparkles | 2026-07-15 | 8fee417 | — |
+| fast | увеличить версию андроида | 2026-08-03 | 7185d2c | — |
 
 ## Session Continuity
 
-Last session: 2026-07-15T20:01:00.000Z
-Stopped at: Completed 260715-vrc decimal weight draft-string
+Last session: 2026-08-08T11:55:39.947Z
+Stopped at: Completed 260808-khe measurement types
 Resume file: None
