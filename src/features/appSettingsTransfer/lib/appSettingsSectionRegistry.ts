@@ -256,7 +256,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
           state.defaultSetDurationSec,
         ),
         exerciseCardShowLastSessionResult:
-          state.exerciseCardShowLastSessionResult ?? false,
+          state.exerciseCardShowLastSessionResult ?? true,
         lastSessionFillButtonEnabled:
           state.lastSessionFillButtonEnabled ?? false,
         exerciseCardShowKcalInHeader:
@@ -316,7 +316,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
               exerciseCardShowLastSessionResult:
                 payload.exerciseCardShowLastSessionResult ??
                 prevState.exerciseCardShowLastSessionResult ??
-                false,
+                true,
               lastSessionFillButtonEnabled:
                 payload.lastSessionFillButtonEnabled ??
                 prevState.lastSessionFillButtonEnabled ??
@@ -369,7 +369,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
               payload.defaultSetDurationSec,
             ),
             exerciseCardShowLastSessionResult:
-              payload.exerciseCardShowLastSessionResult ?? false,
+              payload.exerciseCardShowLastSessionResult ?? true,
             lastSessionFillButtonEnabled:
               payload.lastSessionFillButtonEnabled ?? false,
             exerciseCardShowKcalInHeader:

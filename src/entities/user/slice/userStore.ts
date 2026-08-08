@@ -44,7 +44,7 @@ interface UserState {
   defaultSetDurationSec: number;
   /** Онбординг: вес/возраст/пол (persist в user). */
   workoutCalorieProfileOnboarding: WorkoutCalorieProfileOnboardingStatus;
-  /** Подсказка прошлой тренировки в свёрнутой карточке упражнения. */
+  /** Подсказка прошлой тренировки в свёрнутой карточке упражнения. По умолчанию вкл. */
   exerciseCardShowLastSessionResult: boolean;
   /** Кнопка добавления всех подходов прошлой тренировки. По умолчанию выкл. */
   lastSessionFillButtonEnabled: boolean;
@@ -101,7 +101,7 @@ export const useUserStore = create<UserState & ActionsState>()(
       workoutCaloriesEnabled: false,
       defaultSetDurationSec: 60,
       workoutCalorieProfileOnboarding: "pending",
-      exerciseCardShowLastSessionResult: false,
+      exerciseCardShowLastSessionResult: true,
       lastSessionFillButtonEnabled: false,
       exerciseCardShowKcalInHeader: false,
       exerciseCardShowTotalVolumeInHeader: true,

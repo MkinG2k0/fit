@@ -116,7 +116,7 @@ export const ExerciseBody = ({
   })();
   const showCaloriesUi = useWorkoutCaloriesUiEnabled();
   const showLastSessionResult = useUserStore(
-    (s) => s.exerciseCardShowLastSessionResult ?? false,
+    (s) => s.exerciseCardShowLastSessionResult ?? true,
   );
   const lastSessionFillEnabled = useUserStore(
     (s) => s.lastSessionFillButtonEnabled ?? false,

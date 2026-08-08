@@ -22,7 +22,7 @@ export const ExerciseCardDisplaySettingsCard = ({
 }: ExerciseCardDisplaySettingsCardProps) => {
   const workoutCaloriesUiEnabled = useWorkoutCaloriesUiEnabled();
   const exerciseCardShowLastSessionResult = useUserStore(
-    (s) => s.exerciseCardShowLastSessionResult ?? false,
+    (s) => s.exerciseCardShowLastSessionResult ?? true,
   );
   const setExerciseCardShowLastSessionResult = useUserStore(
     (s) => s.setExerciseCardShowLastSessionResult,
