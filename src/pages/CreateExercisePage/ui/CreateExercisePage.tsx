@@ -70,7 +70,7 @@ export const CreateExercisePage = () => {
   }, [editCategory, editId, editName, exercises, isEditMode]);
 
   return (
-    <div className="mx-auto flex h-full min-h-0 w-full max-w-3xl flex-col gap-4 p-4">
+    <div className="mx-auto flex h-full min-h-0 w-full max-w-3xl flex-col gap-4 ">
       {isEditMode && !editingExercise ? (
         <div className="bg-card text-card-foreground rounded-lg border p-4">
           <p className="text-sm">

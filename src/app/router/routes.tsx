@@ -52,11 +52,12 @@ const LoadTableDetailPage = lazy(() =>
     default: m.LoadTableDetailPage,
   })),
 );
-const AiRecommendationsPage = lazy(() =>
-  import("@/pages/AiRecommendationsPage").then((m) => ({
-    default: m.AiRecommendationsPage,
-  })),
-);
+// AI features disabled
+// const AiRecommendationsPage = lazy(() =>
+//   import("@/pages/AiRecommendationsPage").then((m) => ({
+//     default: m.AiRecommendationsPage,
+//   })),
+// );
 const NewsPage = lazy(() =>
   import("@/pages/NewsPage").then((m) => ({
     default: m.NewsPage,
@@ -139,6 +140,7 @@ export const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      {/* AI features disabled
       <Route
         path="/ai-recommendations"
         element={
@@ -147,6 +149,7 @@ export const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      */}
       <Route
         path="/news"
         element={

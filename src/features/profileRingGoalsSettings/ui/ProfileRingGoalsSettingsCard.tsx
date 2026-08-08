@@ -1,7 +1,6 @@
 import {
   useEffect,
   useMemo,
-  useRef,
   useState,
   type ChangeEvent,
 } from "react";
@@ -11,8 +10,9 @@ import {
   MIN_RING_GOAL_VALUE,
   useUserStore,
 } from "@/entities/user";
-import { AiGatewayError } from "@/shared/api";
-import { readAllTrainingDaysFromStorage } from "@/shared/lib/analyticsStorage";
+// AI features disabled
+// import { AiGatewayError } from "@/shared/api";
+// import { readAllTrainingDaysFromStorage } from "@/shared/lib/analyticsStorage";
 import { cn } from "@/shared/lib/classMerge";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
@@ -24,7 +24,8 @@ import {
 } from "@/shared/ui/shadCNComponents/ui/card";
 import { Input } from "@/shared/ui/shadCNComponents/ui/input";
 import { Label } from "@/shared/ui/shadCNComponents/ui/label";
-import { suggestRingGoalsFromHistory } from "../lib/suggestRingGoalsFromHistory";
+// AI features disabled
+// import { suggestRingGoalsFromHistory } from "../lib/suggestRingGoalsFromHistory";
 
 interface ProfileRingGoalsSettingsCardProps {
   className?: string;
@@ -56,9 +57,10 @@ export const ProfileRingGoalsSettingsCard = ({
     String(ringGoals.fullVolume),
   );
   const [validationMessage, setValidationMessage] = useState("");
-  const [isSuggesting, setIsSuggesting] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-  const aiSuggestionGenerationRef = useRef(0);
+  // AI features disabled
+  // const [isSuggesting, setIsSuggesting] = useState(false);
+  // const [successMessage, setSuccessMessage] = useState("");
+  // const aiSuggestionGenerationRef = useRef(0);
 
   useEffect(() => {
     setSetCountGoalInput(String(ringGoals.fullSetCount));
@@ -88,8 +90,9 @@ export const ProfileRingGoalsSettingsCard = ({
   };
 
   const handleSaveRingGoals = () => {
-    aiSuggestionGenerationRef.current += 1;
-    setSuccessMessage("");
+    // AI features disabled
+    // aiSuggestionGenerationRef.current += 1;
+    // setSuccessMessage("");
     const parsedSetGoal = parseGoalValue(setCountGoalInput);
     const parsedVolumeGoal = parseGoalValue(volumeGoalInput);
 
@@ -106,46 +109,48 @@ export const ProfileRingGoalsSettingsCard = ({
   };
 
   const handleResetRingGoals = () => {
-    aiSuggestionGenerationRef.current += 1;
+    // AI features disabled
+    // aiSuggestionGenerationRef.current += 1;
     setRingGoals(DEFAULT_RING_GOALS);
     setValidationMessage("");
-    setSuccessMessage("");
+    // setSuccessMessage("");
   };
 
-  const handleSuggestAiRingGoals = async () => {
-    if (isSuggesting) {
-      return;
-    }
-
-    const suggestionGeneration = aiSuggestionGenerationRef.current + 1;
-    aiSuggestionGenerationRef.current = suggestionGeneration;
-    setIsSuggesting(true);
-    setValidationMessage("");
-    setSuccessMessage("");
-
-    try {
-      const days = await readAllTrainingDaysFromStorage();
-      const goals = await suggestRingGoalsFromHistory(days);
-      if (suggestionGeneration !== aiSuggestionGenerationRef.current) {
-        return;
-      }
-      setRingGoals(goals);
-      setSuccessMessage("Цель сохранена по истории за 3 месяца");
-    } catch (error) {
-      if (suggestionGeneration !== aiSuggestionGenerationRef.current) {
-        return;
-      }
-      if (error instanceof AiGatewayError) {
-        setValidationMessage(error.message);
-      } else if (error instanceof Error && error.message.trim()) {
-        setValidationMessage(error.message);
-      } else {
-        setValidationMessage("Не удалось получить ИИ-цель. Попробуйте позже.");
-      }
-    } finally {
-      setIsSuggesting(false);
-    }
-  };
+  // AI features disabled
+  // const handleSuggestAiRingGoals = async () => {
+  //   if (isSuggesting) {
+  //     return;
+  //   }
+  //
+  //   const suggestionGeneration = aiSuggestionGenerationRef.current + 1;
+  //   aiSuggestionGenerationRef.current = suggestionGeneration;
+  //   setIsSuggesting(true);
+  //   setValidationMessage("");
+  //   setSuccessMessage("");
+  //
+  //   try {
+  //     const days = await readAllTrainingDaysFromStorage();
+  //     const goals = await suggestRingGoalsFromHistory(days);
+  //     if (suggestionGeneration !== aiSuggestionGenerationRef.current) {
+  //       return;
+  //     }
+  //     setRingGoals(goals);
+  //     setSuccessMessage("Цель сохранена по истории за 3 месяца");
+  //   } catch (error) {
+  //     if (suggestionGeneration !== aiSuggestionGenerationRef.current) {
+  //       return;
+  //     }
+  //     if (error instanceof AiGatewayError) {
+  //       setValidationMessage(error.message);
+  //     } else if (error instanceof Error && error.message.trim()) {
+  //       setValidationMessage(error.message);
+  //     } else {
+  //       setValidationMessage("Не удалось получить ИИ-цель. Попробуйте позже.");
+  //     }
+  //   } finally {
+  //     setIsSuggesting(false);
+  //   }
+  // };
 
   return (
     <Card className={cn("gap-3 py-4", className)}>
@@ -202,6 +207,7 @@ export const ProfileRingGoalsSettingsCard = ({
           >
             Сбросить по умолчанию
           </Button>
+          {/* AI features disabled
           <Button
             type="button"
             variant="outline"
@@ -212,13 +218,16 @@ export const ProfileRingGoalsSettingsCard = ({
           >
             {isSuggesting ? "Считаем…" : "ИИ цель"}
           </Button>
+          */}
         </div>
 
+        {/* AI features disabled
         {successMessage ? (
           <p className="mt-2 text-sm text-muted-foreground">
             {successMessage}
           </p>
         ) : null}
+        */}
         {validationMessage ? (
           <p className="mt-2 text-sm text-destructive">{validationMessage}</p>
         ) : null}

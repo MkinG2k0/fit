@@ -1,21 +1,21 @@
-import { Loader2, Sparkles, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
 import {
   type ChangeEvent,
   useCallback,
   useRef,
-  useState,
 } from "react";
-import {
-  AI_FILL_HISTORY_MONTHS,
-  buildAiFillUserPrompt,
-  buildWorkoutLogText,
-  filterExerciseHistoryForAiFill,
-  formatCurrentSessionSets,
-  getAiFillSystemPrompt,
-  parseAiFillSets,
-} from "@/features/aiRecommendations";
+// AI features disabled
+// import {
+//   AI_FILL_HISTORY_MONTHS,
+//   buildAiFillUserPrompt,
+//   buildWorkoutLogText,
+//   filterExerciseHistoryForAiFill,
+//   formatCurrentSessionSets,
+//   getAiFillSystemPrompt,
+//   parseAiFillSets,
+// } from "@/features/aiRecommendations";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { useCalendarStore } from "@/entities/calendarDay";
 import {
@@ -34,11 +34,12 @@ import {
   useRestTimerStore,
 } from "@/features/timer";
 import { StatisticCard } from "@/widgets/statisticCard";
-import {
-  AiGatewayError,
-  createChatCompletion,
-} from "@/shared/api";
-import { readAllTrainingDaysFromStorage } from "@/shared/lib/analyticsStorage";
+// AI features disabled
+// import {
+//   AiGatewayError,
+//   createChatCompletion,
+// } from "@/shared/api";
+// import { readAllTrainingDaysFromStorage } from "@/shared/lib/analyticsStorage";
 import { cn } from "@/shared/lib/classMerge";
 import { CustomButton } from "@/shared/ui";
 import { getSetPrefillFromLastSession } from "@/shared/lib/findLastExerciseSession";
@@ -121,17 +122,19 @@ export const ExerciseBody = ({
   const lastSessionFillEnabled = useUserStore(
     (s) => s.lastSessionFillButtonEnabled ?? false,
   );
-  const aiFillEnabled = useUserStore((s) => s.aiFillEnabled ?? false);
+  // AI features disabled
+  // const aiFillEnabled = useUserStore((s) => s.aiFillEnabled ?? false);
 
   const onChangeHandler = useCalendarStore((store) => store.setExerciseValues);
   const addSetToExercise = useCalendarStore((store) => store.addSetToExercise);
   const addSetGuardRef = useRef(false);
-  const aiFillGuardRef = useRef(false);
-  const [aiFillLoading, setAiFillLoading] = useState(false);
-  const [aiFillError, setAiFillError] = useState<string | null>(null);
-  const [aiFillEmptyMessage, setAiFillEmptyMessage] = useState<string | null>(
-    null,
-  );
+  // AI features disabled
+  // const aiFillGuardRef = useRef(false);
+  // const [aiFillLoading, setAiFillLoading] = useState(false);
+  // const [aiFillError, setAiFillError] = useState<string | null>(null);
+  // const [aiFillEmptyMessage, setAiFillEmptyMessage] = useState<string | null>(
+  //   null,
+  // );
 
   const inputHandler = useCallback(
     (
@@ -237,110 +240,111 @@ export const ExerciseBody = ({
     onChangeHandler,
   ]);
 
-  const handleAiFill = useCallback(async () => {
-    if (aiFillGuardRef.current || aiFillLoading) {
-      return;
-    }
-    aiFillGuardRef.current = true;
-    setAiFillLoading(true);
-    setAiFillError(null);
-    setAiFillEmptyMessage(null);
-
-    try {
-      const alreadyDoneTodayText = formatCurrentSessionSets(exercise.sets);
-      const allDays = await readAllTrainingDaysFromStorage();
-      const filtered = filterExerciseHistoryForAiFill(
-        allDays,
-        {
-          name: exercise.name,
-          catalogExerciseId: exercise.catalogExerciseId,
-        },
-        AI_FILL_HISTORY_MONTHS,
-      );
-      const workoutLogText = buildWorkoutLogText(filtered);
-
-      if (!workoutLogText.trim() && !alreadyDoneTodayText) {
-        setAiFillEmptyMessage(
-          `Нет истории этого упражнения за последние ${AI_FILL_HISTORY_MONTHS} месяцев.`,
-        );
-        return;
-      }
-
-      const response = await createChatCompletion([
-        { role: "system", content: getAiFillSystemPrompt() },
-        {
-          role: "user",
-          content: buildAiFillUserPrompt(
-            exercise.name,
-            workoutLogText,
-            alreadyDoneTodayText,
-          ),
-        },
-      ]);
-
-      const content = response.choices?.[0]?.message?.content;
-      if (typeof content !== "string" || !content.trim()) {
-        setAiFillError("Пустой ответ ИИ. Попробуйте ещё раз.");
-        return;
-      }
-
-      const recommendedSets = parseAiFillSets(content);
-
-      if (recommendedSets.length === 0) {
-        setAiFillEmptyMessage(
-          "ИИ не предложил новых подходов — по уже сделанному объёма достаточно.",
-        );
-        return;
-      }
-
-      const defaultSec =
-        useUserStore.getState().defaultSetDurationSec ??
-        DEFAULT_SET_DURATION_SEC;
-
-      let previousEnd: Date | null = (() => {
-        const lastSet = exercise.sets.at(-1);
-        if (lastSet?.endTime !== undefined && lastSet.endTime !== "") {
-          return new Date(lastSet.endTime);
-        }
-        return null;
-      })();
-
-      for (const recommended of recommendedSets) {
-        const endNow = previousEnd
-          ? new Date(previousEnd.getTime() + defaultSec * 1000)
-          : new Date();
-        const { startTime, endTime } = getSetTimeRange(
-          previousEnd,
-          defaultSec,
-          endNow,
-        );
-
-        addSetToExercise(exercise, {
-          weight: recommended.weight,
-          reps: recommended.reps,
-          startTime: startTime.toISOString(),
-          endTime: endTime.toISOString(),
-        });
-
-        previousEnd = endTime;
-      }
-
-      if (recommendedSets.length > 0) {
-        startRestBetweenSetsIfEnabled();
-      }
-    } catch (error) {
-      if (error instanceof AiGatewayError) {
-        setAiFillError(error.message);
-      } else if (error instanceof Error && error.message.trim()) {
-        setAiFillError(error.message);
-      } else {
-        setAiFillError("Не удалось заполнить подходы. Попробуйте ещё раз.");
-      }
-    } finally {
-      setAiFillLoading(false);
-      aiFillGuardRef.current = false;
-    }
-  }, [addSetToExercise, aiFillLoading, exercise]);
+  // AI features disabled
+  // const handleAiFill = useCallback(async () => {
+  //   if (aiFillGuardRef.current || aiFillLoading) {
+  //     return;
+  //   }
+  //   aiFillGuardRef.current = true;
+  //   setAiFillLoading(true);
+  //   setAiFillError(null);
+  //   setAiFillEmptyMessage(null);
+  //
+  //   try {
+  //     const alreadyDoneTodayText = formatCurrentSessionSets(exercise.sets);
+  //     const allDays = await readAllTrainingDaysFromStorage();
+  //     const filtered = filterExerciseHistoryForAiFill(
+  //       allDays,
+  //       {
+  //         name: exercise.name,
+  //         catalogExerciseId: exercise.catalogExerciseId,
+  //       },
+  //       AI_FILL_HISTORY_MONTHS,
+  //     );
+  //     const workoutLogText = buildWorkoutLogText(filtered);
+  //
+  //     if (!workoutLogText.trim() && !alreadyDoneTodayText) {
+  //       setAiFillEmptyMessage(
+  //         `Нет истории этого упражнения за последние ${AI_FILL_HISTORY_MONTHS} месяцев.`,
+  //       );
+  //       return;
+  //     }
+  //
+  //     const response = await createChatCompletion([
+  //       { role: "system", content: getAiFillSystemPrompt() },
+  //       {
+  //         role: "user",
+  //         content: buildAiFillUserPrompt(
+  //           exercise.name,
+  //           workoutLogText,
+  //           alreadyDoneTodayText,
+  //         ),
+  //       },
+  //     ]);
+  //
+  //     const content = response.choices?.[0]?.message?.content;
+  //     if (typeof content !== "string" || !content.trim()) {
+  //       setAiFillError("Пустой ответ ИИ. Попробуйте ещё раз.");
+  //       return;
+  //     }
+  //
+  //     const recommendedSets = parseAiFillSets(content);
+  //
+  //     if (recommendedSets.length === 0) {
+  //       setAiFillEmptyMessage(
+  //         "ИИ не предложил новых подходов — по уже сделанному объёма достаточно.",
+  //       );
+  //       return;
+  //     }
+  //
+  //     const defaultSec =
+  //       useUserStore.getState().defaultSetDurationSec ??
+  //       DEFAULT_SET_DURATION_SEC;
+  //
+  //     let previousEnd: Date | null = (() => {
+  //       const lastSet = exercise.sets.at(-1);
+  //       if (lastSet?.endTime !== undefined && lastSet.endTime !== "") {
+  //         return new Date(lastSet.endTime);
+  //       }
+  //       return null;
+  //     })();
+  //
+  //     for (const recommended of recommendedSets) {
+  //       const endNow = previousEnd
+  //         ? new Date(previousEnd.getTime() + defaultSec * 1000)
+  //         : new Date();
+  //       const { startTime, endTime } = getSetTimeRange(
+  //         previousEnd,
+  //         defaultSec,
+  //         endNow,
+  //       );
+  //
+  //       addSetToExercise(exercise, {
+  //         weight: recommended.weight,
+  //         reps: recommended.reps,
+  //         startTime: startTime.toISOString(),
+  //         endTime: endTime.toISOString(),
+  //       });
+  //
+  //       previousEnd = endTime;
+  //     }
+  //
+  //     if (recommendedSets.length > 0) {
+  //       startRestBetweenSetsIfEnabled();
+  //     }
+  //   } catch (error) {
+  //     if (error instanceof AiGatewayError) {
+  //       setAiFillError(error.message);
+  //     } else if (error instanceof Error && error.message.trim()) {
+  //       setAiFillError(error.message);
+  //     } else {
+  //       setAiFillError("Не удалось заполнить подходы. Попробуйте ещё раз.");
+  //     }
+  //   } finally {
+  //     setAiFillLoading(false);
+  //     aiFillGuardRef.current = false;
+  //   }
+  // }, [addSetToExercise, aiFillLoading, exercise]);
 
   return (
     <div
@@ -434,6 +438,7 @@ export const ExerciseBody = ({
           exerciseName={exercise.name}
           catalogExerciseId={exercise.catalogExerciseId}
         />
+        {/* AI features disabled
         {aiFillEnabled ? (
           <Button
             type="button"
@@ -452,6 +457,7 @@ export const ExerciseBody = ({
             )}
           </Button>
         ) : null}
+        */}
         <CustomButton classes={"flex-1"} buttonHandler={handleAddSet}>
           Добавить подход
         </CustomButton>
@@ -464,6 +470,7 @@ export const ExerciseBody = ({
           <Trash2 />
         </Button>
       </div>
+      {/* AI features disabled
       {aiFillEnabled && aiFillEmptyMessage ? (
         <p className="w-full text-xs text-muted-foreground" role="status">
           {aiFillEmptyMessage}
@@ -474,6 +481,7 @@ export const ExerciseBody = ({
           {aiFillError}
         </p>
       ) : null}
+      */}
     </div>
   );
 };

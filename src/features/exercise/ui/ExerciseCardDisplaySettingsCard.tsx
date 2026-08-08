@@ -51,8 +51,9 @@ export const ExerciseCardDisplaySettingsCard = ({
   const setExerciseCardReorderEnabled = useUserStore(
     (s) => s.setExerciseCardReorderEnabled,
   );
-  const aiFillEnabled = useUserStore((s) => s.aiFillEnabled ?? false);
-  const setAiFillEnabled = useUserStore((s) => s.setAiFillEnabled);
+  // AI features disabled
+  // const aiFillEnabled = useUserStore((s) => s.aiFillEnabled ?? false);
+  // const setAiFillEnabled = useUserStore((s) => s.setAiFillEnabled);
 
   const handleLastSessionCheckedChange = useCallback(
     (value: boolean | "indeterminate") => {
@@ -89,12 +90,13 @@ export const ExerciseCardDisplaySettingsCard = ({
     [setExerciseCardReorderEnabled],
   );
 
-  const handleAiFillCheckedChange = useCallback(
-    (value: boolean | "indeterminate") => {
-      setAiFillEnabled(value === true);
-    },
-    [setAiFillEnabled],
-  );
+  // AI features disabled
+  // const handleAiFillCheckedChange = useCallback(
+  //   (value: boolean | "indeterminate") => {
+  //     setAiFillEnabled(value === true);
+  //   },
+  //   [setAiFillEnabled],
+  // );
 
   return (
     <Card className={cn("gap-3 py-4", className)}>
@@ -241,6 +243,7 @@ export const ExerciseCardDisplaySettingsCard = ({
           </div>
         </div>
 
+        {/* AI features disabled
         <div className="flex items-start gap-3 rounded-md border border-border p-3">
           <Checkbox
             id="exercise-card-ai-fill"
@@ -264,6 +267,7 @@ export const ExerciseCardDisplaySettingsCard = ({
             </p>
           </div>
         </div>
+        */}
       </CardContent>
     </Card>
   );

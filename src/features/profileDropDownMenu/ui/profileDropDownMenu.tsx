@@ -7,7 +7,7 @@ import {
   Newspaper,
   Ruler,
   ScrollText,
-  Sparkles,
+  // Sparkles, // AI features disabled
   Table2,
   Timer as TimerIcon,
 } from "lucide-react";
@@ -115,6 +115,7 @@ export const ProfileDropDownMenu = () => {
             <div>Новости</div>
           </Button>
 
+          {/* AI features disabled
           <Separator />
           <Button
             variant="ghost"
@@ -124,6 +125,7 @@ export const ProfileDropDownMenu = () => {
             <Sparkles />
             <div>AI рекомендации</div>
           </Button>
+          */}
 
           <Separator />
           <Button
