@@ -1,5 +1,5 @@
 import { Trash2 } from "lucide-react";
-import { findCatalogExerciseById, useExerciseStore } from "@/entities/exercise";
+import { useCatalogNameById } from "@/entities/exercise";
 import { useLoadTableStore } from "@/entities/loadTable";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 
@@ -11,7 +11,7 @@ interface LoadTableListProps {
 export const LoadTableList = ({ onSelect, onAddClick }: LoadTableListProps) => {
   const exercises = useLoadTableStore((state) => state.exercises);
   const removeExercise = useLoadTableStore((state) => state.removeExercise);
-  const catalog = useExerciseStore((state) => state.exercises);
+  const nameById = useCatalogNameById();
 
   if (exercises.length === 0) {
     return (
@@ -35,11 +35,8 @@ export const LoadTableList = ({ onSelect, onAddClick }: LoadTableListProps) => {
       </div>
       <ul className="flex flex-col gap-2">
         {exercises.map((entry) => {
-          const catalogEntry = findCatalogExerciseById(
-            catalog,
-            entry.catalogExerciseId,
-          );
-          const name = catalogEntry?.name ?? "Упражнение";
+          const name =
+            nameById.get(entry.catalogExerciseId) ?? "Упражнение";
 
           return (
             <li key={entry.id}>

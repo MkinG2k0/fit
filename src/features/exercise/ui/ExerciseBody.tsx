@@ -22,6 +22,8 @@ import {
   FREE_WEIGHT_MEASUREMENT_TYPE,
   findCatalogExerciseById,
   isTimeMeasurementType,
+  resolveWorkoutExerciseDisplayName,
+  useCatalogNameById,
   useExerciseStore,
   type Exercise,
   type ExerciseSet,
@@ -78,6 +80,8 @@ export const ExerciseBody = ({
     exercise.catalogExerciseId,
   );
   const catalogExercises = useExerciseStore((store) => store.exercises);
+  const nameById = useCatalogNameById();
+  const displayName = resolveWorkoutExerciseDisplayName(exercise, nameById);
   const catalogEntry = findCatalogExerciseById(
     catalogExercises,
     exercise.catalogExerciseId ?? "",
@@ -435,7 +439,7 @@ export const ExerciseBody = ({
       </AnimatePresence>
       <div className="flex flex-wrap gap-3 items-center justify-between">
         <StatisticCard
-          exerciseName={exercise.name}
+          exerciseName={displayName}
           catalogExerciseId={exercise.catalogExerciseId}
         />
         {/* AI features disabled

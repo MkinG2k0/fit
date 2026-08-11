@@ -19,7 +19,9 @@ import {
   findCatalogExerciseById,
   findExerciseCategoryById,
   isTimeMeasurementType,
+  resolveWorkoutExerciseDisplayName,
   type Exercise,
+  useCatalogNameById,
   useExerciseStore,
 } from "@/entities/exercise";
 import { cn, formatTonnageParts } from "@shared/lib";
@@ -65,6 +67,8 @@ export const ExerciseCard = ({
   const setExerciseName = useCalendarStore((store) => store.setExerciseName);
   const deleteExercise = useCalendarStore((store) => store.deleteExercise);
   const allExercises = useExerciseStore((store) => store.exercises);
+  const nameById = useCatalogNameById();
+  const displayName = resolveWorkoutExerciseDisplayName(exercise, nameById);
 
   // 🧠 1. Проверяем, был ли уже показан hint
   useEffect(() => {
@@ -234,7 +238,7 @@ export const ExerciseCard = ({
               <div className="flex min-w-0 flex-1 items-center  text-base">
                 <ExerciseNameSelector
                   allExercises={allExercises}
-                  exerciseName={exercise.name}
+                  exerciseName={displayName}
                   isEditable={isEditable}
                   open={modalVisibility}
                   onOpenChange={setModalVisibility}
@@ -310,12 +314,12 @@ export const ExerciseCard = ({
 
       <ExerciseDeleteDialog
         open={isDeleteDialogOpen}
-        exerciseName={exercise.name}
+        exerciseName={displayName}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
       />
       <StatisticCard
-        exerciseName={exercise.name}
+        exerciseName={displayName}
         catalogExerciseId={exercise.catalogExerciseId}
         open={isStatisticOpen}
         onOpenChange={setIsStatisticOpen}
