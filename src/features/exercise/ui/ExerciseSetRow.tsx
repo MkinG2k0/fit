@@ -253,23 +253,6 @@ export const ExerciseSetRow = ({
         </div>
       ) : (
         <>
-          <div className="w-full rounded-full bg-muted">
-            <Input
-              className={cn(
-                "h-12 w-full rounded-md border-primary bg-background text-center text-2xl text-foreground font-numeric shadow-none ring-0 outline-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0",
-                "text-primary",
-              )}
-              type="text"
-              inputMode="numeric"
-              autoComplete="off"
-              placeholder="Кол-во"
-              name="reps"
-              value={isEmptySet ? "" : String(set.reps)}
-              onChange={(e) => {
-                handleRepsChange(e, set);
-              }}
-            />
-          </div>
           <div className="flex w-full items-center gap-1">
             {isStack ? (
               <Button
@@ -320,6 +303,23 @@ export const ExerciseSetRow = ({
                 <Plus />
               </Button>
             ) : null}
+          </div>
+          <div className="w-full rounded-full bg-muted">
+            <Input
+              className={cn(
+                "h-12 w-full rounded-md border-primary bg-background text-center text-2xl text-foreground font-numeric shadow-none ring-0 outline-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0",
+                "text-primary",
+              )}
+              type="text"
+              inputMode="numeric"
+              autoComplete="off"
+              placeholder="Кол-во"
+              name="reps"
+              value={isEmptySet ? "" : String(set.reps)}
+              onChange={(e) => {
+                handleRepsChange(e, set);
+              }}
+            />
           </div>
         </>
       )}

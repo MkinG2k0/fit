@@ -391,10 +391,10 @@ export const ExerciseBody = ({
           ) : (
             <>
               <span className="min-w-0 text-center text-xs font-semibold leading-tight text-muted-foreground">
-                Повторений
+                {measurementType === "stack_lbs" ? "lbs" : "Кг"}
               </span>
               <span className="min-w-0 text-center text-xs font-semibold leading-tight text-muted-foreground">
-                {measurementType === "stack_lbs" ? "lbs" : "Кг"}
+                Повторений
               </span>
             </>
           )}
