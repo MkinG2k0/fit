@@ -9,6 +9,7 @@ import {
   WorkoutSummaryDisplaySettingsCard,
 } from "@/features/exercise";
 import { TimerNotificationsSettingsCard } from "@/features/timer";
+import { MenuSectionsSettingsCard } from "@/features/profileDropDownMenu";
 
 export const SettingsPage = () => {
   return (
@@ -32,6 +33,8 @@ export const SettingsPage = () => {
       <DefaultExercisesSettingsCard />
 
       <TimerNotificationsSettingsCard />
+
+      <MenuSectionsSettingsCard />
 
       <SettingsTransferCard />
     </div>
