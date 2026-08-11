@@ -5,10 +5,10 @@ milestone_name: milestone
 current_phase: 1
 current_phase_name: Quick Logging Core & Local Persistence
 status: ready
-stopped_at: Completed 260811-ty5 measurement type flex-wrap chips
-last_updated: "2026-08-11T18:36:00.000Z"
+stopped_at: Completed 260811-wja resolve workout exercise display names from catalog Map
+last_updated: "2026-08-11T20:35:00.000Z"
 last_activity: 2026-08-11
-last_activity_desc: "Completed quick task 260811-ty5: measurement type wrapping Button chips"
+last_activity_desc: "Completed quick task 260811-wja: catalog Map display names for workout UI"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -31,7 +31,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-14)
 Phase: 1 of 5 (Quick Logging Core & Local Persistence)
 Plan: 0 of 0 in current phase
 Status: Ready to execute
-Last activity: 2026-08-11 - Completed quick task 260811-ty5: measurement type wrapping chips
+Last activity: 2026-08-11 - Completed quick task 260811-wja: catalog Map display names for workout UI
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -80,6 +80,7 @@ Recent decisions affecting current work:
 - [260811-tmf] Back navigation uses parent-route map (`resolveBackPath`), not `history.back`; exercise create/edit/presets → `/exercises`.
 - [260811-tqu] Optional menu sections (Timer, Body metrics, Load table, Activity) gated by userStore flags default OFF; routes remain.
 - [260811-ttt] Time set input accepts `m ss` / `mm ss` (and `m:ss`); live draft mask via `sanitizeTimeDraft`.
+- [260811-wja] Workout display names resolve from catalog Map by catalogExerciseId; day name is orphan fallback only.
 
 ### Pending Todos
 
@@ -139,9 +140,10 @@ None yet.
 | 260811-ttt | Маска ввода времени: `1 55` / `11 55` и `мм:сс` | 2026-08-11 | — | [260811-ttt-time-input-mask-space-separated-mm-ss](./quick/260811-ttt-time-input-mask-space-separated-mm-ss/) |
 | 260811-tqu | Опциональные пункты меню (Таймер / Параметры тела / Таблица нагрузок / Активность), default OFF | 2026-08-11 | 7494703 | [260811-tqu-optional-menu-features](./quick/260811-tqu-optional-menu-features/) |
 | 260811-ty5 | Тип замера: chip-кнопки с flex-wrap вместо RadioGroup | 2026-08-11 | 1406218 | [260811-ty5-flex-wrap](./quick/260811-ty5-flex-wrap/) |
+| 260811-wja | Имена упражнений в тренировке из каталога (Map), без обхода календаря | 2026-08-11 | bb9117a | [260811-wja-resolve-workout-exercise-display-names-f](./quick/260811-wja-resolve-workout-exercise-display-names-f/) |
 
 ## Session Continuity
 
-Last session: 2026-08-11T18:36:00.000Z
-Stopped at: Completed 260811-ty5 — measurement type flex-wrap chips
+Last session: 2026-08-11T20:35:00.000Z
+Stopped at: Completed 260811-wja — resolve workout exercise display names from catalog Map
 Resume file: None
