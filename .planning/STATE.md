@@ -5,10 +5,10 @@ milestone_name: milestone
 current_phase: 1
 current_phase_name: Quick Logging Core & Local Persistence
 status: ready
-stopped_at: Completed 260808-khe measurement types (free_weight/stack/time)
-last_updated: "2026-08-08T11:55:39.954Z"
-last_activity: 2026-08-08
-last_activity_desc: "Completed quick task 260808-khe: measurement types free_weight/stack/time"
+stopped_at: Completed 260811-tqu optional menu features
+last_updated: "2026-08-11T18:30:53.000Z"
+last_activity: 2026-08-11
+last_activity_desc: "Completed quick task 260811-tqu: optional profile menu sections (default OFF)"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -31,7 +31,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-14)
 Phase: 1 of 5 (Quick Logging Core & Local Persistence)
 Plan: 0 of 0 in current phase
 Status: Ready to execute
-Last activity: 2026-08-08 - Completed quick task 260808-khe: measurement types
+Last activity: 2026-08-11 - Completed quick task 260811-tqu: optional profile menu sections
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -77,6 +77,9 @@ Recent decisions affecting current work:
 - [260715-3fn] Rest timer uses persisted endAt deadline + react-timer-hook; rest-between-sets default 120s auto-starts after add set.
 - [260715-3t7] AI fill gated by aiFillEnabled (default false); Settings card + transfer; button hidden when off.
 - [260808-khe] Catalog measurementType (free_weight/stack_kg/stack_lbs/time); duration in set.weight seconds; settings change only from free_weight.
+- [260811-tmf] Back navigation uses parent-route map (`resolveBackPath`), not `history.back`; exercise create/edit/presets → `/exercises`.
+- [260811-tqu] Optional menu sections (Timer, Body metrics, Load table, Activity) gated by userStore flags default OFF; routes remain.
+- [260811-ttt] Time set input accepts `m ss` / `mm ss` (and `m:ss`); live draft mask via `sanitizeTimeDraft`.
 
 ### Pending Todos
 
@@ -131,9 +134,13 @@ None yet.
 | fast | Кнопка ИИ-заполнения: текст → иконка Sparkles | 2026-07-15 | 8fee417 | — |
 | fast | увеличить версию андроида | 2026-08-03 | 7185d2c | — |
 | fast | поменять повторы и кг местами в карточке подхода | 2026-08-11 | 4995d44 | — |
+| 260811-tmf | Единая навигация назад без циклов (parent-route map) | 2026-08-11 | — | [260811-tmf-history-back](./quick/260811-tmf-history-back/) |
+| 260811-tq6 | Убрать дефолтный первый подход при создании упражнения | 2026-08-11 | — | [260811-tq6-no-default-set](./quick/260811-tq6-no-default-set/) |
+| 260811-ttt | Маска ввода времени: `1 55` / `11 55` и `мм:сс` | 2026-08-11 | — | [260811-ttt-time-input-mask-space-separated-mm-ss](./quick/260811-ttt-time-input-mask-space-separated-mm-ss/) |
+| 260811-tqu | Опциональные пункты меню (Таймер / Параметры тела / Таблица нагрузок / Активность), default OFF | 2026-08-11 | 7494703 | [260811-tqu-optional-menu-features](./quick/260811-tqu-optional-menu-features/) |
 
 ## Session Continuity
 
-Last session: 2026-08-08T11:55:39.947Z
-Stopped at: Completed 260808-khe measurement types
+Last session: 2026-08-11T18:30:53.000Z
+Stopped at: Completed 260811-tqu — optional menu features
 Resume file: None
