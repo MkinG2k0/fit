@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUserStore } from "@/entities/user";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button.tsx";
 import {
   Popover,
@@ -24,6 +25,16 @@ import { Separator } from "@/shared/ui/shadCNComponents/ui/separator.tsx";
 export const ProfileDropDownMenu = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const timerMenuEnabled = useUserStore((s) => s.timerMenuEnabled ?? false);
+  const bodyMetricsMenuEnabled = useUserStore(
+    (s) => s.bodyMetricsMenuEnabled ?? false,
+  );
+  const loadTableMenuEnabled = useUserStore(
+    (s) => s.loadTableMenuEnabled ?? false,
+  );
+  const activityMenuEnabled = useUserStore(
+    (s) => s.activityMenuEnabled ?? false,
+  );
 
   const handleNavigate = (path: string) => {
     setOpen(false);
@@ -47,45 +58,61 @@ export const ProfileDropDownMenu = () => {
             <House />
             <div>Главная</div>
           </Button>
-          <Separator />
-          <Button
-            variant="ghost"
-            className="justify-start"
-            onClick={() => handleNavigate("/timer")}
-          >
-            <TimerIcon />
-            <div>Таймер</div>
-          </Button>
+          {timerMenuEnabled ? (
+            <>
+              <Separator />
+              <Button
+                variant="ghost"
+                className="justify-start"
+                onClick={() => handleNavigate("/timer")}
+              >
+                <TimerIcon />
+                <div>Таймер</div>
+              </Button>
+            </>
+          ) : null}
 
-          <Separator />
-          <Button
-            variant="ghost"
-            className="justify-start"
-            onClick={() => handleNavigate("/body-metrics")}
-          >
-            <Ruler />
-            <div>Параметры тела</div>
-          </Button>
+          {bodyMetricsMenuEnabled ? (
+            <>
+              <Separator />
+              <Button
+                variant="ghost"
+                className="justify-start"
+                onClick={() => handleNavigate("/body-metrics")}
+              >
+                <Ruler />
+                <div>Параметры тела</div>
+              </Button>
+            </>
+          ) : null}
 
-          <Separator />
-          <Button
-            variant="ghost"
-            className="justify-start"
-            onClick={() => handleNavigate("/load-table")}
-          >
-            <Table2 />
-            <div>Таблица нагрузок</div>
-          </Button>
+          {loadTableMenuEnabled ? (
+            <>
+              <Separator />
+              <Button
+                variant="ghost"
+                className="justify-start"
+                onClick={() => handleNavigate("/load-table")}
+              >
+                <Table2 />
+                <div>Таблица нагрузок</div>
+              </Button>
+            </>
+          ) : null}
 
-          <Separator />
-          <Button
-            variant="ghost"
-            className="justify-start"
-            onClick={() => handleNavigate("/activity")}
-          >
-            <Activity />
-            <div>Активность</div>
-          </Button>
+          {activityMenuEnabled ? (
+            <>
+              <Separator />
+              <Button
+                variant="ghost"
+                className="justify-start"
+                onClick={() => handleNavigate("/activity")}
+              >
+                <Activity />
+                <div>Активность</div>
+              </Button>
+            </>
+          ) : null}
           <Separator />
           <Button
             variant="ghost"
