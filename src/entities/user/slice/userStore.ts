@@ -64,6 +64,14 @@ interface UserState {
   timerCompleteNotificationsEnabled: boolean;
   /** Экспериментальное ИИ-заполнение подходов. По умолчанию выкл. */
   aiFillEnabled: boolean;
+  /** Пункт «Таймер» в меню профиля. По умолчанию выкл. */
+  timerMenuEnabled: boolean;
+  /** Пункт «Параметры тела» в меню профиля. По умолчанию выкл. */
+  bodyMetricsMenuEnabled: boolean;
+  /** Пункт «Таблица нагрузок» в меню профиля. По умолчанию выкл. */
+  loadTableMenuEnabled: boolean;
+  /** Пункт «Активность» в меню профиля. По умолчанию выкл. */
+  activityMenuEnabled: boolean;
 }
 
 interface ActionsState {
@@ -85,6 +93,10 @@ interface ActionsState {
   setRestBetweenSetsSec: (sec: number) => void;
   setTimerCompleteNotificationsEnabled: (enabled: boolean) => void;
   setAiFillEnabled: (enabled: boolean) => void;
+  setTimerMenuEnabled: (enabled: boolean) => void;
+  setBodyMetricsMenuEnabled: (enabled: boolean) => void;
+  setLoadTableMenuEnabled: (enabled: boolean) => void;
+  setActivityMenuEnabled: (enabled: boolean) => void;
   setAccessToken: (token: string) => void;
   deleteUserData: () => void;
   reset: () => void;
@@ -111,6 +123,10 @@ export const useUserStore = create<UserState & ActionsState>()(
       restBetweenSetsSec: DEFAULT_REST_BETWEEN_SETS_SEC,
       timerCompleteNotificationsEnabled: true,
       aiFillEnabled: false,
+      timerMenuEnabled: false,
+      bodyMetricsMenuEnabled: false,
+      loadTableMenuEnabled: false,
+      activityMenuEnabled: false,
       accessToken: "",
 
       setAccessToken: (token) => set({ accessToken: token }),
@@ -209,6 +225,26 @@ export const useUserStore = create<UserState & ActionsState>()(
           aiFillEnabled: enabled,
         })),
 
+      setTimerMenuEnabled: (enabled) =>
+        set(() => ({
+          timerMenuEnabled: enabled,
+        })),
+
+      setBodyMetricsMenuEnabled: (enabled) =>
+        set(() => ({
+          bodyMetricsMenuEnabled: enabled,
+        })),
+
+      setLoadTableMenuEnabled: (enabled) =>
+        set(() => ({
+          loadTableMenuEnabled: enabled,
+        })),
+
+      setActivityMenuEnabled: (enabled) =>
+        set(() => ({
+          activityMenuEnabled: enabled,
+        })),
+
       deleteUserData: () =>
         set(() => ({
           user: {
@@ -296,6 +332,22 @@ export const useUserStore = create<UserState & ActionsState>()(
             typeof p.aiFillEnabled === "boolean"
               ? p.aiFillEnabled
               : current.aiFillEnabled,
+          timerMenuEnabled:
+            typeof p.timerMenuEnabled === "boolean"
+              ? p.timerMenuEnabled
+              : current.timerMenuEnabled,
+          bodyMetricsMenuEnabled:
+            typeof p.bodyMetricsMenuEnabled === "boolean"
+              ? p.bodyMetricsMenuEnabled
+              : current.bodyMetricsMenuEnabled,
+          loadTableMenuEnabled:
+            typeof p.loadTableMenuEnabled === "boolean"
+              ? p.loadTableMenuEnabled
+              : current.loadTableMenuEnabled,
+          activityMenuEnabled:
+            typeof p.activityMenuEnabled === "boolean"
+              ? p.activityMenuEnabled
+              : current.activityMenuEnabled,
         };
       },
     },

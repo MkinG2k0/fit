@@ -99,6 +99,10 @@ const isUserProfileExport = (
   restBetweenSetsSec?: number;
   timerCompleteNotificationsEnabled?: boolean;
   aiFillEnabled?: boolean;
+  timerMenuEnabled?: boolean;
+  bodyMetricsMenuEnabled?: boolean;
+  loadTableMenuEnabled?: boolean;
+  activityMenuEnabled?: boolean;
 } => {
   if (!isPlainObject(value)) {
     return false;
@@ -185,6 +189,30 @@ const isUserProfileExport = (
   if ("aiFillEnabled" in value && typeof value.aiFillEnabled !== "boolean") {
     return false;
   }
+  if (
+    "timerMenuEnabled" in value &&
+    typeof value.timerMenuEnabled !== "boolean"
+  ) {
+    return false;
+  }
+  if (
+    "bodyMetricsMenuEnabled" in value &&
+    typeof value.bodyMetricsMenuEnabled !== "boolean"
+  ) {
+    return false;
+  }
+  if (
+    "loadTableMenuEnabled" in value &&
+    typeof value.loadTableMenuEnabled !== "boolean"
+  ) {
+    return false;
+  }
+  if (
+    "activityMenuEnabled" in value &&
+    typeof value.activityMenuEnabled !== "boolean"
+  ) {
+    return false;
+  }
   return true;
 };
 
@@ -246,6 +274,10 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         restBetweenSetsSec?: number;
         timerCompleteNotificationsEnabled?: boolean;
         aiFillEnabled?: boolean;
+        timerMenuEnabled?: boolean;
+        bodyMetricsMenuEnabled?: boolean;
+        loadTableMenuEnabled?: boolean;
+        activityMenuEnabled?: boolean;
       };
       return {
         user: state.user ?? { userName: "" },
@@ -272,6 +304,10 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         timerCompleteNotificationsEnabled:
           state.timerCompleteNotificationsEnabled ?? true,
         aiFillEnabled: state.aiFillEnabled ?? false,
+        timerMenuEnabled: state.timerMenuEnabled ?? false,
+        bodyMetricsMenuEnabled: state.bodyMetricsMenuEnabled ?? false,
+        loadTableMenuEnabled: state.loadTableMenuEnabled ?? false,
+        activityMenuEnabled: state.activityMenuEnabled ?? false,
       };
     },
     importSnapshot: async (payload: unknown) => {
@@ -301,6 +337,10 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
             restBetweenSetsSec?: number;
             timerCompleteNotificationsEnabled?: boolean;
             aiFillEnabled?: boolean;
+            timerMenuEnabled?: boolean;
+            bodyMetricsMenuEnabled?: boolean;
+            loadTableMenuEnabled?: boolean;
+            activityMenuEnabled?: boolean;
           };
           const next = {
             ...existing,
@@ -350,6 +390,22 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
                 true,
               aiFillEnabled:
                 payload.aiFillEnabled ?? prevState.aiFillEnabled ?? false,
+              timerMenuEnabled:
+                payload.timerMenuEnabled ??
+                prevState.timerMenuEnabled ??
+                false,
+              bodyMetricsMenuEnabled:
+                payload.bodyMetricsMenuEnabled ??
+                prevState.bodyMetricsMenuEnabled ??
+                false,
+              loadTableMenuEnabled:
+                payload.loadTableMenuEnabled ??
+                prevState.loadTableMenuEnabled ??
+                false,
+              activityMenuEnabled:
+                payload.activityMenuEnabled ??
+                prevState.activityMenuEnabled ??
+                false,
             },
           };
           await writeJsonToStorage(USER_STORAGE_KEY, next);
@@ -387,6 +443,10 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
             timerCompleteNotificationsEnabled:
               payload.timerCompleteNotificationsEnabled ?? true,
             aiFillEnabled: payload.aiFillEnabled ?? false,
+            timerMenuEnabled: payload.timerMenuEnabled ?? false,
+            bodyMetricsMenuEnabled: payload.bodyMetricsMenuEnabled ?? false,
+            loadTableMenuEnabled: payload.loadTableMenuEnabled ?? false,
+            activityMenuEnabled: payload.activityMenuEnabled ?? false,
             accessToken: "",
           },
         });
