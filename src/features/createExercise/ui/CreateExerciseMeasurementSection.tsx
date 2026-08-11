@@ -3,11 +3,8 @@ import {
   defaultMeasurementStep,
   isStackMeasurementType,
 } from "@/entities/exercise";
+import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import { Label } from "@/shared/ui/shadCNComponents/ui/label";
-import {
-  RadioGroup,
-  RadioGroupItem,
-} from "@/shared/ui/shadCNComponents/ui/radio-group";
 
 const MEASUREMENT_OPTIONS: ReadonlyArray<{
   value: MeasurementType;
@@ -42,37 +39,33 @@ export const CreateExerciseMeasurementSection = ({
       <span id="exercise-measurement-type-label" className="text-sm font-medium">
         Тип замера
       </span>
-      <RadioGroup
-        value={value}
-        disabled={disabled}
+      <div
+        role="radiogroup"
         aria-labelledby="exercise-measurement-type-label"
-        className="grid gap-2"
-        onValueChange={(next) => {
-          const nextType = next as MeasurementType;
-          onTypeChange(nextType);
-          if (isStackMeasurementType(nextType)) {
-            onStepChange(defaultMeasurementStep(nextType));
-          } else {
-            onStepChange(undefined);
-          }
-        }}
+        className="flex flex-wrap gap-2"
       >
         {MEASUREMENT_OPTIONS.map((option) => (
-          <div key={option.value} className="flex items-center gap-2">
-            <RadioGroupItem
-              value={option.value}
-              id={`measurement-type-${option.value}`}
-              disabled={disabled}
-            />
-            <Label
-              htmlFor={`measurement-type-${option.value}`}
-              className="text-sm font-normal"
-            >
-              {option.label}
-            </Label>
-          </div>
+          <Button
+            key={option.value}
+            type="button"
+            variant={value === option.value ? "default" : "outline"}
+            aria-pressed={value === option.value}
+            disabled={disabled}
+            className="whitespace-nowrap"
+            onClick={() => {
+              const nextType = option.value;
+              onTypeChange(nextType);
+              if (isStackMeasurementType(nextType)) {
+                onStepChange(defaultMeasurementStep(nextType));
+              } else {
+                onStepChange(undefined);
+              }
+            }}
+          >
+            {option.label}
+          </Button>
         ))}
-      </RadioGroup>
+      </div>
       {showStep ? (
         <div className="flex items-center gap-2 pt-1">
           <Label htmlFor="measurement-step" className="text-sm font-medium">
