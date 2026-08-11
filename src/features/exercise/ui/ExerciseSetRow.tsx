@@ -8,6 +8,7 @@ import {
   isStackMeasurementType,
   isTimeMeasurementType,
   parseMmSsToSeconds,
+  sanitizeTimeDraft,
   type Exercise,
   type ExerciseSet,
   type MeasurementType,
@@ -178,7 +179,11 @@ export const ExerciseSetRow = ({
 
   const handleTimeChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      setTimeDraft(event.target.value);
+      const sanitized = sanitizeTimeDraft(event.target.value);
+      if (sanitized === null) {
+        return;
+      }
+      setTimeDraft(sanitized);
     },
     [],
   );
@@ -241,7 +246,7 @@ export const ExerciseSetRow = ({
             type="text"
             inputMode="numeric"
             autoComplete="off"
-            placeholder="мм:сс"
+            placeholder="мм сс"
             name="weight"
             value={timeValue}
             onFocus={handleTimeFocus}

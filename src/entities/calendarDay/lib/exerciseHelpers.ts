@@ -3,14 +3,6 @@ import type { CalendarDay } from "../model/types";
 import { createRandomUuid, saveDaysToLocalStorage } from "@/shared/lib";
 import dayjs from "dayjs";
 
-export interface GenerateExerciseOptions {
-  /**
-   * Одна пустая строка подхода (0×0), если расчёт ккал на подход выключен —
-   * не нужен лишний клик «Добавить подход».
-   */
-  singleEmptySet?: boolean;
-}
-
 export const generateExercise = (
   name: string,
   _group: string,
@@ -18,12 +10,8 @@ export const generateExercise = (
   iconId?: ExerciseIconId,
   catalogExerciseId?: string,
   categoryId?: string,
-  options?: GenerateExerciseOptions,
 ): Exercise => {
-  const sets: ExerciseSet[] =
-    options?.singleEmptySet === true
-      ? [{ id: createRandomUuid(), weight: 0, reps: 0 }]
-      : [];
+  const sets: ExerciseSet[] = [];
 
   return {
     sets,

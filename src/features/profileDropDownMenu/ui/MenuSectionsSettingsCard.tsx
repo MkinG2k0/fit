@@ -94,7 +94,7 @@ export const MenuSectionsSettingsCard = ({
               id="menu-timer-enabled-hint"
               className="text-xs text-muted-foreground"
             >
-              Скрыт в меню, пока выкл.
+              Отдельный таймер отдыха между подходами
             </p>
           </div>
         </div>
@@ -117,7 +117,7 @@ export const MenuSectionsSettingsCard = ({
               id="menu-body-metrics-enabled-hint"
               className="text-xs text-muted-foreground"
             >
-              Скрыт в меню, пока выкл.
+              Замеры веса и обхватов с графиком динамики
             </p>
           </div>
         </div>
@@ -140,7 +140,7 @@ export const MenuSectionsSettingsCard = ({
               id="menu-load-table-enabled-hint"
               className="text-xs text-muted-foreground"
             >
-              Скрыт в меню, пока выкл.
+              16-недельный план процентов от MAX по упражнениям
             </p>
           </div>
         </div>
@@ -163,7 +163,7 @@ export const MenuSectionsSettingsCard = ({
               id="menu-activity-enabled-hint"
               className="text-xs text-muted-foreground"
             >
-              Скрыт в меню, пока выкл.
+              Шаги и калории из Apple Health / Health Connect
             </p>
           </div>
         </div>

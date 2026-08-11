@@ -16,7 +16,6 @@ import {
 import type { CalendarDay } from "../model/types";
 import { createRandomUuid } from "@/shared/lib";
 import { getDaysFromLocalStorage, saveDaysToLocalStorage } from "@/shared/lib/storage";
-import { useUserStore } from "@/entities/user";
 import {
   generateExercise,
   getDateKeyAndOldExercises,
@@ -105,8 +104,6 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
         state.selectedDate,
         state.days,
       );
-      const workoutCaloriesEnabled =
-        useUserStore.getState().workoutCaloriesEnabled ?? false;
       const newExercises = [
         ...oldExercises,
         generateExercise(
@@ -116,9 +113,6 @@ export const useCalendarStore = create<CalendarStore>()((set) => ({
           iconId,
           catalogExerciseId,
           categoryId,
-          {
-          singleEmptySet: !workoutCaloriesEnabled,
-          },
         ),
       ];
       const newDays = replaceExercises(

@@ -1,8 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import dayjs from "dayjs";
-import { useNavigate } from "react-router-dom";
 import { useCalendarStore } from "@/entities/calendarDay";
-import { firstLetterToUpperCase } from "@/shared/lib";
+import { firstLetterToUpperCase, useNavigateBack } from "@/shared/lib";
 import { ProfileDropDownMenu } from "@/features/profileDropDownMenu";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 
@@ -19,7 +18,7 @@ export const Header = ({ date, title, navigateBack }: HeaderProps) => {
   const setObservableDate = useCalendarStore(
     (state) => state.setObservableDate,
   );
-  const navigate = useNavigate();
+  const navigateBackToParent = useNavigateBack();
   const isTodaySelected = selectedDate.isSame(dayjs(), "day");
 
   const handleNavigateToToday = () => {
@@ -32,7 +31,7 @@ export const Header = ({ date, title, navigateBack }: HeaderProps) => {
     <div className="flex items-start justify-between gap-1 text-center font-bold">
       <div className="flex min-w-0 items-center gap-2.5 max-[480px]:gap-2 ">
         {navigateBack && (
-          <Button variant="outline" onClick={() => navigate(-1)}>
+          <Button variant="outline" onClick={() => navigateBackToParent()}>
             <ArrowLeft />
           </Button>
         )}

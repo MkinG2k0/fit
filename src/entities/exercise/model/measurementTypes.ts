@@ -77,7 +77,39 @@ export const formatSecondsAsMmSs = (totalSeconds: number): string => {
 };
 
 /**
- * Parse `m:ss` / `mm:ss` draft into total seconds.
+ * Live draft mask for time input: digits + at most one `:` or space;
+ * seconds part at most 2 digits. Returns null if the keystroke is invalid.
+ */
+export const sanitizeTimeDraft = (raw: string): string | null => {
+  if (raw === "") {
+    return "";
+  }
+
+  if (/[^\d:\s]/.test(raw)) {
+    return null;
+  }
+
+  const match = /^(\d*)([:\s]?)(\d{0,2})$/.exec(raw);
+  if (!match) {
+    return null;
+  }
+
+  const [, minutesPart = "", separator = "", secondsPart = ""] = match;
+
+  // Reject a second separator or digits after a complete mm:ss / mm ss shape
+  // that doesn't match the pattern above (already handled). Also reject
+  // leading separator without minutes when there are no digits at all beyond it
+  // only if separator alone — allow ":" / " " mid-edit after minutes.
+  if (separator && minutesPart.length === 0) {
+    return null;
+  }
+
+  return `${minutesPart}${separator}${secondsPart}`;
+};
+
+/**
+ * Parse `m:ss` / `mm:ss` or `m ss` / `mm ss` draft into total seconds.
+ * Minutes-only digits (no separator) → whole minutes.
  * Empty string → 0. Invalid → null.
  */
 export const parseMmSsToSeconds = (draft: string): number | null => {
@@ -86,16 +118,23 @@ export const parseMmSsToSeconds = (draft: string): number | null => {
     return 0;
   }
 
-  const match = /^(\d+):([0-5]?\d)$/.exec(trimmed);
-  if (!match) {
-    return null;
+  const withSeconds = /^(\d+)[:\s]+([0-5]?\d)$/.exec(trimmed);
+  if (withSeconds) {
+    const minutes = Number(withSeconds[1]);
+    const seconds = Number(withSeconds[2]);
+    if (!Number.isFinite(minutes) || !Number.isFinite(seconds)) {
+      return null;
+    }
+    return minutes * 60 + seconds;
   }
 
-  const minutes = Number(match[1]);
-  const seconds = Number(match[2]);
-  if (!Number.isFinite(minutes) || !Number.isFinite(seconds)) {
-    return null;
+  if (/^\d+$/.test(trimmed)) {
+    const minutes = Number(trimmed);
+    if (!Number.isFinite(minutes)) {
+      return null;
+    }
+    return minutes * 60;
   }
 
-  return minutes * 60 + seconds;
+  return null;
 };
