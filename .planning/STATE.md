@@ -5,10 +5,10 @@ milestone_name: milestone
 current_phase: 1
 current_phase_name: Quick Logging Core & Local Persistence
 status: ready
-stopped_at: Completed 260815-q1b rework preset create/edit into a composition
-last_updated: "2026-08-15T15:53:32.594Z"
+stopped_at: Completed 260815-pwy fix rest timer notifications when Android is locked
+last_updated: "2026-08-15T15:55:15Z"
 last_activity: 2026-08-15
-last_activity_desc: "Completed quick task 260815-q1b: composition-first preset create/edit"
+last_activity_desc: "Completed quick task 260815-pwy: native rest-complete alarm + in-app volume"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -31,7 +31,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-14)
 Phase: 1 of 5 (Quick Logging Core & Local Persistence)
 Plan: 0 of 0 in current phase
 Status: Ready to execute
-Last activity: 2026-08-15 - Completed quick task 260815-q1b: composition-first preset create/edit
+Last activity: 2026-08-15 - Completed quick task 260815-pwy: native rest-complete alarm + in-app volume
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -82,6 +82,7 @@ Recent decisions affecting current work:
 - [260811-ttt] Time set input accepts `m ss` / `mm ss` (and `m:ss`); live draft mask via `sanitizeTimeDraft`.
 - [260811-wja] Workout display names resolve from catalog Map by catalogExerciseId; day name is orphan fallback only.
 - [260815-q1b] Preset create/edit is composition-first (name + numbered list); add via FullExerciseCommand drawer; reorder with motion Reorder; save still unique catalog id string[].
+- [260815-pwy] Rest-complete on locked Android uses LocalNotifications.schedule at endAt (id 710015); in-app volume slider scales Web Audio only.
 
 ### Pending Todos
 
@@ -144,9 +145,10 @@ None yet.
 | 260811-wja | Имена упражнений в тренировке из каталога (Map), без обхода календаря | 2026-08-11 | bb9117a | [260811-wja-resolve-workout-exercise-display-names-f](./quick/260811-wja-resolve-workout-exercise-display-names-f/) |
 | 46 | увеличить версию андроида до 1.3 (4) | 2026-08-13 | b81fc27 | — |
 | 260815-q1b | Создание/редактирование пресета: состав (список + drawer + Reorder) | 2026-08-15 | 1bcece0 | [260815-q1b-rework-preset-create-edit-into-a-composi](./quick/260815-q1b-rework-preset-create-edit-into-a-composi/) |
+| 260815-pwy | Уведомление таймера отдыха на заблокированном Android + громкость | 2026-08-15 | 903a8d9 | [260815-pwy-fix-rest-timer-notifications-when-androi](./quick/260815-pwy-fix-rest-timer-notifications-when-androi/) |
 
 ## Session Continuity
 
-Last session: 2026-08-15T15:53:32.584Z
-Stopped at: Completed 260815-q1b rework preset create/edit into a composition
+Last session: 2026-08-15T15:55:15Z
+Stopped at: Completed 260815-pwy fix rest timer notifications when Android is locked
 Resume file: None
