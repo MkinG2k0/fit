@@ -6,15 +6,14 @@ current_phase: 1
 current_phase_name: Quick Logging Core & Local Persistence
 status: ready
 stopped_at: Completed 260815-q7h sausage-icon stats overlay close on outside click and Back
-last_updated: "2026-08-15T16:05:00Z"
+last_updated: "2026-08-15T16:08:58.571Z"
 last_activity: 2026-08-15
 last_activity_desc: "Completed quick task 260815-q7h: stats modal overlay click + GET param Back close"
 progress:
-  total_phases: 5
+  total_phases: 1
   completed_phases: 0
   total_plans: 3
   completed_plans: 0
-  percent: 0
 ---
 
 # Project State
@@ -147,6 +146,7 @@ None yet.
 | 260815-q1b | Создание/редактирование пресета: состав (список + drawer + Reorder) | 2026-08-15 | 1bcece0 | [260815-q1b-rework-preset-create-edit-into-a-composi](./quick/260815-q1b-rework-preset-create-edit-into-a-composi/) |
 | 260815-pwy | Уведомление таймера отдыха на заблокированном Android + громкость | 2026-08-15 | 903a8d9 | [260815-pwy-fix-rest-timer-notifications-when-androi](./quick/260815-pwy-fix-rest-timer-notifications-when-androi/) |
 | 260815-q7h | Fix sausage-icon overlay: close on outside click; open via GET search param so Back closes the modal without leaving the page | 2026-08-15 | 7571cf0 | [260815-q7h-fix-sausage-icon-overlay-close-on-outsid](./quick/260815-q7h-fix-sausage-icon-overlay-close-on-outsid/) |
+| 50 | fix: open preset create from add-exercise without history.back race | 2026-08-15 | 6d5548f | — |
 
 ## Session Continuity
 
