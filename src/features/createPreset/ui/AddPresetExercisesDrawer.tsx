@@ -1,7 +1,10 @@
-import { useSearchParams } from "react-router-dom";
 import { useExerciseSelection } from "@/features/addExercise/lib/useExerciseSelection";
 import { useDrawerViewportStyle } from "@/features/addExercise/lib/useDrawerViewportStyle";
 import { FullExerciseCommand } from "@/features/fullExerciseList";
+import {
+  ADD_EXERCISE_PARAM,
+  useOverlaySearchParam,
+} from "@/shared/lib/navigation";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
   Drawer,
@@ -13,9 +16,6 @@ import {
   DrawerTrigger,
 } from "@/shared/ui/shadCNComponents/ui/drawer";
 
-const DRAWER_QUERY_PARAM = "add-exercise";
-const DRAWER_QUERY_VALUE = "1";
-
 const noopPresetSelectHandler = () => {};
 
 interface AddPresetExercisesDrawerProps {
@@ -25,9 +25,11 @@ interface AddPresetExercisesDrawerProps {
 export const AddPresetExercisesDrawer = ({
   onAdd,
 }: AddPresetExercisesDrawerProps) => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const isDrawerOpen =
-    searchParams.get(DRAWER_QUERY_PARAM) === DRAWER_QUERY_VALUE;
+  const {
+    isOpen: isDrawerOpen,
+    close: closeDrawer,
+    onOpenChange: handleDrawerOpenChange,
+  } = useOverlaySearchParam(ADD_EXERCISE_PARAM, "1");
   const drawerViewportStyle = useDrawerViewportStyle(isDrawerOpen);
 
   const {
@@ -36,28 +38,10 @@ export const AddPresetExercisesDrawer = ({
     reset,
   } = useExerciseSelection();
 
-  const handleDrawerOpenChange = (open: boolean) => {
-    if (open) {
-      if (isDrawerOpen) {
-        return;
-      }
-      const nextSearchParams = new URLSearchParams(searchParams);
-      nextSearchParams.set(DRAWER_QUERY_PARAM, DRAWER_QUERY_VALUE);
-      setSearchParams(nextSearchParams);
-      return;
-    }
-    if (!isDrawerOpen) {
-      return;
-    }
-    const nextSearchParams = new URLSearchParams(searchParams);
-    nextSearchParams.delete(DRAWER_QUERY_PARAM);
-    setSearchParams(nextSearchParams, { replace: true });
-  };
-
   const handleSubmit = () => {
     onAdd(selectedExerciseCheckboxes);
     reset();
-    handleDrawerOpenChange(false);
+    closeDrawer();
   };
 
   return (
@@ -112,10 +96,7 @@ export const AddPresetExercisesDrawer = ({
           >
             Добавить
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => handleDrawerOpenChange(false)}
-          >
+          <Button variant="outline" onClick={closeDrawer}>
             Отмена
           </Button>
         </DrawerFooter>

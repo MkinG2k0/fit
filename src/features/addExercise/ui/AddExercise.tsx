@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
   Drawer,
@@ -14,22 +14,25 @@ import { CreateCategory } from "@/features/createCategory";
 import { useCalendarStore } from "@/entities/calendarDay";
 import { useExerciseStore } from "@/entities/exercise";
 import { FullExerciseCommand } from "@/features/fullExerciseList";
+import {
+  ADD_EXERCISE_PARAM,
+  useOverlaySearchParam,
+} from "@/shared/lib/navigation";
 import { useExerciseSelection } from "../lib/useExerciseSelection";
 import { submitExercises } from "../lib/submitExercises";
 import { CreateButtons } from "./CreateButtons";
 import { mapCurrentWorkoutToPresetExercises } from "@/features/createPreset/lib/mapCurrentWorkoutToPresetExercises";
 import { useDrawerViewportStyle } from "../lib/useDrawerViewportStyle";
 
-const DRAWER_QUERY_PARAM = "add-exercise";
-const DRAWER_QUERY_VALUE = "1";
-
 export const AddExercise = () => {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const {
+    isOpen: isDrawerOpen,
+    close: closeDrawer,
+    onOpenChange: handleDrawerOpenChange,
+  } = useOverlaySearchParam(ADD_EXERCISE_PARAM, "1");
   const [openAddPopover, setOpenAddPopover] = useState(false);
   const [openCategoryModal, setOpenCategoryModal] = useState(false);
-  const isDrawerOpen =
-    searchParams.get(DRAWER_QUERY_PARAM) === DRAWER_QUERY_VALUE;
   const drawerViewportStyle = useDrawerViewportStyle(isDrawerOpen);
 
   const addExercise = useCalendarStore((state) => state.addExercise);
@@ -60,48 +63,28 @@ export const AddExercise = () => {
       addExercise,
     );
     reset();
-    const nextSearchParams = new URLSearchParams(searchParams);
-    nextSearchParams.delete(DRAWER_QUERY_PARAM);
-    setSearchParams(nextSearchParams, { replace: true });
-  };
-
-  const handleDrawerOpenChange = (open: boolean) => {
-    if (open) {
-      if (isDrawerOpen) {
-        return;
-      }
-      const nextSearchParams = new URLSearchParams(searchParams);
-      nextSearchParams.set(DRAWER_QUERY_PARAM, DRAWER_QUERY_VALUE);
-      setSearchParams(nextSearchParams);
-      return;
-    }
-    if (!isDrawerOpen) {
-      return;
-    }
-    const nextSearchParams = new URLSearchParams(searchParams);
-    nextSearchParams.delete(DRAWER_QUERY_PARAM);
-    setSearchParams(nextSearchParams, { replace: true });
+    closeDrawer();
   };
 
   const handleOpenPresetModal = () => {
-    handleDrawerOpenChange(false);
+    closeDrawer();
     navigate("/presets/create");
   };
 
   const handleOpenPresetFromCurrentWorkoutModal = () => {
-    handleDrawerOpenChange(false);
+    closeDrawer();
     navigate("/presets/create", {
       state: { initialExercises: currentWorkoutPresetExercises },
     });
   };
 
   const handleOpenBulkCreatePage = () => {
-    handleDrawerOpenChange(false);
+    closeDrawer();
     navigate("/exercises/bulk-create");
   };
 
   const handleOpenCreateExercisePage = () => {
-    handleDrawerOpenChange(false);
+    closeDrawer();
     navigate("/exercises/create");
   };
 
@@ -176,10 +159,7 @@ export const AddExercise = () => {
             >
               Добавить
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => handleDrawerOpenChange(false)}
-            >
+            <Button variant="outline" onClick={closeDrawer}>
               Отмена
             </Button>
           </DrawerFooter>
