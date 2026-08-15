@@ -3,11 +3,11 @@ import { App } from "@capacitor/app";
 import { Capacitor } from "@capacitor/core";
 import type { PluginListenerHandle } from "@capacitor/core";
 import { useLocation, useNavigate } from "react-router-dom";
-import { resolveBackPath } from "@/shared/lib";
+import { hasOverlaySearchParam, resolveBackPath } from "@/shared/lib";
 
 export const AndroidBackNavigation = () => {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
 
   useEffect(() => {
     if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== "android") {
@@ -19,6 +19,11 @@ export const AndroidBackNavigation = () => {
 
     const registerListener = async () => {
       backButtonListener = await App.addListener("backButton", () => {
+        const searchParams = new URLSearchParams(search);
+        if (hasOverlaySearchParam(searchParams)) {
+          navigate(-1);
+          return;
+        }
         const backPath = resolveBackPath(pathname);
         if (backPath) {
           navigate(backPath);
@@ -39,7 +44,7 @@ export const AndroidBackNavigation = () => {
       isActive = false;
       void backButtonListener?.remove();
     };
-  }, [navigate, pathname]);
+  }, [navigate, pathname, search]);
 
   return null;
 };
