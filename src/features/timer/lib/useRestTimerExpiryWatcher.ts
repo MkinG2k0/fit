@@ -1,6 +1,11 @@
 import { useEffect } from "react";
+import { useUserStore } from "@/entities/user";
 import { useRestTimerStore } from "../slice/restTimerStore";
 import { completeRestTimer } from "./completeRestTimer";
+import {
+  cancelRestTimerNotification,
+  syncRestTimerNativeAlarm,
+} from "./restTimerLocalNotification";
 
 /**
  * Fires rest-complete notification when `endAt` elapses,
@@ -8,10 +13,17 @@ import { completeRestTimer } from "./completeRestTimer";
  */
 export const useRestTimerExpiryWatcher = () => {
   const endAt = useRestTimerStore((s) => s.endAt);
+  const notificationsEnabled = useUserStore(
+    (s) => s.timerCompleteNotificationsEnabled ?? true,
+  );
 
   useEffect(() => {
+    void syncRestTimerNativeAlarm(endAt);
+
     if (endAt == null) {
-      return;
+      return () => {
+        void cancelRestTimerNotification();
+      };
     }
 
     const remainingMs = endAt - Date.now();
@@ -21,10 +33,15 @@ export const useRestTimerExpiryWatcher = () => {
 
     if (remainingMs <= 0) {
       fire();
-      return;
+      return () => {
+        void cancelRestTimerNotification();
+      };
     }
 
     const timeoutId = window.setTimeout(fire, remainingMs);
-    return () => window.clearTimeout(timeoutId);
-  }, [endAt]);
+    return () => {
+      window.clearTimeout(timeoutId);
+      void cancelRestTimerNotification();
+    };
+  }, [endAt, notificationsEnabled]);
 };
