@@ -17,6 +17,7 @@ export const useOverlaySearchParam = (paramKey: string, value: string) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const didPushRef = useRef(false);
+  const isClosingRef = useRef(false);
   const isOpen = searchParams.get(paramKey) === value;
 
   const open = useCallback(() => {
@@ -26,13 +27,15 @@ export const useOverlaySearchParam = (paramKey: string, value: string) => {
     const next = new URLSearchParams(searchParams);
     next.set(paramKey, value);
     didPushRef.current = true;
+    isClosingRef.current = false;
     setSearchParams(next);
   }, [paramKey, searchParams, setSearchParams, value]);
 
   const close = useCallback(() => {
-    if (searchParams.get(paramKey) !== value) {
+    if (isClosingRef.current || searchParams.get(paramKey) !== value) {
       return;
     }
+    isClosingRef.current = true;
     if (didPushRef.current) {
       didPushRef.current = false;
       navigate(-1);
@@ -57,6 +60,7 @@ export const useOverlaySearchParam = (paramKey: string, value: string) => {
   useEffect(() => {
     if (!isOpen) {
       didPushRef.current = false;
+      isClosingRef.current = false;
     }
   }, [isOpen]);
 
