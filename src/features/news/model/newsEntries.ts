@@ -1,10 +1,45 @@
 import type { NewsEntry } from "./types";
 
 /**
- * Curated user-facing changelog from `git log --grep="^feat"` (apr–jul 2026).
+ * Curated user-facing changelog from `git log --grep="^feat"` (apr–aug 2026).
  * Related feat commits are merged into one entry; dates are real commit dates.
  */
 export const newsEntries: NewsEntry[] = [
+  {
+    id: "rest-timer-lock-screen",
+    date: "2026-08-15",
+    title: "Таймер отдыха на заблокированном экране",
+    summary:
+      "На Android звук и уведомление о конце отдыха срабатывают при заблокированном телефоне. Громкость сигнала можно настроить.",
+  },
+  {
+    id: "preset-composition",
+    date: "2026-08-15",
+    title: "Состав пресета",
+    summary:
+      "Создание и редактирование пресета — страница со списком упражнений: добавить из каталога, поменять порядок перетаскиванием и сохранить.",
+  },
+  {
+    id: "optional-menu",
+    date: "2026-08-11",
+    title: "Опциональные пункты меню",
+    summary:
+      "В настройках можно включить Таймер, Параметры тела, Таблицу нагрузок и Активность — по умолчанию они скрыты.",
+  },
+  {
+    id: "measurement-types",
+    date: "2026-08-08",
+    title: "Типы замера",
+    summary:
+      "У упражнения — свободный вес, стек (кг или lbs) или время. Карточка подхода подстраивается под тип; время вводится как мм:сс.",
+  },
+  {
+    id: "share-stats",
+    date: "2026-07-21",
+    title: "Поделиться статистикой",
+    summary:
+      "С аналитики можно отправить карточку прогресса — упражнение, тренировку или период — картинкой 9:16.",
+  },
   {
     id: "exercise-card-reorder",
     date: "2026-07-21",
