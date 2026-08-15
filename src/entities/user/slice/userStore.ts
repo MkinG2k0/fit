@@ -33,6 +33,13 @@ const clampRestBetweenSetsSec = (sec: number): number => {
   );
 };
 
+export const clampTimerNotificationVolume = (value: number): number => {
+  if (!Number.isFinite(value)) {
+    return 1;
+  }
+  return Math.min(1, Math.max(0, value));
+};
+
 interface UserState {
   user: IUser;
   accessToken: string;
@@ -62,6 +69,8 @@ interface UserState {
   restBetweenSetsSec: number;
   /** Звук, вибрация и системное уведомление при завершении таймера отдыха. */
   timerCompleteNotificationsEnabled: boolean;
+  /** Громкость in-app Web Audio при завершении таймера (0–1). */
+  timerNotificationVolume: number;
   /** Экспериментальное ИИ-заполнение подходов. По умолчанию выкл. */
   aiFillEnabled: boolean;
   /** Пункт «Таймер» в меню профиля. По умолчанию выкл. */
@@ -92,6 +101,7 @@ interface ActionsState {
   setRestBetweenSetsEnabled: (enabled: boolean) => void;
   setRestBetweenSetsSec: (sec: number) => void;
   setTimerCompleteNotificationsEnabled: (enabled: boolean) => void;
+  setTimerNotificationVolume: (volume: number) => void;
   setAiFillEnabled: (enabled: boolean) => void;
   setTimerMenuEnabled: (enabled: boolean) => void;
   setBodyMetricsMenuEnabled: (enabled: boolean) => void;
@@ -122,6 +132,7 @@ export const useUserStore = create<UserState & ActionsState>()(
       restBetweenSetsEnabled: true,
       restBetweenSetsSec: DEFAULT_REST_BETWEEN_SETS_SEC,
       timerCompleteNotificationsEnabled: true,
+      timerNotificationVolume: 1,
       aiFillEnabled: false,
       timerMenuEnabled: false,
       bodyMetricsMenuEnabled: false,
@@ -218,6 +229,11 @@ export const useUserStore = create<UserState & ActionsState>()(
       setTimerCompleteNotificationsEnabled: (enabled) =>
         set(() => ({
           timerCompleteNotificationsEnabled: enabled,
+        })),
+
+      setTimerNotificationVolume: (volume) =>
+        set(() => ({
+          timerNotificationVolume: clampTimerNotificationVolume(volume),
         })),
 
       setAiFillEnabled: (enabled) =>
@@ -328,6 +344,11 @@ export const useUserStore = create<UserState & ActionsState>()(
             typeof p.timerCompleteNotificationsEnabled === "boolean"
               ? p.timerCompleteNotificationsEnabled
               : current.timerCompleteNotificationsEnabled,
+          timerNotificationVolume:
+            typeof p.timerNotificationVolume === "number" &&
+            Number.isFinite(p.timerNotificationVolume)
+              ? clampTimerNotificationVolume(p.timerNotificationVolume)
+              : current.timerNotificationVolume,
           aiFillEnabled:
             typeof p.aiFillEnabled === "boolean"
               ? p.aiFillEnabled

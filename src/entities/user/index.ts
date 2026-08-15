@@ -8,6 +8,7 @@ export {
 } from "./model/ringGoals";
 export {
   useUserStore,
+  clampTimerNotificationVolume,
   MIN_DEFAULT_SET_DURATION_SEC,
   MAX_DEFAULT_SET_DURATION_SEC,
   DEFAULT_SET_DURATION_FALLBACK_SEC,

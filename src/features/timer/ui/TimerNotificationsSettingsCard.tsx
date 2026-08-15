@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { type ChangeEvent, useCallback, useEffect, useState } from "react";
 import { App } from "@capacitor/app";
 import { Capacitor } from "@capacitor/core";
 import type { PluginListenerHandle } from "@capacitor/core";
@@ -88,6 +88,10 @@ export const TimerNotificationsSettingsCard = ({
   const setEnabled = useUserStore(
     (s) => s.setTimerCompleteNotificationsEnabled,
   );
+  const volume = useUserStore((s) => s.timerNotificationVolume ?? 1);
+  const setTimerNotificationVolume = useUserStore(
+    (s) => s.setTimerNotificationVolume,
+  );
   const [webPermission, setWebPermission] = useState<WebPermissionState>(() => {
     if (typeof window === "undefined" || !("Notification" in window)) {
       return "unsupported";
@@ -167,6 +171,13 @@ export const TimerNotificationsSettingsCard = ({
       }
     },
     [isNative, refreshNativeStatuses, setEnabled],
+  );
+
+  const handleVolumeChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setTimerNotificationVolume(Number(event.target.value) / 100);
+    },
+    [setTimerNotificationVolume],
   );
 
   const handleRequestPermission = useCallback(async () => {
@@ -263,6 +274,31 @@ export const TimerNotificationsSettingsCard = ({
                 Разрешить точные будильники
               </button>
             ) : null}
+          </div>
+        ) : null}
+        {enabled ? (
+          <div className="flex items-start gap-3 rounded-md border border-border p-3">
+            <div className="grid min-w-0 flex-1 gap-2">
+              <Label
+                htmlFor="timer-notification-volume"
+                className="text-sm font-medium leading-none"
+              >
+                Громкость уведомления: {Math.round(volume * 100)}%
+              </Label>
+              <input
+                id="timer-notification-volume"
+                type="range"
+                min={0}
+                max={100}
+                step={1}
+                value={Math.round(volume * 100)}
+                onChange={handleVolumeChange}
+                className="w-full accent-primary"
+              />
+              <p className="text-xs text-muted-foreground">
+                На заблокированном экране громкость системных уведомлений
+              </p>
+            </div>
           </div>
         ) : null}
       </CardContent>

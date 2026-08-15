@@ -20,6 +20,8 @@ export const vibrateDevice = () => {
 
 export const playNotificationSound = () => {
   try {
+    const volume = useUserStore.getState().timerNotificationVolume ?? 1;
+    const peak = Math.max(0.0001, 0.35 * volume);
     const audioContext = new window.AudioContext();
     const playBeep = (startAt: number, frequency: number, duration: number) => {
       const oscillator = audioContext.createOscillator();
@@ -30,7 +32,7 @@ export const playNotificationSound = () => {
 
       oscillator.frequency.value = frequency;
       gainNode.gain.setValueAtTime(0.0001, startAt);
-      gainNode.gain.exponentialRampToValueAtTime(0.35, startAt + 0.02);
+      gainNode.gain.exponentialRampToValueAtTime(peak, startAt + 0.02);
       gainNode.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
 
       oscillator.start(startAt);

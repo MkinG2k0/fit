@@ -1,8 +1,9 @@
 import { useExerciseStore } from "@/entities/exercise";
 import { useThemeStore } from "@/entities/theme";
-import { useUserStore } from "@/entities/user";
 import {
   DEFAULT_RING_GOALS,
+  clampTimerNotificationVolume,
+  useUserStore,
   type IUser,
   type IUserPersonalData,
   type RingGoalsSettings,
@@ -98,6 +99,7 @@ const isUserProfileExport = (
   restBetweenSetsEnabled?: boolean;
   restBetweenSetsSec?: number;
   timerCompleteNotificationsEnabled?: boolean;
+  timerNotificationVolume?: number;
   aiFillEnabled?: boolean;
   timerMenuEnabled?: boolean;
   bodyMetricsMenuEnabled?: boolean;
@@ -183,6 +185,14 @@ const isUserProfileExport = (
   if (
     "timerCompleteNotificationsEnabled" in value &&
     typeof value.timerCompleteNotificationsEnabled !== "boolean"
+  ) {
+    return false;
+  }
+  if (
+    "timerNotificationVolume" in value &&
+    value.timerNotificationVolume !== undefined &&
+    (typeof value.timerNotificationVolume !== "number" ||
+      !Number.isFinite(value.timerNotificationVolume))
   ) {
     return false;
   }
@@ -273,6 +283,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         restBetweenSetsEnabled?: boolean;
         restBetweenSetsSec?: number;
         timerCompleteNotificationsEnabled?: boolean;
+        timerNotificationVolume?: number;
         aiFillEnabled?: boolean;
         timerMenuEnabled?: boolean;
         bodyMetricsMenuEnabled?: boolean;
@@ -303,6 +314,9 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         ),
         timerCompleteNotificationsEnabled:
           state.timerCompleteNotificationsEnabled ?? true,
+        timerNotificationVolume: clampTimerNotificationVolume(
+          state.timerNotificationVolume ?? 1,
+        ),
         aiFillEnabled: state.aiFillEnabled ?? false,
         timerMenuEnabled: state.timerMenuEnabled ?? false,
         bodyMetricsMenuEnabled: state.bodyMetricsMenuEnabled ?? false,
@@ -336,6 +350,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
             restBetweenSetsEnabled?: boolean;
             restBetweenSetsSec?: number;
             timerCompleteNotificationsEnabled?: boolean;
+            timerNotificationVolume?: number;
             aiFillEnabled?: boolean;
             timerMenuEnabled?: boolean;
             bodyMetricsMenuEnabled?: boolean;
@@ -388,6 +403,11 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
                 payload.timerCompleteNotificationsEnabled ??
                 prevState.timerCompleteNotificationsEnabled ??
                 true,
+              timerNotificationVolume: clampTimerNotificationVolume(
+                payload.timerNotificationVolume ??
+                  prevState.timerNotificationVolume ??
+                  1,
+              ),
               aiFillEnabled:
                 payload.aiFillEnabled ?? prevState.aiFillEnabled ?? false,
               timerMenuEnabled:
@@ -442,6 +462,9 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
             ),
             timerCompleteNotificationsEnabled:
               payload.timerCompleteNotificationsEnabled ?? true,
+            timerNotificationVolume: clampTimerNotificationVolume(
+              payload.timerNotificationVolume ?? 1,
+            ),
             aiFillEnabled: payload.aiFillEnabled ?? false,
             timerMenuEnabled: payload.timerMenuEnabled ?? false,
             bodyMetricsMenuEnabled: payload.bodyMetricsMenuEnabled ?? false,
