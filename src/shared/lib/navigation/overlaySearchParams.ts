@@ -1,11 +1,18 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import {
+  type NavigateOptions,
+  type To,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 
 export const ADD_EXERCISE_PARAM = "add-exercise";
+export const ADD_PRESET_EXERCISE_PARAM = "add-preset-exercise";
 export const EXERCISE_STATS_PARAM = "exercise-stats";
 
 export const OVERLAY_SEARCH_PARAM_KEYS = [
   ADD_EXERCISE_PARAM,
+  ADD_PRESET_EXERCISE_PARAM,
   EXERCISE_STATS_PARAM,
 ] as const;
 
@@ -46,6 +53,15 @@ export const useOverlaySearchParam = (paramKey: string, value: string) => {
     setSearchParams(next, { replace: true });
   }, [navigate, paramKey, searchParams, setSearchParams, value]);
 
+  const closeAndNavigate = useCallback(
+    (to: To, options?: NavigateOptions) => {
+      isClosingRef.current = true;
+      didPushRef.current = false;
+      navigate(to, { ...options, replace: true });
+    },
+    [navigate],
+  );
+
   const onOpenChange = useCallback(
     (nextOpen: boolean) => {
       if (nextOpen) {
@@ -64,5 +80,5 @@ export const useOverlaySearchParam = (paramKey: string, value: string) => {
     }
   }, [isOpen]);
 
-  return { isOpen, open, close, onOpenChange };
+  return { isOpen, open, close, closeAndNavigate, onOpenChange };
 };

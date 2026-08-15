@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
 import {
   Drawer,
@@ -25,10 +24,10 @@ import { mapCurrentWorkoutToPresetExercises } from "@/features/createPreset/lib/
 import { useDrawerViewportStyle } from "../lib/useDrawerViewportStyle";
 
 export const AddExercise = () => {
-  const navigate = useNavigate();
   const {
     isOpen: isDrawerOpen,
     close: closeDrawer,
+    closeAndNavigate,
     onOpenChange: handleDrawerOpenChange,
   } = useOverlaySearchParam(ADD_EXERCISE_PARAM, "1");
   const [openAddPopover, setOpenAddPopover] = useState(false);
@@ -67,25 +66,21 @@ export const AddExercise = () => {
   };
 
   const handleOpenPresetModal = () => {
-    closeDrawer();
-    navigate("/presets/create");
+    closeAndNavigate("/presets/create");
   };
 
   const handleOpenPresetFromCurrentWorkoutModal = () => {
-    closeDrawer();
-    navigate("/presets/create", {
+    closeAndNavigate("/presets/create", {
       state: { initialExercises: currentWorkoutPresetExercises },
     });
   };
 
   const handleOpenBulkCreatePage = () => {
-    closeDrawer();
-    navigate("/exercises/bulk-create");
+    closeAndNavigate("/exercises/bulk-create");
   };
 
   const handleOpenCreateExercisePage = () => {
-    closeDrawer();
-    navigate("/exercises/create");
+    closeAndNavigate("/exercises/create");
   };
 
   return (

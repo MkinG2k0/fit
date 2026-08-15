@@ -2,7 +2,7 @@ import { useExerciseSelection } from "@/features/addExercise/lib/useExerciseSele
 import { useDrawerViewportStyle } from "@/features/addExercise/lib/useDrawerViewportStyle";
 import { FullExerciseCommand } from "@/features/fullExerciseList";
 import {
-  ADD_EXERCISE_PARAM,
+  ADD_PRESET_EXERCISE_PARAM,
   useOverlaySearchParam,
 } from "@/shared/lib/navigation";
 import { Button } from "@/shared/ui/shadCNComponents/ui/button";
@@ -29,7 +29,7 @@ export const AddPresetExercisesDrawer = ({
     isOpen: isDrawerOpen,
     close: closeDrawer,
     onOpenChange: handleDrawerOpenChange,
-  } = useOverlaySearchParam(ADD_EXERCISE_PARAM, "1");
+  } = useOverlaySearchParam(ADD_PRESET_EXERCISE_PARAM, "1");
   const drawerViewportStyle = useDrawerViewportStyle(isDrawerOpen);
 
   const {
