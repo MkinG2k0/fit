@@ -1,6 +1,11 @@
 import { Capacitor } from "@capacitor/core";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { useUserStore } from "@/entities/user";
+import { useRestTimerStore } from "../slice/restTimerStore";
+import {
+  acknowledgeRestTimerOsDelivery,
+  completeRestTimer,
+} from "./completeRestTimer";
 
 export const REST_TIMER_NOTIFICATION_ID = 710015;
 export const REST_TIMER_CHANNEL_ID = "rest-timer-complete";
@@ -95,4 +100,45 @@ export const syncRestTimerNativeAlarm = async (
     return;
   }
   await scheduleRestTimerNotification(endAt);
+};
+
+export const reconcileRestTimerOnAppActive = async (): Promise<void> => {
+  if (!isNativeTimerPlatform()) {
+    return;
+  }
+
+  try {
+    const delivered = await LocalNotifications.getDeliveredNotifications();
+    const ours = delivered.notifications.filter(
+      (notification) => notification.id === REST_TIMER_NOTIFICATION_ID,
+    );
+    if (ours.length > 0) {
+      try {
+        await LocalNotifications.removeDeliveredNotifications({
+          notifications: ours,
+        });
+      } catch (error) {
+        console.error(
+          "Не удалось снять доставленное уведомление таймера отдыха:",
+          error,
+        );
+      }
+      acknowledgeRestTimerOsDelivery(useRestTimerStore.getState().endAt);
+      return;
+    }
+  } catch (error) {
+    console.error(
+      "Не удалось прочитать доставленные уведомления таймера отдыха:",
+      error,
+    );
+  }
+
+  const endAt = useRestTimerStore.getState().endAt;
+  if (typeof endAt === "number" && Number.isFinite(endAt) && endAt <= Date.now()) {
+    completeRestTimer(endAt);
+    return;
+  }
+  if (typeof endAt === "number" && Number.isFinite(endAt) && endAt > Date.now()) {
+    void syncRestTimerNativeAlarm(endAt);
+  }
 };

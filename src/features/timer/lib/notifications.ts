@@ -1,3 +1,5 @@
+import { Capacitor } from "@capacitor/core";
+import { LocalNotifications } from "@capacitor/local-notifications";
 import { useUserStore } from "@/entities/user";
 
 const VIBRATE_PATTERN = [200, 100, 200, 100, 400];
@@ -110,6 +112,12 @@ export const sendPushNotification = async () => {
 /** Call on Start (user gesture) so permission prompt is allowed. */
 export const ensureNotificationPermission = () => {
   if (!areTimerNotificationsEnabled()) {
+    return;
+  }
+  if (Capacitor.isNativePlatform()) {
+    void LocalNotifications.requestPermissions().catch((error) => {
+      console.error("Не удалось запросить разрешение на уведомления:", error);
+    });
     return;
   }
   if (!("Notification" in window)) {

@@ -1,9 +1,13 @@
 import { useEffect } from "react";
+import { App } from "@capacitor/app";
+import type { PluginListenerHandle } from "@capacitor/core";
 import { useUserStore } from "@/entities/user";
 import { useRestTimerStore } from "../slice/restTimerStore";
 import { completeRestTimer } from "./completeRestTimer";
 import {
   cancelRestTimerNotification,
+  isNativeTimerPlatform,
+  reconcileRestTimerOnAppActive,
   syncRestTimerNativeAlarm,
 } from "./restTimerLocalNotification";
 
@@ -44,4 +48,34 @@ export const useRestTimerExpiryWatcher = () => {
       void cancelRestTimerNotification();
     };
   }, [endAt, notificationsEnabled]);
+
+  useEffect(() => {
+    if (!isNativeTimerPlatform()) {
+      return;
+    }
+
+    let isMounted = true;
+    let appStateListener: PluginListenerHandle | null = null;
+
+    const registerListener = async () => {
+      appStateListener = await App.addListener(
+        "appStateChange",
+        ({ isActive }) => {
+          if (isActive) {
+            void reconcileRestTimerOnAppActive();
+          }
+        },
+      );
+      if (!isMounted) {
+        void appStateListener.remove();
+      }
+    };
+
+    void registerListener();
+
+    return () => {
+      isMounted = false;
+      void appStateListener?.remove();
+    };
+  }, []);
 };

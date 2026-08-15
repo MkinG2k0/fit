@@ -1,4 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
+import { App } from "@capacitor/app";
+import { Capacitor } from "@capacitor/core";
+import type { PluginListenerHandle } from "@capacitor/core";
+import { LocalNotifications } from "@capacitor/local-notifications";
 import { Bell } from "lucide-react";
 import { useUserStore } from "@/entities/user";
 import { cn } from "@/shared/lib/classMerge";
@@ -12,10 +16,12 @@ import {
 } from "@/shared/ui/shadCNComponents/ui/card";
 import { Label } from "@/shared/ui/shadCNComponents/ui/label";
 import { ensureNotificationPermission } from "../lib/notifications";
+import { isNativeTimerPlatform } from "../lib/restTimerLocalNotification";
 
-type PermissionState = NotificationPermission | "unsupported";
+type WebPermissionState = NotificationPermission | "unsupported";
+type PluginPermissionState = "prompt" | "prompt-with-rationale" | "granted" | "denied";
 
-const permissionLabel = (permission: PermissionState): string => {
+const webPermissionLabel = (permission: WebPermissionState): string => {
   switch (permission) {
     case "granted":
       return "разрешены браузером";
@@ -30,6 +36,43 @@ const permissionLabel = (permission: PermissionState): string => {
   }
 };
 
+const pluginPermissionLabel = (permission: PluginPermissionState | null): string => {
+  switch (permission) {
+    case "granted":
+      return "разрешены системой";
+    case "denied":
+      return "запрещены — включите в настройках приложения";
+    case "prompt":
+    case "prompt-with-rationale":
+      return "ещё не запрошены";
+    default:
+      return "неизвестно";
+  }
+};
+
+const readPluginDisplay = async (): Promise<PluginPermissionState | null> => {
+  try {
+    const status = await LocalNotifications.checkPermissions();
+    return status.display;
+  } catch (error) {
+    console.error("Не удалось проверить разрешение на уведомления:", error);
+    return null;
+  }
+};
+
+const readExactAlarm = async (): Promise<PluginPermissionState | null> => {
+  if (Capacitor.getPlatform() !== "android") {
+    return null;
+  }
+  try {
+    const status = await LocalNotifications.checkExactNotificationSetting();
+    return status.exact_alarm;
+  } catch (error) {
+    console.error("Не удалось проверить разрешение точных будильников:", error);
+    return null;
+  }
+};
+
 interface TimerNotificationsSettingsCardProps {
   className?: string;
 }
@@ -37,25 +80,76 @@ interface TimerNotificationsSettingsCardProps {
 export const TimerNotificationsSettingsCard = ({
   className,
 }: TimerNotificationsSettingsCardProps) => {
+  const isNative = isNativeTimerPlatform();
+  const isAndroid = Capacitor.getPlatform() === "android";
   const enabled = useUserStore(
     (s) => s.timerCompleteNotificationsEnabled ?? true,
   );
   const setEnabled = useUserStore(
     (s) => s.setTimerCompleteNotificationsEnabled,
   );
-  const [permission, setPermission] = useState<PermissionState>(() => {
+  const [webPermission, setWebPermission] = useState<WebPermissionState>(() => {
     if (typeof window === "undefined" || !("Notification" in window)) {
       return "unsupported";
     }
     return Notification.permission;
   });
+  const [pluginDisplay, setPluginDisplay] =
+    useState<PluginPermissionState | null>(null);
+  const [exactAlarm, setExactAlarm] = useState<PluginPermissionState | null>(
+    null,
+  );
+
+  const refreshNativeStatuses = useCallback(async () => {
+    if (!isNative) {
+      return;
+    }
+    setPluginDisplay(await readPluginDisplay());
+    if (isAndroid) {
+      setExactAlarm(await readExactAlarm());
+    }
+  }, [isAndroid, isNative]);
 
   useEffect(() => {
+    if (isNative) {
+      void refreshNativeStatuses();
+      return;
+    }
     if (!("Notification" in window)) {
       return;
     }
-    setPermission(Notification.permission);
-  }, [enabled]);
+    setWebPermission(Notification.permission);
+  }, [enabled, isNative, refreshNativeStatuses]);
+
+  useEffect(() => {
+    if (!isNative || !enabled) {
+      return;
+    }
+
+    let isMounted = true;
+    let appStateListener: PluginListenerHandle | null = null;
+
+    const registerListener = async () => {
+      appStateListener = await App.addListener(
+        "appStateChange",
+        ({ isActive }) => {
+          if (isActive) {
+            void refreshNativeStatuses();
+          }
+        },
+      );
+      if (!isMounted) {
+        void appStateListener.remove();
+      }
+    };
+
+    void registerListener();
+
+    return () => {
+      isMounted = false;
+      void appStateListener?.remove();
+    };
+  }, [enabled, isNative, refreshNativeStatuses]);
 
   const handleCheckedChange = useCallback(
     (value: boolean | "indeterminate") => {
@@ -63,21 +157,51 @@ export const TimerNotificationsSettingsCard = ({
       setEnabled(next);
       if (next) {
         ensureNotificationPermission();
+        if (isNative) {
+          void refreshNativeStatuses();
+          return;
+        }
         if ("Notification" in window) {
-          setPermission(Notification.permission);
+          setWebPermission(Notification.permission);
         }
       }
     },
-    [setEnabled],
+    [isNative, refreshNativeStatuses, setEnabled],
   );
 
   const handleRequestPermission = useCallback(async () => {
+    if (isNative) {
+      try {
+        await LocalNotifications.requestPermissions();
+        await refreshNativeStatuses();
+      } catch (error) {
+        console.error("Не удалось запросить разрешение на уведомления:", error);
+      }
+      return;
+    }
     if (!("Notification" in window)) {
       return;
     }
     const result = await Notification.requestPermission();
-    setPermission(result);
-  }, []);
+    setWebPermission(result);
+  }, [isNative, refreshNativeStatuses]);
+
+  const handleRequestExactAlarm = useCallback(async () => {
+    if (!isAndroid) {
+      return;
+    }
+    try {
+      await LocalNotifications.changeExactNotificationSetting();
+      await refreshNativeStatuses();
+    } catch (error) {
+      console.error("Не удалось открыть настройки точных будильников:", error);
+    }
+  }, [isAndroid, refreshNativeStatuses]);
+
+  const showWebRequest = !isNative && webPermission === "default";
+  const showNativeRequest = isNative && pluginDisplay !== "granted";
+  const showExactAlarmRequest =
+    isNative && isAndroid && exactAlarm !== "granted";
 
   return (
     <Card className={cn("gap-3 py-4", className)}>
@@ -117,15 +241,26 @@ export const TimerNotificationsSettingsCard = ({
         {enabled ? (
           <div className="flex flex-col gap-2 rounded-md border border-border p-3">
             <p className="text-xs text-muted-foreground">
-              Разрешение браузера: {permissionLabel(permission)}
+              {isNative
+                ? `Разрешение уведомлений: ${pluginPermissionLabel(pluginDisplay)}`
+                : `Разрешение браузера: ${webPermissionLabel(webPermission)}`}
             </p>
-            {permission === "default" ? (
+            {showWebRequest || showNativeRequest ? (
               <button
                 type="button"
                 onClick={() => void handleRequestPermission()}
                 className="self-start text-sm font-medium text-primary underline-offset-4 hover:underline"
               >
                 Разрешить уведомления
+              </button>
+            ) : null}
+            {showExactAlarmRequest ? (
+              <button
+                type="button"
+                onClick={() => void handleRequestExactAlarm()}
+                className="self-start text-sm font-medium text-primary underline-offset-4 hover:underline"
+              >
+                Разрешить точные будильники
               </button>
             ) : null}
           </div>
