@@ -1,4 +1,4 @@
-import { Trash2 } from "lucide-react";
+import { ChartColumnBig, Trash2 } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
 import {
@@ -22,8 +22,6 @@ import {
   FREE_WEIGHT_MEASUREMENT_TYPE,
   findCatalogExerciseById,
   isTimeMeasurementType,
-  resolveWorkoutExerciseDisplayName,
-  useCatalogNameById,
   useExerciseStore,
   type Exercise,
   type ExerciseSet,
@@ -35,7 +33,6 @@ import {
   ensureNotificationPermission,
   useRestTimerStore,
 } from "@/features/timer";
-import { StatisticCard } from "@/widgets/statisticCard";
 // AI features disabled
 // import {
 //   AiGatewayError,
@@ -57,6 +54,7 @@ import { ExerciseSetRow } from "./ExerciseSetRow";
 interface ExerciseBodyProps {
   exercise: Exercise;
   onDeleteRequested: () => void;
+  onOpenStats: () => void;
 }
 
 const startRestBetweenSetsIfEnabled = () => {
@@ -74,14 +72,13 @@ const startRestBetweenSetsIfEnabled = () => {
 export const ExerciseBody = ({
   exercise,
   onDeleteRequested,
+  onOpenStats,
 }: ExerciseBodyProps) => {
   const lastSession = useLastExerciseSession(
     exercise.name,
     exercise.catalogExerciseId,
   );
   const catalogExercises = useExerciseStore((store) => store.exercises);
-  const nameById = useCatalogNameById();
-  const displayName = resolveWorkoutExerciseDisplayName(exercise, nameById);
   const catalogEntry = findCatalogExerciseById(
     catalogExercises,
     exercise.catalogExerciseId ?? "",
@@ -438,10 +435,15 @@ export const ExerciseBody = ({
         })}
       </AnimatePresence>
       <div className="flex flex-wrap gap-3 items-center justify-between">
-        <StatisticCard
-          exerciseName={displayName}
-          catalogExerciseId={exercise.catalogExerciseId}
-        />
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          aria-label="Статистика"
+          onClick={onOpenStats}
+        >
+          <ChartColumnBig />
+        </Button>
         {/* AI features disabled
         {aiFillEnabled ? (
           <Button

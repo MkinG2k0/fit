@@ -108,7 +108,25 @@ export const StatisticCard = ({
               </Button>
             </DialogTrigger>
           )}
-          <DialogContent className="sm:max-w-lg h-[80dvh]">
+          <DialogContent
+            className="sm:max-w-lg h-[80dvh]"
+            onPointerDownOutside={(event) => {
+              if (
+                event.target instanceof HTMLElement &&
+                event.target.dataset.slot === "dialog-overlay"
+              ) {
+                handleDialogOpenChange(false);
+              }
+            }}
+            onInteractOutside={(event) => {
+              if (
+                event.target instanceof HTMLElement &&
+                event.target.dataset.slot === "dialog-overlay"
+              ) {
+                handleDialogOpenChange(false);
+              }
+            }}
+          >
             <div className="space-y-3 mt-6 overflow-y-auto">
               <div className="grid grid-cols-2 gap-2 rounded-md border bg-muted p-1">
                 <Button

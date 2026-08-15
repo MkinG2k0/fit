@@ -26,6 +26,10 @@ import {
 } from "@/entities/exercise";
 import { cn, formatTonnageParts } from "@shared/lib";
 import { calcSetVolumeKg } from "@/shared/lib/calcSetVolumeKg";
+import {
+  EXERCISE_STATS_PARAM,
+  useOverlaySearchParam,
+} from "@/shared/lib/navigation";
 import { appStorage } from "@/shared/lib/storageAdapter";
 import * as motion from "motion/react-client";
 import { ExerciseBody } from "./ExerciseBody";
@@ -61,8 +65,11 @@ export const ExerciseCard = ({
   const [modalVisibility, setModalVisibility] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isStatisticOpen, setIsStatisticOpen] = useState(false);
   const isCardDraggingRef = useRef(false);
+  const statsOverlay = useOverlaySearchParam(
+    EXERCISE_STATS_PARAM,
+    exercise.id,
+  );
 
   const setExerciseName = useCalendarStore((store) => store.setExerciseName);
   const deleteExercise = useCalendarStore((store) => store.deleteExercise);
@@ -97,7 +104,7 @@ export const ExerciseCard = ({
     const isSwipeLeft = info.offset.x < -SWIPE_DISTANCE_THRESHOLD;
 
     if (isSwipeRight) {
-      setIsStatisticOpen(true);
+      statsOverlay.open();
 
       return;
     }
@@ -301,6 +308,7 @@ export const ExerciseCard = ({
                 <ExerciseBody
                   exercise={exercise}
                   onDeleteRequested={handleDeleteRequest}
+                  onOpenStats={statsOverlay.open}
                 />
               </motion.div>
             )}
@@ -321,8 +329,8 @@ export const ExerciseCard = ({
       <StatisticCard
         exerciseName={displayName}
         catalogExerciseId={exercise.catalogExerciseId}
-        open={isStatisticOpen}
-        onOpenChange={setIsStatisticOpen}
+        open={statsOverlay.isOpen}
+        onOpenChange={statsOverlay.onOpenChange}
         showTrigger={false}
       />
     </div>
