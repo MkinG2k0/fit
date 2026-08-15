@@ -6,7 +6,7 @@ current_phase: 1
 current_phase_name: Quick Logging Core & Local Persistence
 status: ready
 stopped_at: Completed 260815-q7h sausage-icon stats overlay close on outside click and Back
-last_updated: "2026-08-15T16:18:17.261Z"
+last_updated: "2026-08-15T16:32:42.185Z"
 last_activity: 2026-08-15
 last_activity_desc: "Completed quick task 260815-q7h: stats modal overlay click + GET param Back close"
 progress:
@@ -149,6 +149,7 @@ None yet.
 | 50 | fix: open preset create from add-exercise without history.back race | 2026-08-15 | 6d5548f | — |
 | 51 | Android rest-timer lock-screen notification channel sound | 2026-08-15 | a47813b | — |
 | 52 | увелич версию приложения | 2026-08-15 | 2a7404e | — |
+| 53 | обновить новости changelog (август 2026) | 2026-08-15 | 38b79ab | — |
 
 ## Session Continuity
 
