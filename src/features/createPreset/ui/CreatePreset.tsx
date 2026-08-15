@@ -1,4 +1,3 @@
-import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   type TrainingPreset,
@@ -14,14 +13,13 @@ import {
 } from "../lib/presetExerciseIds";
 import type { NewPreset } from "../model/types";
 import { AddPresetExercisesDrawer } from "./AddPresetExercisesDrawer";
+import { PresetCompositionList } from "./PresetCompositionList";
 
 interface CreatePresetProps {
   onCancel?: () => void;
   editingPreset?: TrainingPreset;
   initialExercises?: string[];
 }
-
-const MISSING_CATALOG_NAME = "Упражнение недоступно";
 
 const createInitialPreset = (
   editingPreset?: TrainingPreset,
@@ -113,6 +111,13 @@ export const CreatePreset = ({
     }));
   };
 
+  const handleReorderExercises = (ids: string[]) => {
+    setNewPreset((prevState) => ({
+      ...prevState,
+      exercises: ids,
+    }));
+  };
+
   return (
     <div className="relative flex h-full min-h-0 flex-1 flex-col">
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-x-hidden overflow-y-auto pb-[calc(11rem+env(safe-area-inset-bottom,0px))]">
@@ -142,30 +147,12 @@ export const CreatePreset = ({
             Нажмите «Добавить упражнение», чтобы собрать состав пресета.
           </p>
         ) : (
-          <ol className="flex flex-col gap-2">
-            {newPreset.exercises.map((id, index) => (
-              <li
-                key={id}
-                className="flex items-center gap-2 bg-card text-card-foreground border border-border rounded-xl px-3 py-2"
-              >
-                <span className="text-sm text-muted-foreground tabular-nums">
-                  {index + 1}
-                </span>
-                <span className="min-w-0 flex-1 truncate text-sm">
-                  {nameById.get(id) ?? MISSING_CATALOG_NAME}
-                </span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  aria-label="Удалить упражнение"
-                  onClick={() => handleRemoveExercise(id)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </li>
-            ))}
-          </ol>
+          <PresetCompositionList
+            exercises={newPreset.exercises}
+            nameById={nameById}
+            onReorder={handleReorderExercises}
+            onRemove={handleRemoveExercise}
+          />
         )}
       </div>
 
