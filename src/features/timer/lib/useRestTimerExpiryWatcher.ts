@@ -5,7 +5,6 @@ import { useUserStore } from "@/entities/user";
 import { useRestTimerStore } from "../slice/restTimerStore";
 import { completeRestTimer } from "./completeRestTimer";
 import {
-  cancelRestTimerNotification,
   isNativeTimerPlatform,
   reconcileRestTimerOnAppActive,
   syncRestTimerNativeAlarm,
@@ -25,9 +24,7 @@ export const useRestTimerExpiryWatcher = () => {
     void syncRestTimerNativeAlarm(endAt);
 
     if (endAt == null) {
-      return () => {
-        void cancelRestTimerNotification();
-      };
+      return;
     }
 
     const remainingMs = endAt - Date.now();
@@ -37,15 +34,12 @@ export const useRestTimerExpiryWatcher = () => {
 
     if (remainingMs <= 0) {
       fire();
-      return () => {
-        void cancelRestTimerNotification();
-      };
+      return;
     }
 
     const timeoutId = window.setTimeout(fire, remainingMs);
     return () => {
       window.clearTimeout(timeoutId);
-      void cancelRestTimerNotification();
     };
   }, [endAt, notificationsEnabled]);
 
