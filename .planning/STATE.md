@@ -5,10 +5,10 @@ milestone_name: milestone
 current_phase: 1
 current_phase_name: Quick Logging Core & Local Persistence
 status: ready
-stopped_at: Completed 260811-wja resolve workout exercise display names from catalog Map
-last_updated: "2026-08-11T20:35:00.000Z"
-last_activity: 2026-08-11
-last_activity_desc: "Completed quick task 260811-wja: catalog Map display names for workout UI"
+stopped_at: Completed 260815-q1b rework preset create/edit into a composition
+last_updated: "2026-08-15T15:53:32.594Z"
+last_activity: 2026-08-15
+last_activity_desc: "Completed quick task 260815-q1b: composition-first preset create/edit"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -31,7 +31,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-14)
 Phase: 1 of 5 (Quick Logging Core & Local Persistence)
 Plan: 0 of 0 in current phase
 Status: Ready to execute
-Last activity: 2026-08-11 - Completed quick task 260811-wja: catalog Map display names for workout UI
+Last activity: 2026-08-15 - Completed quick task 260815-q1b: composition-first preset create/edit
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -81,6 +81,7 @@ Recent decisions affecting current work:
 - [260811-tqu] Optional menu sections (Timer, Body metrics, Load table, Activity) gated by userStore flags default OFF; routes remain.
 - [260811-ttt] Time set input accepts `m ss` / `mm ss` (and `m:ss`); live draft mask via `sanitizeTimeDraft`.
 - [260811-wja] Workout display names resolve from catalog Map by catalogExerciseId; day name is orphan fallback only.
+- [260815-q1b] Preset create/edit is composition-first (name + numbered list); add via FullExerciseCommand drawer; reorder with motion Reorder; save still unique catalog id string[].
 
 ### Pending Todos
 
@@ -141,9 +142,11 @@ None yet.
 | 260811-tqu | Опциональные пункты меню (Таймер / Параметры тела / Таблица нагрузок / Активность), default OFF | 2026-08-11 | 7494703 | [260811-tqu-optional-menu-features](./quick/260811-tqu-optional-menu-features/) |
 | 260811-ty5 | Тип замера: chip-кнопки с flex-wrap вместо RadioGroup | 2026-08-11 | 1406218 | [260811-ty5-flex-wrap](./quick/260811-ty5-flex-wrap/) |
 | 260811-wja | Имена упражнений в тренировке из каталога (Map), без обхода календаря | 2026-08-11 | bb9117a | [260811-wja-resolve-workout-exercise-display-names-f](./quick/260811-wja-resolve-workout-exercise-display-names-f/) |
+| 46 | увеличить версию андроида до 1.3 (4) | 2026-08-13 | b81fc27 | — |
+| 260815-q1b | Создание/редактирование пресета: состав (список + drawer + Reorder) | 2026-08-15 | 1bcece0 | [260815-q1b-rework-preset-create-edit-into-a-composi](./quick/260815-q1b-rework-preset-create-edit-into-a-composi/) |
 
 ## Session Continuity
 
-Last session: 2026-08-11T20:35:00.000Z
-Stopped at: Completed 260811-wja — resolve workout exercise display names from catalog Map
+Last session: 2026-08-15T15:53:32.584Z
+Stopped at: Completed 260815-q1b rework preset create/edit into a composition
 Resume file: None
