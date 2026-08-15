@@ -8,7 +8,10 @@ import {
 } from "./completeRestTimer";
 
 export const REST_TIMER_NOTIFICATION_ID = 710015;
-export const REST_TIMER_CHANNEL_ID = "rest-timer-complete";
+/** v2: Android cannot change sound on an already-created channel. */
+export const REST_TIMER_CHANNEL_ID = "rest-timer-complete-v2";
+const LEGACY_REST_TIMER_CHANNEL_ID = "rest-timer-complete";
+const REST_TIMER_CHANNEL_SOUND = "rest_timer_complete.wav";
 
 let restTimerChannelEnsured = false;
 
@@ -26,10 +29,15 @@ export const ensureRestTimerCompleteChannel = async (): Promise<void> => {
     return;
   }
   try {
+    await LocalNotifications.deleteChannel({
+      id: LEGACY_REST_TIMER_CHANNEL_ID,
+    }).catch(() => undefined);
     await LocalNotifications.createChannel({
       id: REST_TIMER_CHANNEL_ID,
       name: "Таймер отдыха",
+      sound: REST_TIMER_CHANNEL_SOUND,
       importance: 4,
+      visibility: 1,
       vibration: true,
     });
     restTimerChannelEnsured = true;
@@ -76,6 +84,7 @@ export const scheduleRestTimerNotification = async (
           body: "Время для следующего подхода",
           extra: { endAt },
           channelId: REST_TIMER_CHANNEL_ID,
+          sound: REST_TIMER_CHANNEL_SOUND,
           autoCancel: true,
           schedule: { at: new Date(endAt) },
         },
