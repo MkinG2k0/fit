@@ -69,7 +69,8 @@ export const WorkoutCalorieProfileDialog = ({
           <DialogTitle>Данные для расчёта ккал</DialogTitle>
           <DialogDescription>
             Вес, возраст и пол нужны для оценки калорий на подход (по пульсу или
-            MET).
+            MET). Данные сохраняются локально в приложении. Заполнить можно
+            сейчас или позже в настройках.
           </DialogDescription>
         </DialogHeader>
         <WorkoutCalorieProfileFields

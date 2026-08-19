@@ -8,6 +8,7 @@ import {
 } from "@/shared/ui/shadCNComponents/ui/card";
 import { cn } from "@/shared/lib/classMerge";
 import { useSettingsTransfer } from "../lib/useSettingsTransfer";
+import { ExportSettingsDialog } from "./ExportSettingsDialog";
 import { ImportSettingsDialog } from "./ImportSettingsDialog";
 
 interface SettingsTransferCardProps {
@@ -21,7 +22,12 @@ export const SettingsTransferCard = ({
     fileInputRef,
     status,
     clearStatus,
-    handleExport,
+    exportOpen,
+    exportIncludeMedia,
+    setExportIncludeMedia,
+    handleOpenExport,
+    handleCloseExport,
+    handleConfirmExport,
     handlePickImportFile,
     handleImportFileSelected,
     importOpen,
@@ -54,7 +60,7 @@ export const SettingsTransferCard = ({
           onChange={handleImportFileSelected}
         />
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-          <Button type="button" variant="secondary" onClick={handleExport}>
+          <Button type="button" variant="secondary" onClick={handleOpenExport}>
             Экспорт настроек
           </Button>
           <Button
@@ -67,8 +73,8 @@ export const SettingsTransferCard = ({
         </div>
         <p className="text-xs text-muted-foreground">
           В файл попадают тема, каталог упражнений и пресеты, журнал тренировок
-          по дням и профиль без токена входа. Импорт перезаписывает только
-          отмеченные разделы.
+          по дням и профиль без токена входа. При экспорте можно включить фото
+          упражнений. Импорт перезаписывает только отмеченные разделы.
         </p>
         {status ? (
           <div
@@ -93,6 +99,17 @@ export const SettingsTransferCard = ({
           </div>
         ) : null}
       </CardContent>
+      <ExportSettingsDialog
+        open={exportOpen}
+        includeMedia={exportIncludeMedia}
+        onOpenChange={(open) => {
+          if (!open) {
+            handleCloseExport();
+          }
+        }}
+        onIncludeMediaChange={setExportIncludeMedia}
+        onConfirm={handleConfirmExport}
+      />
       <ImportSettingsDialog
         open={importOpen}
         bundle={pendingBundle}

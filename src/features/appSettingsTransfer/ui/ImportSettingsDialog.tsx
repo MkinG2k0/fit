@@ -67,13 +67,15 @@ export const ImportSettingsDialog = ({
             будут проигнорированы текущей версией приложения.
           </p>
         ) : null}
-        <DialogFooter className="gap-2 sm:gap-0">
-          <Button type="button" variant="outline" onClick={handleCancel}>
-            Отмена
-          </Button>
-          <Button type="button" onClick={onConfirm}>
-            Применить
-          </Button>
+        <DialogFooter>
+          <div className="flex w-full flex-col-reverse gap-3 sm:w-auto sm:flex-row sm:justify-end">
+            <Button type="button" variant="outline" onClick={handleCancel}>
+              Отмена
+            </Button>
+            <Button type="button" onClick={onConfirm}>
+              Применить
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

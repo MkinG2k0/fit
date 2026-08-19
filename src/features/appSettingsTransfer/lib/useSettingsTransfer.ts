@@ -1,5 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
+import { useNavigate } from "react-router-dom";
+import { isWorkoutCalorieProfileComplete, useUserStore } from "@/entities/user";
 import {
   APP_SETTINGS_EXPORT_FILENAME_PREFIX,
   buildAppSettingsBundle,
@@ -10,7 +12,10 @@ import {
 import { applySelectedBundleSections } from "./applySelectedBundleSections";
 import { collectExportableSections } from "./collectExportableSections";
 import { downloadTextFile } from "./downloadTextFile";
-import { getAppSettingsSectionDefinitions } from "./appSettingsSectionRegistry";
+import {
+  APP_SETTINGS_SECTION_IDS,
+  getAppSettingsSectionDefinitions,
+} from "./appSettingsSectionRegistry";
 import type { AppSettingsSectionDefinition } from "../model/types";
 
 const JSON_FILE_MIME = "application/json;charset=utf-8";
@@ -21,10 +26,13 @@ export type StatusMessage =
   | { variant: "error"; text: string };
 
 export const useSettingsTransfer = () => {
+  const navigate = useNavigate();
   const definitions = useMemo(() => getAppSettingsSectionDefinitions(), []);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [status, setStatus] = useState<StatusMessage | null>(null);
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exportIncludeMedia, setExportIncludeMedia] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [pendingBundle, setPendingBundle] = useState<AppSettingsBundle | null>(
     null,
@@ -37,11 +45,22 @@ export const useSettingsTransfer = () => {
     setStatus(null);
   }, []);
 
-  const handleExport = useCallback(() => {
+  const handleOpenExport = useCallback(() => {
+    clearStatus();
+    setExportIncludeMedia(false);
+    setExportOpen(true);
+  }, [clearStatus]);
+
+  const handleCloseExport = useCallback(() => {
+    setExportOpen(false);
+  }, []);
+
+  const handleConfirmExport = useCallback(() => {
     void (async () => {
-      console.log("aa");
-      const sections = await collectExportableSections(definitions);
-      console.log(sections);
+      const sections = await collectExportableSections(definitions, {
+        includeExerciseMedia: exportIncludeMedia,
+      });
+      setExportOpen(false);
       if (Object.keys(sections).length === 0) {
         setStatus({
           variant: "error",
@@ -60,10 +79,12 @@ export const useSettingsTransfer = () => {
       );
       setStatus({
         variant: "success",
-        text: "Файл с настройками сформирован и отправлен в загрузки браузера.",
+        text: exportIncludeMedia
+          ? "Файл с настройками и фото упражнений отправлен в загрузки браузера."
+          : "Файл с настройками (без фото упражнений) отправлен в загрузки браузера.",
       });
     })();
-  }, [definitions]);
+  }, [definitions, exportIncludeMedia]);
 
   const handlePickImportFile = useCallback(() => {
     clearStatus();
@@ -170,8 +191,20 @@ export const useSettingsTransfer = () => {
         variant: "success",
         text: `Импортировано разделов: ${result.appliedIds.length}.`,
       });
+      if (
+        result.appliedIds.includes(APP_SETTINGS_SECTION_IDS.userProfile)
+      ) {
+        const { workoutCaloriesEnabled, personalData } =
+          useUserStore.getState();
+        if (
+          workoutCaloriesEnabled &&
+          !isWorkoutCalorieProfileComplete(personalData)
+        ) {
+          navigate("/settings?calorieProfile=1");
+        }
+      }
     })();
-  }, [definitions, handleCloseImport, pendingBundle, selectedSectionIds]);
+  }, [definitions, handleCloseImport, navigate, pendingBundle, selectedSectionIds]);
 
   const unknownSectionKeys = useMemo(() => {
     if (!pendingBundle) {
@@ -198,7 +231,12 @@ export const useSettingsTransfer = () => {
     fileInputRef,
     status,
     clearStatus,
-    handleExport,
+    exportOpen,
+    exportIncludeMedia,
+    setExportIncludeMedia,
+    handleOpenExport,
+    handleCloseExport,
+    handleConfirmExport,
     handlePickImportFile,
     handleImportFileSelected,
     importOpen,

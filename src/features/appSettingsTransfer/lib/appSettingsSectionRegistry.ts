@@ -3,10 +3,12 @@ import { useThemeStore } from "@/entities/theme";
 import {
   DEFAULT_RING_GOALS,
   clampTimerNotificationVolume,
+  isWorkoutCalorieProfileComplete,
   useUserStore,
   type IUser,
   type IUserPersonalData,
   type RingGoalsSettings,
+  type WorkoutCalorieProfileOnboardingStatus,
 } from "@/entities/user";
 import { isPlainObject, isZustandPersistBlob } from "@/shared/lib/appSettingsTransfer";
 import { appStorage } from "@/shared/lib/storageAdapter";
@@ -38,6 +40,20 @@ export const APP_SETTINGS_SECTION_IDS = {
   workoutJournal: "workoutJournal",
   userProfile: "userProfile",
 } as const;
+
+const resolveWorkoutCalorieProfileOnboardingAfterImport = (
+  personalData: IUserPersonalData,
+  workoutCaloriesEnabled: boolean,
+  previousStatus?: WorkoutCalorieProfileOnboardingStatus,
+): WorkoutCalorieProfileOnboardingStatus => {
+  if (isWorkoutCalorieProfileComplete(personalData)) {
+    return "done";
+  }
+  if (workoutCaloriesEnabled) {
+    return "skipped";
+  }
+  return previousStatus ?? "pending";
+};
 
 const readJsonFromStorage = async (key: string): Promise<unknown | null> => {
   const raw = await appStorage.getString(key);
@@ -235,7 +251,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
     importSnapshot: async (payload: unknown) => {
       assertPersistBlob(payload, "Тема");
       await writeJsonToStorage(THEME_STORAGE_KEY, payload);
-      void useThemeStore.persist.rehydrate();
+      await useThemeStore.persist.rehydrate();
     },
   },
   {
@@ -246,7 +262,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
     importSnapshot: async (payload: unknown) => {
       assertPersistBlob(payload, "Упражнения");
       await writeJsonToStorage(EXERCISE_STORAGE_KEY, payload);
-      void useExerciseStore.persist.rehydrate();
+      await useExerciseStore.persist.rehydrate();
     },
   },
   {
@@ -340,6 +356,7 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
         }
         if (isZustandPersistBlob(existing) && isPlainObject(existing.state)) {
           const prevState = existing.state as {
+            workoutCalorieProfileOnboarding?: WorkoutCalorieProfileOnboardingStatus;
             defaultSetDurationSec?: number;
             exerciseCardShowLastSessionResult?: boolean;
             lastSessionFillButtonEnabled?: boolean;
@@ -426,6 +443,12 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
                 payload.activityMenuEnabled ??
                 prevState.activityMenuEnabled ??
                 false,
+              workoutCalorieProfileOnboarding:
+                resolveWorkoutCalorieProfileOnboardingAfterImport(
+                  payload.personalData,
+                  payload.workoutCaloriesEnabled ?? false,
+                  prevState.workoutCalorieProfileOnboarding,
+                ),
             },
           };
           await writeJsonToStorage(USER_STORAGE_KEY, next);
@@ -470,11 +493,16 @@ export const getAppSettingsSectionDefinitions = (): AppSettingsSectionDefinition
             bodyMetricsMenuEnabled: payload.bodyMetricsMenuEnabled ?? false,
             loadTableMenuEnabled: payload.loadTableMenuEnabled ?? false,
             activityMenuEnabled: payload.activityMenuEnabled ?? false,
+            workoutCalorieProfileOnboarding:
+              resolveWorkoutCalorieProfileOnboardingAfterImport(
+                payload.personalData,
+                payload.workoutCaloriesEnabled ?? false,
+              ),
             accessToken: "",
           },
         });
       }
-      void useUserStore.persist.rehydrate();
+      await useUserStore.persist.rehydrate();
     },
   },
 ];
