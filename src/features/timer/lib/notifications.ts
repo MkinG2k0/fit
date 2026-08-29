@@ -57,8 +57,8 @@ const showLocalNotification = (title: string, body: string, url: string) => {
 
   const notification = new Notification(title, {
     body,
-    icon: "/logo.svg",
-    badge: "/logo.svg",
+    icon: "/logo.png",
+    badge: "/logo.png",
     tag: "timer-complete",
     requireInteraction: true,
     // Chrome Android supports vibration on Notification options

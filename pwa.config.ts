@@ -32,9 +32,9 @@ export const pwaManifest: Partial<ManifestOptions> = {
       purpose: "any maskable",
     },
     {
-      src: "/logo.svg",
-      type: "image/svg+xml",
-      sizes: "any",
+      src: "/logo.png",
+      type: "image/png",
+      sizes: "256x256",
     },
   ],
   shortcuts: [
